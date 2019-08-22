@@ -32,7 +32,7 @@
             android:id="@+id/offer_showMap"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="SHOW MAP" />
+            android:text="Verify Location" />
 
         <EditText
             android:id="@+id/offer_price"
