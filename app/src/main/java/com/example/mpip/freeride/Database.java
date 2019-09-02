@@ -114,6 +114,7 @@ public class Database extends SQLiteOpenHelper
         onCreate(db);
     }
 
+
     public void addCategories()
     {
         SQLiteDatabase db = this.getWritableDatabase();

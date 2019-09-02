@@ -157,8 +157,32 @@ public class OfferActivity extends Activity
             @Override
             public void onClick(View v) {
 
-                    Intent i = new Intent(getApplicationContext(), MapsActivity.class);
-                    startActivity(i);
+
+                Intent i = new Intent(getApplicationContext(), MapsActivity.class);
+                String location = e1.getText().toString();
+                double latitude=0;
+                double longitude=0;
+
+                try
+                {
+                    List<Address> addresses = geocoder.getFromLocationName(location, 1);
+                    Address address = addresses.get(0);
+                    if(addresses.size() > 0)
+                    {
+                        latitude = addresses.get(0).getLatitude();
+                        longitude = addresses.get(0).getLongitude();
+                    }
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+
+                Bundle b = new Bundle();
+                b.putDouble("longitude", longitude);
+                b.putDouble("latitude", latitude);
+                i.putExtras(b);
+                startActivity(i);
             }
         });
 
