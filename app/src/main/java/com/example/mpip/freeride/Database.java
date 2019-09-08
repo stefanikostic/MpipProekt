@@ -9,6 +9,8 @@ import android.os.strictmode.SqliteObjectLeakedViolation;
 import android.util.Log;
 import android.widget.Toast;
 
+import java.util.ArrayList;
+
 import static android.support.constraint.Constraints.TAG;
 
 public class Database extends SQLiteOpenHelper
@@ -112,6 +114,46 @@ public class Database extends SQLiteOpenHelper
         onCreate(db);
     }
 
+
+    public void addCategories()
+    {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        db.delete(table_categories, null, null);
+
+        ContentValues values = new ContentValues();
+        values.put(category, "Mountain Bike");
+        db.insert(table_categories, null, values);
+
+        values.put(category, "Everyday");
+        db.insert(table_categories, null, values);
+
+        values.put(category, "Sports");
+        db.insert(table_categories, null, values);
+
+    }
+
+    public ArrayList getCategories()
+    {
+        ArrayList<String> list = new ArrayList<>();
+
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        Cursor cursor = db.rawQuery("Select * from " + table_categories, null);
+        cursor.moveToFirst();
+
+        if(cursor != null)
+        {
+            while(cursor.isAfterLast() == false)
+            {
+                list.add(cursor.getString(cursor.getColumnIndex(category)));
+                cursor.moveToNext();
+            }
+        }
+        return list;
+
+    }
+
     public boolean checkLogin(String email, String pass)
     {
         SQLiteDatabase db = this.getReadableDatabase();
@@ -121,6 +163,32 @@ public class Database extends SQLiteOpenHelper
 
         boolean exists = (cursor.getCount() > 0);
         return exists;
+    }
+
+    public int getLoginID(String email, String pass)
+    {
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        Cursor cursor = db.rawQuery("Select * from Login where Email" + "='" + email + "'" +
+                " and Password" + "='" + pass + "'", null);
+
+        String key = cursor.getString(cursor.getColumnIndex(id_l));
+        int id = Integer.parseInt(key);
+
+        return id;
+    }
+
+    public int getCategoryID(String categori)
+    {
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        Cursor cursor = db.rawQuery("Select * from " + table_categories + " where "
+                + category + "='" + categori + "'", null);
+
+        String key = cursor.getString(cursor.getColumnIndex(id_k));
+
+        int id = Integer.parseInt(key);
+        return id;
     }
 
     public boolean checkMail(String email)
@@ -150,4 +218,41 @@ public class Database extends SQLiteOpenHelper
         else
             return true;
     }
+
+    public boolean insertOffer(int idL, double lang, double longi, int cena, int idK)
+    {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put(id_l, idL);
+        values.put(langitude, lang);
+        values.put(longitude, longi);
+        values.put(price, cena);
+        values.put(id_k, idK);
+
+        long result = db.insert(table_categories, null, values);
+
+        if(result == -1)
+            return false;
+        else
+            return true;
+    }
+
+    public boolean insertImage(int idO, String uri)
+    {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put(id_O, idO);
+        values.put(path_to_image, uri);
+
+        long result = db.insert(table_images, null, values);
+
+        if(result == -1)
+            return false;
+        else
+            return true;
+    }
+
+
 }

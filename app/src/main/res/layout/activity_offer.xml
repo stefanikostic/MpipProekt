@@ -6,7 +6,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".OfferActivity"
-    android:background="@color/backgroundActivity">
+    android:background="@color/backgroundActivity"
+    android:orientation="vertical">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -27,6 +28,12 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
+        <Button
+            android:id="@+id/offer_showMap"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Verify Location" />
+
         <EditText
             android:id="@+id/offer_price"
             android:layout_width="wrap_content"
@@ -41,47 +48,49 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/offer_lokacija" />
 
-        <EditText
-            android:id="@+id/offer_model"
-            android:layout_width="wrap_content"
+        <Spinner
+            android:id="@+id/offer_spinner"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginEnd="8dp"
-            android:ems="10"
-            android:hint="Make N Model"
-            android:inputType="textPersonName"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/offer_price" />
+            android:background="@android:drawable/btn_dropdown"
+            android:spinnerMode="dropdown"
+            android:backgroundTint="@color/colorPrimary"/>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal">
 
-            <RadioButton
-                android:id="@+id/offer_start"
-                android:layout_width="wrap_content"
+            <RadioGroup
+                android:id="@+id/radioGroup"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="88dp"
-                android:layout_marginTop="44dp"
-                android:text="Start Date"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/offer_year" />
+                android:orientation="horizontal">
 
-            <RadioButton
-                android:id="@+id/offer_end"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:layout_marginTop="44dp"
-                android:layout_marginEnd="8dp"
-                android:text="End Date"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.178"
-                app:layout_constraintStart_toEndOf="@+id/offer_start"
-                app:layout_constraintTop_toBottomOf="@+id/offer_year" />
+                <RadioButton
+                    android:id="@+id/offer_start"
+                    android:layout_width="105dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginStart="88dp"
+                    android:layout_marginTop="44dp"
+                    android:text="Start Date"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/offer_year" />
+
+                <RadioButton
+                    android:id="@+id/offer_end"
+                    android:layout_width="102dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginTop="44dp"
+                    android:layout_marginEnd="8dp"
+                    android:text="End Date"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0.178"
+                    app:layout_constraintStart_toEndOf="@+id/offer_start"
+                    app:layout_constraintTop_toBottomOf="@+id/offer_year" />
+
+            </RadioGroup>
 
         </LinearLayout>
 
@@ -97,7 +106,7 @@
             android:inputType="textPersonName"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/offer_model" />
+            app:layout_constraintTop_toBottomOf="@+id/offer_spinner" />
 
         <CalendarView
             android:id="@+id/offer_calendar"
@@ -119,16 +128,17 @@
             android:text="Select or Capture Image"
             android:textAppearance="?android:attr/textAppearanceLarge" />
 
-        <ImageView
-            android:id="@+id/offer_iv"
-            android:layout_width="86dp"
-            android:layout_height="62dp"
-            android:layout_gravity="center"
-            android:scaleType="fitXY"
-            android:src="@mipmap/ic_launcher"
-            tools:layout_editor_absoluteX="58dp"
-            tools:layout_editor_absoluteY="661dp"
-            android:layout_marginTop="15dp" />
+
+        <android.support.v4.view.ViewPager
+            android:id="@+id/vp"
+            android:layout_width="150dp"
+            android:layout_height="150dp"
+            android:layout_marginTop="25dp"
+            android:layout_marginBottom="25dp"
+            android:paddingLeft="50dp"
+            android:visibility="visible"
+            tools:visibility="visible"
+            android:layout_marginLeft="125dp" />
 
         <Button
             android:id="@+id/offer_done"
