@@ -13,7 +13,7 @@ public class LoginActivity extends Activity
 {
     Button register;
     Button sign;
-    Button test;
+
 
     EditText e1, e2;
 
@@ -29,7 +29,7 @@ public class LoginActivity extends Activity
 
         register = (Button) findViewById(R.id.login_reg);
         sign = (Button) findViewById(R.id.login_sign);
-        test = (Button) findViewById(R.id.btn_test);
+
 
         e1 = (EditText) findViewById(R.id.login_email);
         e2 = (EditText) findViewById(R.id.login_pass);
@@ -74,13 +74,7 @@ public class LoginActivity extends Activity
             }
         });
 
-        test.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent i = new Intent(getApplicationContext(), testActivity.class);
-                startActivity(i);
-            }
-        });
+
 
     }
 
