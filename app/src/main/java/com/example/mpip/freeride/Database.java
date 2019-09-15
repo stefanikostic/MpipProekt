@@ -9,6 +9,7 @@ import android.os.strictmode.SqliteObjectLeakedViolation;
 import android.util.Log;
 import android.widget.Toast;
 
+import java.net.URI;
 import java.util.ArrayList;
 
 import static android.support.constraint.Constraints.TAG;
@@ -172,9 +173,8 @@ public class Database extends SQLiteOpenHelper
         Cursor cursor = db.rawQuery("Select * from Login where Email" + "='" + email + "'" +
                 " and Password" + "='" + pass + "'", null);
 
-        String key = cursor.getString(cursor.getColumnIndex(id_l));
-        int id = Integer.parseInt(key);
-
+        cursor.moveToFirst();
+        int id = cursor.getInt(cursor.getColumnIndex(id_l));
         return id;
     }
 
@@ -185,6 +185,7 @@ public class Database extends SQLiteOpenHelper
         Cursor cursor = db.rawQuery("Select * from " + table_categories + " where "
                 + category + "='" + categori + "'", null);
 
+        cursor.moveToFirst();
         String key = cursor.getString(cursor.getColumnIndex(id_k));
 
         int id = Integer.parseInt(key);
@@ -230,12 +231,71 @@ public class Database extends SQLiteOpenHelper
         values.put(price, cena);
         values.put(id_k, idK);
 
-        long result = db.insert(table_categories, null, values);
+        long result = db.insert(table_offer, null, values);
 
         if(result == -1)
             return false;
         else
             return true;
+    }
+
+    public boolean updateOffer(int idO, int idL, double lang, double longi, int cena, int idK)
+    {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+
+        values.put(id_l, idL);
+        values.put(langitude, lang);
+        values.put(longitude, longi);
+        values.put(price, cena);
+        values.put(id_k, idK);
+
+        int result = db.update(table_offer, values, id_O + "=" + idO, null);
+
+        return result > 0;
+    }
+
+    public boolean createEmptyOffer()
+    {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        //ContentValues values = new ContentValues();
+
+        long result = db.insert(table_offer, id_O, null);
+
+        if(result == -1)
+            return false;
+        else
+            return true;
+
+    }
+
+    public int getEmptyOfferID()
+    {
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        Cursor cursor = db.rawQuery("Select * from Offer where Price is null", null);
+
+        String key = "";
+
+        if(cursor != null)
+        {
+            if (cursor.moveToFirst())
+                key = cursor.getString(cursor.getColumnIndex(id_O));
+            cursor.close();
+        }
+
+        int id = Integer.parseInt(key);
+        return id;
+    }
+
+    public Cursor getAllOffers()
+    {
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        Cursor cursor = db.rawQuery("Select * from Offer", null);
+        return cursor;
     }
 
     public boolean insertImage(int idO, String uri)
@@ -254,5 +314,21 @@ public class Database extends SQLiteOpenHelper
             return true;
     }
 
+    public boolean createDates(int idO, String from, String to)
+    {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put(date_from, from);
+        values.put(date_to, to);
+        values.put(id_O, idO);
+
+        long result = db.insert(table_dates, null, values);
+
+        if(result == -1)
+            return false;
+        else
+            return true;
+    }
 
 }
