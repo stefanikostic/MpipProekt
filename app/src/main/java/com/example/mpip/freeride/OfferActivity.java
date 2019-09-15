@@ -65,6 +65,8 @@ public class OfferActivity extends Activity
     Database db;
     Geocoder geocoder;
 
+    String email, pass;
+    String start = "", end = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -72,7 +74,24 @@ public class OfferActivity extends Activity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_offer);
 
-        db = new Database(this);
+        db = new Database(this);;
+
+        Intent i = getIntent();
+
+        email = i.getStringExtra("email");
+        pass = i.getStringExtra("password");
+
+        Toast.makeText(getApplicationContext(), email + " " + pass, Toast.LENGTH_SHORT).show();
+
+        boolean create = db.createEmptyOffer();
+        if(create)
+        {
+            //Toast.makeText(getApplicationContext(), "Successful making of empty offer", Toast.LENGTH_SHORT).show();
+        }
+        else
+        {
+            //Toast.makeText(getApplicationContext(), "Error while making of empty offer", Toast.LENGTH_SHORT).show();
+        }
 
         db.addCategories();
 
@@ -101,7 +120,7 @@ public class OfferActivity extends Activity
         dropdown.setAdapter(adapter);
 
         cv.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
-            String start = "", end = "";
+
             @Override
             public void onSelectedDayChange(CalendarView view, int year, int month, int day)
             {
@@ -189,10 +208,9 @@ public class OfferActivity extends Activity
         done.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent i = new Intent();
-                i = getIntent();
-                String email = i.getStringExtra("email");
-                String pass = i.getStringExtra("password");
+
+                Toast.makeText(getApplicationContext(), email + " " + pass, Toast.LENGTH_SHORT).show();
+
                 int id_l = db.getLoginID(email, pass);
 
                 String item = dropdown.getSelectedItem().toString();
@@ -219,8 +237,19 @@ public class OfferActivity extends Activity
                     e.printStackTrace();
                 }
 
-                db.insertOffer(id_l, latitude, longitude, cena, id_k);
 
+                int id = db.getEmptyOfferID();
+
+                boolean update = db.updateOffer(id, id_l, latitude, longitude, cena, id_k);
+                boolean dates = db.createDates(id, start, end);
+
+                if(update && dates)
+                    Toast.makeText(getApplicationContext(), "Offer updated successfully", Toast.LENGTH_SHORT).show();
+                else
+                    Toast.makeText(getApplicationContext(), "Offer NOT updated successfully", Toast.LENGTH_SHORT).show();
+                
+                Intent i = new Intent(getApplicationContext(), RentActivity.class);
+                startActivity(i);
             }
         });
 
@@ -253,6 +282,10 @@ public class OfferActivity extends Activity
     protected void onActivityResult(int requestCode, int resultCode, Intent data)
     {
 
+        db = new Database(this);
+
+        int id = db.getEmptyOfferID();
+
         if(requestCode == 1 && resultCode == RESULT_OK)
         {
             bitmaps = new ArrayList<>();
@@ -264,6 +297,13 @@ public class OfferActivity extends Activity
                 for(int i = 0; i < clipData.getItemCount(); i++)
                 {
                     Uri imageUri = clipData.getItemAt(i).getUri();
+
+                    boolean insert = db.insertImage(id, imageUri.toString());
+
+                    if(insert)
+                        Toast.makeText(getApplicationContext(), "Image(s) inserted successfully", Toast.LENGTH_SHORT).show();
+                    else
+                        Toast.makeText(getApplicationContext(), "Image(s) NOT inserted successfully", Toast.LENGTH_SHORT).show();
 
                     try
                     {
@@ -284,6 +324,13 @@ public class OfferActivity extends Activity
             else
             {
                 Uri imageUri = data.getData();
+
+                boolean insert = db.insertImage(id, imageUri.toString());
+
+                if(insert)
+                    Toast.makeText(getApplicationContext(), "Image(s) inserted successfully", Toast.LENGTH_SHORT).show();
+                else
+                    Toast.makeText(getApplicationContext(), "Image(s) NOT inserted successfully", Toast.LENGTH_SHORT).show();
 
                 try
                 {

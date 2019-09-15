@@ -58,10 +58,13 @@ public class LoginActivity extends Activity
                 if(check)
                 {
                     //go to rent activity
-                    Toast.makeText(getApplicationContext(), "Successful Login", Toast.LENGTH_SHORT).show();
-                    Intent i = new Intent(getApplicationContext(), RentActivity.class);
-                    i.putExtra("email", s1);
-                    i.putExtra("password", s2);
+                    //Toast.makeText(getApplicationContext(), "Successful Login", Toast.LENGTH_SHORT).show();
+
+                    Intent i = new Intent(LoginActivity.this, RentActivity.class);
+                    Bundle extras = new Bundle();
+                    extras.putString("email", s1);
+                    extras.putString("password", s2);
+                    i.putExtras(extras);
                     startActivity(i);
                 }
                 else

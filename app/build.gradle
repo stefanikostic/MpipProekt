@@ -29,4 +29,5 @@ dependencies {
     implementation 'com.android.support:support-v4:27.1.1'
     implementation 'com.google.android.gms:play-services-maps:16.1.0'
     implementation 'com.google.android.gms:play-services-location:16.0.0'
+    implementation 'com.lucasurbas:listitemview:0.9.0'
 }
