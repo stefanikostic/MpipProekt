@@ -356,6 +356,7 @@ public class OfferActivity extends Activity
     }
 
 }
+
 class AdapterPagerImageSlider extends PagerAdapter {
 
     private ArrayList<Bitmap> bitmaps;

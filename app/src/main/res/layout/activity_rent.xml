@@ -9,15 +9,18 @@
     android:background="@color/backgroundActivity"
     android:orientation="vertical" >
 
-    <ListView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/rent_listView" />
 
     <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/rent_offer"
         android:text="Create Offer" />
+
+    <ListView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/rent_listView" />
+
+
 
 </LinearLayout>
