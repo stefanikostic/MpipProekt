@@ -192,6 +192,15 @@ public class Database extends SQLiteOpenHelper
         return id;
     }
 
+    public String getCategoryByID(int id)
+    {
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        Cursor cursor = db.rawQuery("Select * from Categories where idK" + "'=" + id + "'", null);
+
+        return cursor.getString(cursor.getColumnIndex(category));
+    }
+
     public boolean checkMail(String email)
     {
         SQLiteDatabase db = this.getReadableDatabase();
@@ -330,5 +339,21 @@ public class Database extends SQLiteOpenHelper
         else
             return true;
     }
+    public Cursor getDates()
+    {
+        SQLiteDatabase db = this.getReadableDatabase();
 
+        Cursor cursor = db.rawQuery("Select * from Dates", null);
+
+        return cursor;
+    }
+
+    public Cursor getImages()
+    {
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        Cursor cursor = db.rawQuery("Select * from Images", null);
+
+        return cursor;
+    }
 }
