@@ -6,8 +6,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".RentActivity"
-    android:background="@color/backgroundActivity"
     android:orientation="vertical" >
+    android:background="@drawable/bg2" >
 
 
     <Button
