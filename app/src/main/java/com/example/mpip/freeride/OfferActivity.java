@@ -81,17 +81,15 @@ public class OfferActivity extends Activity
         email = i.getStringExtra("email");
         pass = i.getStringExtra("password");
 
-        Toast.makeText(getApplicationContext(), email + " " + pass, Toast.LENGTH_SHORT).show();
-
-        boolean create = db.createEmptyOffer();
+        /*boolean create = db.createEmptyOffer();
         if(create)
         {
             //Toast.makeText(getApplicationContext(), "Successful making of empty offer", Toast.LENGTH_SHORT).show();
-        }
+        }*//*
         else
         {
             //Toast.makeText(getApplicationContext(), "Error while making of empty offer", Toast.LENGTH_SHORT).show();
-        }
+        }*/
 
         db.addCategories();
 
@@ -237,9 +235,9 @@ public class OfferActivity extends Activity
                     e.printStackTrace();
                 }
 
-
-                int id = db.getEmptyOfferID();
-
+/*
+                int id = db.getEmptyOfferID();*/
+/*
                 boolean update = db.updateOffer(id, id_l, latitude, longitude, cena, id_k);
                 boolean dates = db.createDates(id, start, end);
 
@@ -247,8 +245,8 @@ public class OfferActivity extends Activity
                     Toast.makeText(getApplicationContext(), "Offer updated successfully", Toast.LENGTH_SHORT).show();
                 else
                     Toast.makeText(getApplicationContext(), "Offer NOT updated successfully", Toast.LENGTH_SHORT).show();
-                
-                Intent i = new Intent(getApplicationContext(), RentActivity.class);
+                */
+                Intent i = new Intent(getApplicationContext(), MapsActivity.class);
                 startActivity(i);
             }
         });
@@ -284,7 +282,7 @@ public class OfferActivity extends Activity
 
         db = new Database(this);
 
-        int id = db.getEmptyOfferID();
+//        int id = db.getEmptyOfferID();
 
         if(requestCode == 1 && resultCode == RESULT_OK)
         {
@@ -298,13 +296,13 @@ public class OfferActivity extends Activity
                 {
                     Uri imageUri = clipData.getItemAt(i).getUri();
 
-                    boolean insert = db.insertImage(id, imageUri.toString());
+                  /*  boolean insert = db.insertImage(id, imageUri.toString());
 
                     if(insert)
                         Toast.makeText(getApplicationContext(), "Image(s) inserted successfully", Toast.LENGTH_SHORT).show();
                     else
                         Toast.makeText(getApplicationContext(), "Image(s) NOT inserted successfully", Toast.LENGTH_SHORT).show();
-
+*/
                     try
                     {
                         InputStream is = getContentResolver().openInputStream(imageUri);
@@ -325,13 +323,13 @@ public class OfferActivity extends Activity
             {
                 Uri imageUri = data.getData();
 
-                boolean insert = db.insertImage(id, imageUri.toString());
+               /* boolean insert = db.insertImage(id, imageUri.toString());
 
                 if(insert)
                     Toast.makeText(getApplicationContext(), "Image(s) inserted successfully", Toast.LENGTH_SHORT).show();
                 else
                     Toast.makeText(getApplicationContext(), "Image(s) NOT inserted successfully", Toast.LENGTH_SHORT).show();
-
+*/
                 try
                 {
                     InputStream is = getContentResolver().openInputStream(imageUri);

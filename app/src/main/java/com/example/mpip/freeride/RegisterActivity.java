@@ -33,7 +33,7 @@ public class RegisterActivity extends Activity
 
         register = (Button) findViewById(R.id.reg_register);
 
-        register.setOnClickListener(new View.OnClickListener() {
+      /*  register.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 String s2 = e2.getText().toString();
@@ -72,6 +72,6 @@ public class RegisterActivity extends Activity
                     }
                 }
             }
-        });
+        });*/
     }
 }

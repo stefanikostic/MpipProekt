@@ -39,7 +39,7 @@ public class LoginActivity extends Activity
         register.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent i = new Intent(getApplicationContext(), RegisterActivity.class);
+                Intent i = new Intent(getApplicationContext(), RegActivity.class);
                 startActivity(i);
             }
         });
@@ -60,7 +60,7 @@ public class LoginActivity extends Activity
                     //go to rent activity
                     //Toast.makeText(getApplicationContext(), "Successful Login", Toast.LENGTH_SHORT).show();
 
-                    Intent i = new Intent(LoginActivity.this, RentActivity.class);
+                    Intent i = new Intent(LoginActivity.this, OfferActivity.class);
                     Bundle extras = new Bundle();
                     extras.putString("email", s1);
                     extras.putString("password", s2);

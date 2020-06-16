@@ -20,98 +20,112 @@ public class Database extends SQLiteOpenHelper
     public static String db_Name = "database";
 
     //Creating table names
-    private static final String table_login = "Login";
-    private static final String table_offer = "Offer";
-    private static final String table_images = "Images";
-    private static final String table_dates = "Dates";
-    private static final String table_rented = "Rented";
-    private static final String table_categories = "Categories";
+    private static final String table_users = "User";
+    private static final String table_clients = "Client";
+    private static final String table_renters = "Renter";
+    private static final String table_bikes = "Bike";
+    private static final String table_rents = "Rent";
+    private static final String table_locations = "Location";
+    private static final String table_categories = "Category";
 
-    //Creating table_login columns
-    private static final String id_l = "idL";
-    private static final String email = "Email";
-    private static final String pass = "Password";
-    private static final String ime = "Ime";
-    private static final String prezime = "Prezime";
-
-    private static final String create_table_login = "CREATE TABLE "
-            + table_login + "(" + id_l + " INTEGER PRIMARY KEY AUTOINCREMENT, "
-            + email + " TEXT, " + pass + " TEXT, " + ime + " TEXT, "
-            + prezime + " TEXT);";
-
-    //Creating table_offer columns
-    private static final String id_O = "idO";
-    private static final String langitude = "Langitude";
-    private static final String longitude = "Longitude";
-    private static final String price = "Price";
-    private static final String id_k = "idK";
-
-    private static final String create_table_offer = "CREATE TABLE "
-            + table_offer + "(" + id_O + " INTEGER PRIMARY KEY AUTOINCREMENT,"
-            + id_l + " INTEGER, " + langitude + " TEXT, " + longitude + " TEXT, "
-            + price + " INTEGER, " + id_k + " INTEGER);";
-
-    //Creating table_images columns
+    //Creating table_users columns
     private static final String id = "id";
-    private static final String path_to_image = "PathToImage";
+    private static final String email = "Email";
+    private static final String password = "Password";
+    private static final String name = "Name";
+    private static final String surname = "Surname";
+    private static final String telephone = "Telephone";
+    private static final String card_number = "card_number";
 
-    private static final String create_table_images = "CREATE TABLE "
-            + table_images + "(" + id + " INTEGER PRIMARY KEY AUTOINCREMENT, " + id_O + " INTEGER, "
-            + path_to_image + " TEXT);";
+    private static final String create_table_users = "CREATE TABLE "
+            + table_users + "(" + id + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+            + email + " TEXT, " + telephone + " TEXT, " + password + " TEXT, " + name + " TEXT, "
+            + surname + " TEXT, " + card_number + " TEXT);";
 
-    //Crating table_dates columns
-    private static final String id_d = "idD";
-    private static final String date_from = "DateFrom";
-    private static final String date_to = "DateTo";
+    //Creating table_clients columns
+    private static final String client_id = "client_id";
+    private static final String create_table_clients = "CREATE TABLE "
+            + table_clients + "(" + id + " INTEGER PRIMARY KEY AUTOINCREMENT,"
+            + client_id + " INTEGER, FOREIGN KEY ("+ client_id + ") REFERENCES " + table_users + "(" + id + "));";
 
-    private static final String create_table_dates = "CREATE TABLE "
-            + table_dates + "(" + id_d + " INTEGER, "
-            + id_O + " INTEGER, " + date_from + " TEXT, "
-            + date_to + " TEXT);";
-
-    //Creating table_rented columns
-    private static final String id_z = "idZ";
-    private static final String rented_from = "RentedFrom";
-    private static final String rented_to = "RentedTo";
-
-    private static final String create_table_rented = "CREATE TABLE "
-            + table_rented + "(" + id_z + " INTEGER PRIMARY KEY AUTOINCREMENT, "
-            + id_O + " INTEGER, " + rented_from + " TEXT, "
-            + rented_to + " TEXT);";
+    //Creating table_renters columns
+    private static final String renter_id = "renter_id";
+    private static final String store_name = "store_name";
+    private static final String create_table_renters = "CREATE TABLE "
+            + table_renters + "(" + id + " INTEGER PRIMARY KEY AUTOINCREMENT, " + renter_id + " INTEGER, "
+            + store_name + " TEXT, FOREIGN KEY (" + renter_id + ") REFERENCES " + table_users + " (" + id + "));";
 
     //Creating table_categories columns
     private static final String category = "Category";
-
+    private static final String description = "Description";
     private static final String create_table_categories = "CREATE TABLE "
-            + table_categories + "(" + id_k + " INTEGER PRIMARY KEY AUTOINCREMENT, "
-            + category + " TEXT);";
+            + table_categories + "(" + id + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+            + category + " TEXT, " + description + " TEXT);";
+
+    //Crating table_locations columns
+    private static final String longitude = "Longitude";
+    private static final String latitude = "Latitude";
+    private static final String create_table_locations = "CREATE TABLE "
+            + table_locations + "(" + id + " INTEGER, "
+            + longitude + " TEXT, " + latitude + " TEXT, "
+            + renter_id + " INTEGER, FOREIGN KEY (" + renter_id + ") REFERENCES " + table_rents + " (" + id + "));";
+
+    //Crating table_bikes columns
+    private static final String price = "Price";
+    private static final String rented = "Rented";
+    private static final String category_id = "category_id";
+    private static final String location_id = "location_id";
+    private static final String image_url = "image_url";
+
+    private static final String create_table_bikes = "CREATE TABLE "
+            + table_bikes + "(" + id + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+            + renter_id + " INTEGER, " + image_url + " TEXT, " + price + " INTEGER, " + category_id + " INTEGER, " + location_id + " INTEGER, "
+            + rented + " INTEGER, "
+            + " FOREIGN KEY (" + renter_id + ") REFERENCES " + table_renters + " (" + id  + "),"
+            + " FOREIGN KEY (" + category_id + ") REFERENCES " + table_categories + " (" + id + "),"
+            + " FOREIGN KEY (" + location_id + ") REFERENCES " + table_locations + " (" + id + "));";
+
+    //Crating table_rents columns
+    private static final String date_from = "date_from";
+    private static final String date_to = "date_to";
+    private static final String bike_id = "bike_id";
+    private static final String full_price="full_price";
+    private static final String create_table_rents = "CREATE TABLE "
+            + table_rents + "(" + id + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+            + client_id + " INTEGER, " + full_price + " INTEGER, " + bike_id + " INTEGER, "
+            + date_from + " DATE, " + date_to + " DATE, "
+            + "FOREIGN KEY (" + client_id + ") REFERENCES " + table_clients + " (" + id + "),"
+            + "FOREIGN KEY (" + bike_id + ") REFERENCES " + table_bikes + " (" + id + "))";
+
 
     public Database(Context context)
     {
         super(context, db_Name + ".db", null, 1);
-        Log.d("table", create_table_login);
+        Log.d("table", create_table_users);
     }
 
     @Override
     public void onCreate(SQLiteDatabase db)
     {
-        db.execSQL(create_table_login);
-        db.execSQL(create_table_offer);
-        db.execSQL(create_table_images);
-        db.execSQL(create_table_dates);
-        db.execSQL(create_table_rented);
+        db.execSQL(create_table_users);
+        db.execSQL(create_table_locations);
         db.execSQL(create_table_categories);
+        db.execSQL(create_table_clients);
+        db.execSQL(create_table_renters);
+        db.execSQL(create_table_bikes);
+        db.execSQL(create_table_rents);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion)
     {
-        db.execSQL("DROP TABLE IF EXISTS '" + table_login + "'");
-        db.execSQL("DROP TABLE IF EXISTS '" + table_offer + "'");
-        db.execSQL("DROP TABLE IF EXISTS '" + table_images + "'");
-        db.execSQL("DROP TABLE IF EXISTS '" + table_dates + "'");
-        db.execSQL("DROP TABLE IF EXISTS '" + table_rented + "'");
+        db.execSQL("DROP TABLE IF EXISTS '" + table_users + "'");
+        db.execSQL("DROP TABLE IF EXISTS '" + table_clients + "'");
+        db.execSQL("DROP TABLE IF EXISTS '" + table_renters + "'");
+        db.execSQL("DROP TABLE IF EXISTS '" + table_locations + "'");
         db.execSQL("DROP TABLE IF EXISTS '" + table_categories + "'");
+        db.execSQL("DROP TABLE IF EXISTS '" + table_bikes + "'");
+        db.execSQL("DROP TABLE IF EXISTS '" + table_rents + "'");
         onCreate(db);
     }
 
@@ -131,7 +145,6 @@ public class Database extends SQLiteOpenHelper
 
         values.put(category, "Sports");
         db.insert(table_categories, null, values);
-
     }
 
     public ArrayList getCategories()
@@ -152,51 +165,47 @@ public class Database extends SQLiteOpenHelper
             }
         }
         return list;
-
     }
 
     public boolean checkLogin(String email, String pass)
     {
         SQLiteDatabase db = this.getReadableDatabase();
 
-        Cursor cursor = db.rawQuery("Select * from Login where Email" + "='" + email + "'" +
-                " and Password" + "='" + pass + "'", null);
+        Cursor cursor = db.rawQuery("Select * from User where Email='" + email + "'" +
+                " and Password='" + pass + "'", null);
 
-        boolean exists = (cursor.getCount() > 0);
-        return exists;
+        return (cursor.getCount() > 0);
     }
 
     public int getLoginID(String email, String pass)
     {
         SQLiteDatabase db = this.getReadableDatabase();
 
-        Cursor cursor = db.rawQuery("Select * from Login where Email" + "='" + email + "'" +
-                " and Password" + "='" + pass + "'", null);
+        Cursor cursor = db.rawQuery("Select * from User where Email='" + email + "'" +
+                " and Password='" + pass + "'", null);
 
         cursor.moveToFirst();
-        int id = cursor.getInt(cursor.getColumnIndex(id_l));
-        return id;
+        return cursor.getInt(cursor.getColumnIndex(id));
     }
 
-    public int getCategoryID(String categori)
+    public int getCategoryID(String cat)
     {
         SQLiteDatabase db = this.getReadableDatabase();
 
         Cursor cursor = db.rawQuery("Select * from " + table_categories + " where "
-                + category + "='" + categori + "'", null);
+                + category + "='" + cat + "'", null);
 
         cursor.moveToFirst();
-        String key = cursor.getString(cursor.getColumnIndex(id_k));
+        String key = cursor.getString(cursor.getColumnIndex(id));
 
-        int id = Integer.parseInt(key);
-        return id;
+        return Integer.parseInt(key);
     }
 
-    public String getCategoryByID(int id)
+    public String getCategoryByID(int categoryId)
     {
         SQLiteDatabase db = this.getReadableDatabase();
 
-        Cursor cursor = db.rawQuery("Select * from Categories where idK" + "'=" + id + "'", null);
+        Cursor cursor = db.rawQuery("Select * from Categories where id=" + categoryId + "'", null);
 
         return cursor.getString(cursor.getColumnIndex(category));
     }
@@ -205,67 +214,87 @@ public class Database extends SQLiteOpenHelper
     {
         SQLiteDatabase db = this.getReadableDatabase();
 
-        Cursor cursor = db.rawQuery("Select * from Login where Email" + "='" + email + "'", null);
+        Cursor cursor = db.rawQuery("Select * from Login where Email='" + email + "'", null);
 
-        boolean exists = (cursor.getCount() > 0);
-        return exists;
+        return (cursor.getCount() > 0);
     }
 
-    public boolean insertUser(String password, String Email, String name, String surname)
+    public boolean insertUser(String pass, String Email, String n, String s, String tel, String cardNumber)
     {
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
         values.put(email, Email);
-        values.put(pass, password);
-        values.put(ime, name);
-        values.put(prezime, surname);
+        values.put(password, pass);
+        values.put(name, n);
+        values.put(surname, s);
+        values.put(telephone, tel);
+        values.put(card_number, cardNumber);
+        long result = db.insert(table_users, null, values);
 
-        long result = db.insert(table_login, null, values);
-
-        if(result == -1)
-            return false;
-        else
-            return true;
+        return result != -1;
     }
 
-    public boolean insertOffer(int idL, double lang, double longi, int cena, int idK)
+    public boolean insertClient(String pass, String Email, String n, String s, String tel, String cardNumber)
     {
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
-        values.put(id_l, idL);
-        values.put(langitude, lang);
-        values.put(longitude, longi);
-        values.put(price, cena);
-        values.put(id_k, idK);
-
-        long result = db.insert(table_offer, null, values);
-
-        if(result == -1)
-            return false;
-        else
-            return true;
+        if(this.insertUser(pass, Email, n, s, tel, cardNumber)) {
+            long result = db.insert(table_clients, null, values);
+            return result != -1;
+        }
+        return false;
     }
 
-    public boolean updateOffer(int idO, int idL, double lang, double longi, int cena, int idK)
+    public boolean insertRenter(String pass, String Email, String n, String s, String tel, String cardNumber)
+    {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        if(this.insertUser(pass, Email, n, s, tel, cardNumber)) {
+            long result = db.insert(table_renters, null, values);
+            return result != -1;
+        }
+        return false;
+    }
+
+    public boolean insertBike(int isRented, int cena, int renterId, int categoryId, int locationId, String imageUrl)
     {
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
 
-        values.put(id_l, idL);
-        values.put(langitude, lang);
-        values.put(longitude, longi);
+        values.put(renter_id, renterId);
+        values.put(category_id, categoryId);
         values.put(price, cena);
-        values.put(id_k, idK);
+        values.put(image_url, imageUrl);
+        values.put(rented, isRented);
+        values.put(location_id, locationId);
 
-        int result = db.update(table_offer, values, id_O + "=" + idO, null);
+        long result = db.insert(table_bikes, null, values);
+
+        return result != -1;
+    }
+
+    public boolean updateBike(int bike_id, int isRented, int cena, int renterId, int categoryId, int locationId)
+    {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+
+        values.put(renter_id, renterId);
+        values.put(category_id, categoryId);
+        values.put(price, cena);
+        values.put(rented, isRented);
+        values.put(location_id, locationId);
+
+        int result = db.update(table_bikes, values, id + "=" + bike_id, null);
 
         return result > 0;
     }
 
-    public boolean createEmptyOffer()
+    /*public boolean createEmptyOffer()
     {
         SQLiteDatabase db = this.getWritableDatabase();
 
@@ -277,7 +306,6 @@ public class Database extends SQLiteOpenHelper
             return false;
         else
             return true;
-
     }
 
     public int getEmptyOfferID()
@@ -297,63 +325,54 @@ public class Database extends SQLiteOpenHelper
 
         int id = Integer.parseInt(key);
         return id;
-    }
+    }*/
 
-    public Cursor getAllOffers()
+    public Cursor getAllBikes()
     {
         SQLiteDatabase db = this.getReadableDatabase();
 
-        Cursor cursor = db.rawQuery("Select * from Offer", null);
-        return cursor;
+        return db.rawQuery("Select * from Bike", null);
     }
 
-    public boolean insertImage(int idO, String uri)
+    public boolean insertLocation(String longi, String lat, int renterId)
     {
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
-        values.put(id_O, idO);
-        values.put(path_to_image, uri);
+        values.put(longitude, longi);
+        values.put(latitude, lat);
+        values.put(renter_id, renterId);
+        long result = db.insert(table_locations, null, values);
 
-        long result = db.insert(table_images, null, values);
-
-        if(result == -1)
-            return false;
-        else
-            return true;
+        return result != -1;
     }
 
-    public boolean createDates(int idO, String from, String to)
+    public boolean insertRent(String from, String to, int bikeId, int clientId, int fullPrice)
     {
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
         values.put(date_from, from);
         values.put(date_to, to);
-        values.put(id_O, idO);
+        values.put(bike_id, bikeId);
+        values.put(client_id, clientId);
+        values.put(full_price, fullPrice);
 
-        long result = db.insert(table_dates, null, values);
+        long result = db.insert(table_rents, null, values);
 
-        if(result == -1)
-            return false;
-        else
-            return true;
+        return result != -1;
     }
-    public Cursor getDates()
+    public Cursor getRents()
     {
         SQLiteDatabase db = this.getReadableDatabase();
 
-        Cursor cursor = db.rawQuery("Select * from Dates", null);
-
-        return cursor;
+        return db.rawQuery("Select * from Rents", null);
     }
 
-    public Cursor getImages()
+    public Cursor getLocations()
     {
         SQLiteDatabase db = this.getReadableDatabase();
 
-        Cursor cursor = db.rawQuery("Select * from Images", null);
-
-        return cursor;
+        return db.rawQuery("Select * from Locations", null);
     }
 }
