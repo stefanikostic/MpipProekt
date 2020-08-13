@@ -47,30 +47,21 @@ public class RenterRegisterFragment extends Fragment {
                 String s6 = et6.getText().toString();
                 String s7 = et7.getText().toString();
 
-                if(s1.equals("") || s2.equals("") || s3.equals("") || s4.equals("") || s5.equals("") || s6.equals("") || s7.equals(""))
-                {
+                if (s1.equals("") || s2.equals("") || s3.equals("") || s4.equals("") || s5.equals("") || s6.equals("") || s7.equals("")) {
                     Toast.makeText(v.getContext(), "Please fill out all the fields.", Toast.LENGTH_SHORT).show();
-                }
-                else
-                {
-                    if(s2.equals(s3))
-                    {
+                } else {
+                    if (s2.equals(s3)) {
                         boolean checkm = db.checkMail(s1);
-                        if(!checkm)
-                        {
-                            Boolean insert = db.insertUser(s2, s1, s4, s5, s6, s7);
-                            if(insert)
-                            {
+                        if (!checkm) {
+                            Boolean insert = db.insertRenter(s2, s1, s4, s5, s6, s7);
+                            if (insert) {
                                 Toast.makeText(v.getContext(), "Register Successful", Toast.LENGTH_SHORT).show();
                                 Intent i = new Intent(getActivity(), LoginActivity.class);
                                 startActivity(i);
                             }
-                        }
-                        else
+                        } else
                             Toast.makeText(v.getContext(), "E-mail alredy exists", Toast.LENGTH_SHORT).show();
-                    }
-                    else
-                    {
+                    } else {
                         Toast.makeText(v.getContext(), "Passwords do not match!", Toast.LENGTH_SHORT).show();
                         et2.setText("");
                         et3.setText("");
@@ -80,5 +71,5 @@ public class RenterRegisterFragment extends Fragment {
         });
         // Inflate the layout for this fragment
         return view;
-
+    }
 }

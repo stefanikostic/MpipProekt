@@ -35,7 +35,6 @@ public class Database extends SQLiteOpenHelper
     private static final String name = "Name";
     private static final String surname = "Surname";
     private static final String telephone = "Telephone";
-    private static final String card_number = "card_number";
 
     private static final String create_table_users = "CREATE TABLE "
             + table_users + "(" + id + " INTEGER PRIMARY KEY AUTOINCREMENT, "
@@ -47,7 +46,7 @@ public class Database extends SQLiteOpenHelper
     private static final String store_name = "store_name";
     private static final String create_table_renters = "CREATE TABLE "
             + table_renters + "(" + id + " INTEGER PRIMARY KEY AUTOINCREMENT, "
-            +  email + " TEXT, " + telephone + " TEXT, " + password + " TEXT, " + name + " TEXT, "
+            + email + " TEXT, " + telephone + " TEXT, " + password + " TEXT, " + name + " TEXT, "
             + surname + " TEXT, "
             + store_name + " TEXT);";
 
