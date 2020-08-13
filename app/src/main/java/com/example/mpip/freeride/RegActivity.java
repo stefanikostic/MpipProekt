@@ -64,7 +64,6 @@ public class RegActivity extends AppCompatActivity {
                         .setAction("Action", null).show();
             }
         });
-
     }
 
 
@@ -139,9 +138,9 @@ public class RegActivity extends AppCompatActivity {
         public Fragment getItem(int position) {
             Fragment fragment = null;
             if(position==0) {
-                fragment = new ClientRegister();
+                fragment = new ClientRegisterFragment();
             } else
-                fragment = new RenterRegister();
+                fragment = new RenterRegisterFragment();
             return fragment;
         }
 

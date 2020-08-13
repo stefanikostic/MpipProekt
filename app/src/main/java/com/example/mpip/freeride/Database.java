@@ -214,7 +214,7 @@ public class Database extends SQLiteOpenHelper
     {
         SQLiteDatabase db = this.getReadableDatabase();
 
-        Cursor cursor = db.rawQuery("Select * from Login where Email='" + email + "'", null);
+        Cursor cursor = db.rawQuery("Select * from User where Email='" + email + "'", null);
 
         return (cursor.getCount() > 0);
     }

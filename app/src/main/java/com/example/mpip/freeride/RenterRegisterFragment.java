@@ -10,14 +10,13 @@ import android.view.View;
 import android.view.ViewGroup;
 
 
-public class ClientRegister extends Fragment {
-
+public class RenterRegisterFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_client_register, container, false);
+        return inflater.inflate(R.layout.fragment_renter_register, container, false);
     }
 
 }
