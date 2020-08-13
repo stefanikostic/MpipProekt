@@ -8,12 +8,14 @@
     android:background="@drawable/bg" >
 
     <ImageView
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="39dp"
-        android:src="@drawable/freeridelogo1"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:layout_editor_absoluteX="0dp" />
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="39dp"
+            android:src="@drawable/freeridelogo1"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent" android:layout_marginStart="8dp"
+            app:layout_constraintBottom_toTopOf="@+id/login_email" app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginBottom="8dp"/>
 
     <EditText
         android:id="@+id/login_pass"

@@ -40,20 +40,16 @@ public class Database extends SQLiteOpenHelper
     private static final String create_table_users = "CREATE TABLE "
             + table_users + "(" + id + " INTEGER PRIMARY KEY AUTOINCREMENT, "
             + email + " TEXT, " + telephone + " TEXT, " + password + " TEXT, " + name + " TEXT, "
-            + surname + " TEXT, " + card_number + " TEXT);";
-
-    //Creating table_clients columns
-    private static final String client_id = "client_id";
-    private static final String create_table_clients = "CREATE TABLE "
-            + table_clients + "(" + id + " INTEGER PRIMARY KEY AUTOINCREMENT,"
-            + client_id + " INTEGER, FOREIGN KEY ("+ client_id + ") REFERENCES " + table_users + "(" + id + "));";
+            + surname + " TEXT);";
 
     //Creating table_renters columns
     private static final String renter_id = "renter_id";
     private static final String store_name = "store_name";
     private static final String create_table_renters = "CREATE TABLE "
-            + table_renters + "(" + id + " INTEGER PRIMARY KEY AUTOINCREMENT, " + renter_id + " INTEGER, "
-            + store_name + " TEXT, FOREIGN KEY (" + renter_id + ") REFERENCES " + table_users + " (" + id + "));";
+            + table_renters + "(" + id + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+            +  email + " TEXT, " + telephone + " TEXT, " + password + " TEXT, " + name + " TEXT, "
+            + surname + " TEXT, "
+            + store_name + " TEXT);";
 
     //Creating table_categories columns
     private static final String category = "Category";
@@ -89,12 +85,13 @@ public class Database extends SQLiteOpenHelper
     private static final String date_from = "date_from";
     private static final String date_to = "date_to";
     private static final String bike_id = "bike_id";
+    private static final String user_id = "user_id";
     private static final String full_price="full_price";
     private static final String create_table_rents = "CREATE TABLE "
             + table_rents + "(" + id + " INTEGER PRIMARY KEY AUTOINCREMENT, "
-            + client_id + " INTEGER, " + full_price + " INTEGER, " + bike_id + " INTEGER, "
+            + user_id + " INTEGER, " + full_price + " INTEGER, " + bike_id + " INTEGER, "
             + date_from + " DATE, " + date_to + " DATE, "
-            + "FOREIGN KEY (" + client_id + ") REFERENCES " + table_clients + " (" + id + "),"
+            + "FOREIGN KEY (" + user_id + ") REFERENCES " + table_users + " (" + id + "),"
             + "FOREIGN KEY (" + bike_id + ") REFERENCES " + table_bikes + " (" + id + "))";
 
 
@@ -110,7 +107,6 @@ public class Database extends SQLiteOpenHelper
         db.execSQL(create_table_users);
         db.execSQL(create_table_locations);
         db.execSQL(create_table_categories);
-        db.execSQL(create_table_clients);
         db.execSQL(create_table_renters);
         db.execSQL(create_table_bikes);
         db.execSQL(create_table_rents);
@@ -167,14 +163,21 @@ public class Database extends SQLiteOpenHelper
         return list;
     }
 
-    public boolean checkLogin(String email, String pass)
+    public int checkLogin(String email, String pass)
     {
         SQLiteDatabase db = this.getReadableDatabase();
 
-        Cursor cursor = db.rawQuery("Select * from User where Email='" + email + "'" +
+        Cursor cursor = db.rawQuery("Select * from User where email='" + email + "'" +
+                " and password='" + pass + "'", null);
+        if(cursor.getCount()>0){
+            return 1;
+        }
+        Cursor cursor1 = db.rawQuery("Select * from Renter where Email='" + email + "'" +
                 " and Password='" + pass + "'", null);
-
-        return (cursor.getCount() > 0);
+        if(cursor1.getCount()>0){
+            return 2;
+        }
+        return 0;
     }
 
     public int getLoginID(String email, String pass)
@@ -219,8 +222,8 @@ public class Database extends SQLiteOpenHelper
         return (cursor.getCount() > 0);
     }
 
-    public boolean insertUser(String pass, String Email, String n, String s, String tel, String cardNumber)
-    {
+    public boolean insertUser(String pass, String Email, String n, String s, String tel)
+        {
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
@@ -229,34 +232,25 @@ public class Database extends SQLiteOpenHelper
         values.put(name, n);
         values.put(surname, s);
         values.put(telephone, tel);
-        values.put(card_number, cardNumber);
         long result = db.insert(table_users, null, values);
 
         return result != -1;
     }
 
-    public boolean insertClient(String pass, String Email, String n, String s, String tel, String cardNumber)
+
+    public boolean insertRenter(String pass, String Email, String n, String s, String tel, String storeName)
     {
         SQLiteDatabase db = this.getWritableDatabase();
-
         ContentValues values = new ContentValues();
-        if(this.insertUser(pass, Email, n, s, tel, cardNumber)) {
-            long result = db.insert(table_clients, null, values);
-            return result != -1;
-        }
-        return false;
-    }
+        values.put(email, Email);
+        values.put(password, pass);
+        values.put(name, n);
+        values.put(surname, s);
+        values.put(telephone, tel);
+        values.put(store_name, storeName);
+        long result = db.insert(table_renters, null, values);
 
-    public boolean insertRenter(String pass, String Email, String n, String s, String tel, String cardNumber)
-    {
-        SQLiteDatabase db = this.getWritableDatabase();
-
-        ContentValues values = new ContentValues();
-        if(this.insertUser(pass, Email, n, s, tel, cardNumber)) {
-            long result = db.insert(table_renters, null, values);
-            return result != -1;
-        }
-        return false;
+        return result != -1;
     }
 
     public boolean insertBike(int isRented, int cena, int renterId, int categoryId, int locationId, String imageUrl)
@@ -347,7 +341,7 @@ public class Database extends SQLiteOpenHelper
         return result != -1;
     }
 
-    public boolean insertRent(String from, String to, int bikeId, int clientId, int fullPrice)
+    public boolean insertRent(String from, String to, int bikeId, int userId, int fullPrice)
     {
         SQLiteDatabase db = this.getWritableDatabase();
 
@@ -355,7 +349,7 @@ public class Database extends SQLiteOpenHelper
         values.put(date_from, from);
         values.put(date_to, to);
         values.put(bike_id, bikeId);
-        values.put(client_id, clientId);
+        values.put(user_id, userId);
         values.put(full_price, fullPrice);
 
         long result = db.insert(table_rents, null, values);

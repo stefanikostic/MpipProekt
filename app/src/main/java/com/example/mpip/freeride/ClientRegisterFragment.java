@@ -34,7 +34,6 @@ public class ClientRegisterFragment extends Fragment {
         et4 = (EditText) view.findViewById(R.id.reg_ime);
         et5 = (EditText) view.findViewById(R.id.reg_surname);
         et6 = (EditText) view.findViewById(R.id.reg_tel);
-        et7 = (EditText) view.findViewById(R.id.reg_card);
         register = (Button) view.findViewById(R.id.reg_register);
 
         register.setOnClickListener(new View.OnClickListener() {
@@ -46,9 +45,8 @@ public class ClientRegisterFragment extends Fragment {
                 String s4 = et4.getText().toString();
                 String s5 = et5.getText().toString();
                 String s6 = et6.getText().toString();
-                String s7 = et7.getText().toString();
 
-                if(s1.equals("") || s2.equals("") || s3.equals("") || s4.equals("") || s5.equals("") || s6.equals("") || s7.equals(""))
+                if(s1.equals("") || s2.equals("") || s3.equals("") || s4.equals("") || s5.equals("") || s6.equals(""))
                 {
                     Toast.makeText(v.getContext(), "Please fill out all the fields.", Toast.LENGTH_SHORT).show();
                 }
@@ -59,7 +57,7 @@ public class ClientRegisterFragment extends Fragment {
                         boolean checkm = db.checkMail(s1);
                         if(!checkm)
                         {
-                            Boolean insert = db.insertUser(s2, s1, s4, s5, s6, s7);
+                            Boolean insert = db.insertUser(s2, s1, s4, s5, s6);
                             if(insert)
                             {
                                 Toast.makeText(v.getContext(), "Register Successful", Toast.LENGTH_SHORT).show();
