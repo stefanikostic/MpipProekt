@@ -75,7 +75,7 @@ public class LoginActivity extends Activity
                         i.putExtras(extras);
                         startActivity(i);
                     } else {
-                        Intent i = new Intent(LoginActivity.this, OfferActivity.class);
+                        Intent i = new Intent(LoginActivity.this, RenterMainActivity.class);
                         //go to rent activity
                         //Toast.makeText(getApplicationContext(), "Successful Login", Toast.LENGTH_SHORT).show();
                         Bundle extras = new Bundle();

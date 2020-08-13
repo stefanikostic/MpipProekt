@@ -17,6 +17,16 @@
             android:supportsRtl="true"
             android:theme="@style/AppTheme">
         <activity
+                android:name=".AddBicycleActivity"
+                android:label="@string/title_activity_add_bicycle"
+                android:theme="@style/AppTheme.NoActionBar">
+        </activity>
+        <activity
+                android:name=".RenterMainActivity"
+                android:label="@string/title_activity_renter_main"
+                android:theme="@style/AppTheme.NoActionBar">
+        </activity>
+        <activity
                 android:name=".ClientMainActivity"
                 android:label="ClientMainActivity"
                 android:theme="@style/AppTheme.NoActionBar">
