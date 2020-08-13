@@ -17,6 +17,11 @@
             android:supportsRtl="true"
             android:theme="@style/AppTheme">
         <activity
+                android:name=".ClientMainActivity"
+                android:label="ClientMainActivity"
+                android:theme="@style/AppTheme.NoActionBar">
+        </activity>
+        <activity
                 android:name=".RegActivity"
                 android:label="@string/title_activity_reg"
                 android:theme="@style/AppTheme.NoActionBar">
