@@ -3,44 +3,96 @@ package com.example.mpip.freeride;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.AppCompatButton;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
-import android.widget.ImageButton;
+import android.widget.*;
 
+import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Arrays;
 
 public class AddBicycleActivity extends AppCompatActivity {
 
     public static final int GET_FROM_GALLERY = 3;
+    private ImageView image;
+    private ImageButton imageButton;
+    private AppCompatButton addBike;
+    private AutoCompleteTextView actv;
+    private Button changePic;
+    private EditText et;
+    private EditText et2;
+    Bitmap bitmap = null;
+    Database db;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_bicycle);
         Toolbar toolbar = findViewById(R.id.toolbar);
+        db = new Database(this);
+        image = (ImageView) findViewById(R.id.imageView);
+        changePic = (Button) findViewById(R.id.changePic);
+        addBike = (AppCompatButton) findViewById(R.id.btn_add_bike);
+        actv = (AutoCompleteTextView) findViewById(R.id.category);
+        et = (EditText) findViewById(R.id.price);
+        et2 = (EditText) findViewById(R.id.model_name);
         setSupportActionBar(toolbar);
-
-        FloatingActionButton fab = findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
-        ImageButton imageButton = findViewById(R.id.imageButton);
+        String[] categories = (String[]) db.getCategories().toArray(new String[0]);
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>
+                (this, R.layout.autocomplete_textview, categories);
+        actv.setThreshold(1);
+        actv.setAdapter(adapter);
+        actv.setTextColor(Color.parseColor("#000000"));
+        imageButton = findViewById(R.id.imageButton);
         imageButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 startActivityForResult(new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.INTERNAL_CONTENT_URI), GET_FROM_GALLERY);
             }
         });
+        changePic.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivityForResult(new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.INTERNAL_CONTENT_URI), GET_FROM_GALLERY);
+            }
+        });
+        addBike.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                byte[] data = getBitmapAsByteArray(bitmap);
+                int price = Integer.parseInt(et.getText().toString());
+                Intent i = getIntent();
+                String email = i.getStringExtra("email");
+                int renter_id = db.getRenterId(email);
+                Location location = db.getRenterLocation(email);
+                double lat = location.getLatitude();
+                double longi = location.getLongitude();
+                String cat = actv.getText().toString();
+                int category_id = db.getCategoryID(cat);
+                String modelName = et2.getText().toString();
+                Boolean insert = db.insertBike(0, price, modelName, renter_id, category_id, lat, longi, data);
+                if(insert) {
+                    Toast.makeText(view.getContext(), "You added the bike successfully!", Toast.LENGTH_SHORT).show();
+                    Intent intent1 = new Intent(AddBicycleActivity.this, RenterMainActivity.class);
+                    startActivity(intent1);
+                }
+            }
+
+        });
+
+    }
+    public static byte[] getBitmapAsByteArray(Bitmap bitmap) {
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.PNG, 0, outputStream);
+        return outputStream.toByteArray();
     }
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -48,9 +100,13 @@ public class AddBicycleActivity extends AppCompatActivity {
         //Detects request codes
         if(requestCode==GET_FROM_GALLERY && resultCode == Activity.RESULT_OK) {
             Uri selectedImage = data.getData();
-            Bitmap bitmap = null;
+            bitmap = null;
             try {
                 bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), selectedImage);
+                image.setImageBitmap(bitmap);
+                image.setVisibility(View.VISIBLE);
+                imageButton.setVisibility(View.INVISIBLE);
+                changePic.setVisibility(View.VISIBLE);
             } catch (FileNotFoundException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();

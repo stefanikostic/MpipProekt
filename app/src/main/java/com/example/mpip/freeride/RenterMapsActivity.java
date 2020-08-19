@@ -1,45 +1,76 @@
 package com.example.mpip.freeride;
 
 import android.Manifest;
-import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.location.Geocoder;
 import android.location.Location;
-import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
+import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
-
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 
-public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
+import java.util.Locale;
+
+public class RenterMapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
     Location currentLocation;
     FusedLocationProviderClient fusedLocationProviderClient;
+    Geocoder geocoder;
+    GoogleMap map;
+    Button register;
+    Database db;
+    MarkerOptions finalMarkerOptions = new MarkerOptions();
     private static final int REQUEST_CODE = 101;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_maps);
-
+        setContentView(R.layout.activity_renter_maps);
+        db = new Database(this);
+        geocoder = new Geocoder(this, Locale.getDefault());
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
+        register = (Button) findViewById(R.id.btn_renter);
+        register.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = getIntent();
+                String email = i.getStringExtra("email");
+                String pass = i.getStringExtra("pass");
+                String name = i.getStringExtra("name");
+                String surn = i.getStringExtra("surn");
+                String tel = i.getStringExtra("tel");
+                String storeName = i.getStringExtra("storeName");
+                double lat = finalMarkerOptions.getPosition().latitude;
+                double longi = finalMarkerOptions.getPosition().longitude;
+                Boolean insert = db.insertRenter(pass, email, name, surn, tel, storeName, lat, longi);
+                if(insert) {
+                    Toast.makeText(v.getContext(), "Register Successful", Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
+                    startActivity(intent);
+                } else {
+                    Toast.makeText(v.getContext(), "Registration failed!", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
         fetchLastLocation();
-
     }
+
 
     private void fetchLastLocation() {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
@@ -56,9 +87,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 if(location != null)
                 {
                     currentLocation = location;
-                    Bundle b = getIntent().getExtras();
-                    double latitude = b.getDouble("latitude");
-                    double longitude = b.getDouble("longitude");
+                    double latitude = location.getLatitude();
+                    double longitude = location.getLongitude();
                     currentLocation.setLatitude(latitude);
                     currentLocation.setLongitude(longitude);
 
@@ -66,27 +96,47 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             currentLocation.getLongitude(), Toast.LENGTH_SHORT).show();
                     SupportMapFragment supportMapFragment = (SupportMapFragment) getSupportFragmentManager().
                             findFragmentById(R.id.maps_view);
-                    supportMapFragment.getMapAsync(MapsActivity.this);
-
+                    supportMapFragment.getMapAsync(RenterMapsActivity.this);
                 }
-
             }
         });
-
-
     }
-
     @Override
-    public void onMapReady(GoogleMap googleMap)
-    {
+    public void onMapReady(final GoogleMap googleMap) {
         LatLng latLng = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
         MarkerOptions markerOptions = new MarkerOptions().position(latLng)
                 .title("I AM HERE");
         googleMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));
-        googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 5));
+        googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 16));
         googleMap.addMarker(markerOptions);
+        googleMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
 
+            @Override
+            public void onMapClick(LatLng latLng) {
 
+                // Creating a marker
+                MarkerOptions markerOptions = new MarkerOptions();
+
+                // Setting the position for the marker
+                markerOptions.position(latLng);
+
+                // Setting the title for the marker.
+                // This will be displayed on taping the marker
+                markerOptions.title(latLng.latitude + " : " + latLng.longitude);
+
+                finalMarkerOptions = markerOptions;
+
+                // Clears the previously touched position
+                googleMap.clear();
+
+                // Animating to the touched position
+                googleMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));
+
+                // Placing a marker on the touched position
+                googleMap.addMarker(markerOptions.icon(BitmapDescriptorFactory
+                        .defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
+            }
+        });
     }
 
     @Override
@@ -99,7 +149,5 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 break;
         }
 
-
     }
 }
-

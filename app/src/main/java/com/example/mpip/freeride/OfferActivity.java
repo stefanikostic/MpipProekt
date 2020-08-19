@@ -2,10 +2,8 @@ package com.example.mpip.freeride;
 
 import android.Manifest;
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.ClipData;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -13,7 +11,6 @@ import android.graphics.BitmapFactory;
 import android.location.Address;
 import android.location.Geocoder;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
@@ -32,10 +29,8 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Spinner;
 import android.widget.Toast;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
+
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -90,8 +85,6 @@ public class OfferActivity extends Activity
         {
             //Toast.makeText(getApplicationContext(), "Error while making of empty offer", Toast.LENGTH_SHORT).show();
         }*/
-
-        db.addCategories();
 
         select = findViewById(R.id.offer_images);
 
@@ -175,7 +168,7 @@ public class OfferActivity extends Activity
             public void onClick(View v) {
 
 
-                Intent i = new Intent(getApplicationContext(), MapsActivity.class);
+                Intent i = new Intent(getApplicationContext(), MapsFragment.class);
                 String location = e1.getText().toString();
                 double latitude=0;
                 double longitude=0;
@@ -246,7 +239,7 @@ public class OfferActivity extends Activity
                 else
                     Toast.makeText(getApplicationContext(), "Offer NOT updated successfully", Toast.LENGTH_SHORT).show();
                 */
-                Intent i = new Intent(getApplicationContext(), MapsActivity.class);
+                Intent i = new Intent(getApplicationContext(), MapsFragment.class);
                 startActivity(i);
             }
         });

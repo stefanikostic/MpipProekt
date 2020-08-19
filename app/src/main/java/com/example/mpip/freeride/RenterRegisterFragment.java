@@ -1,8 +1,6 @@
 package com.example.mpip.freeride;
 
-import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -53,12 +51,15 @@ public class RenterRegisterFragment extends Fragment {
                     if (s2.equals(s3)) {
                         boolean checkm = db.checkMail(s1);
                         if (!checkm) {
-                            Boolean insert = db.insertRenter(s2, s1, s4, s5, s6, s7);
-                            if (insert) {
-                                Toast.makeText(v.getContext(), "Register Successful", Toast.LENGTH_SHORT).show();
-                                Intent i = new Intent(getActivity(), LoginActivity.class);
+                                Toast.makeText(v.getContext(), "Let's pick your shop address...", Toast.LENGTH_SHORT).show();
+                                Intent i = new Intent(getActivity(), RenterMapsActivity.class);
+                                i.putExtra("email", s1);
+                                i.putExtra("pass", s2);
+                                i.putExtra("name", s4);
+                                i.putExtra("surn", s5);
+                                i.putExtra("tel", s6);
+                                i.putExtra("storeName", s7);
                                 startActivity(i);
-                            }
                         } else
                             Toast.makeText(v.getContext(), "E-mail alredy exists", Toast.LENGTH_SHORT).show();
                     } else {

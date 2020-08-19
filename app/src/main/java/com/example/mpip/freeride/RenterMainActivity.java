@@ -18,10 +18,14 @@ public class RenterMainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         FloatingActionButton fab = findViewById(R.id.fab);
+
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent i = new Intent(RenterMainActivity.this, AddBicycleActivity.class);
+                Intent intent = getIntent();
+                String email = intent.getStringExtra("email");
+                i.putExtra("email", email);
                 startActivity(i);
             }
         });
