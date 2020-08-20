@@ -1,4 +1,4 @@
-package com.example.mpip.freeride;
+package com.example.mpip.freeride.domain;
 
 public class Location {
     double latitude;

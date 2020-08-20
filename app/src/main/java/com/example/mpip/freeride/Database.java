@@ -5,15 +5,10 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.os.strictmode.SqliteObjectLeakedViolation;
 import android.util.Log;
-import android.widget.Toast;
-import java.util.LinkedList;
+import com.example.mpip.freeride.domain.Location;
 
-import java.net.URI;
 import java.util.ArrayList;
-
-import static android.support.constraint.Constraints.TAG;
 
 public class Database extends SQLiteOpenHelper
 {
@@ -80,11 +75,12 @@ public class Database extends SQLiteOpenHelper
 
     private static final String create_table_bikes = "CREATE TABLE "
             + table_bikes + "(" + id + " INTEGER PRIMARY KEY AUTOINCREMENT, "
-            + renter_id + " INTEGER, " + image_url + " BLOB, " + price + " INTEGER, " + category_id + " INTEGER, "
+            + renter_id + " INTEGER, " + price + " INTEGER, " + category_id + " INTEGER, "
             + model_name + " TEXT, "
             + latitude + " REAL, "
             + longitude + " REAL, "
             + rented + " INTEGER, "
+            + image_url + " TEXT, "
             + " FOREIGN KEY (" + renter_id + ") REFERENCES " + table_renters + " (" + id  + "),"
             + " FOREIGN KEY (" + category_id + ") REFERENCES " + table_categories + " (" + id + "));";
 
@@ -277,7 +273,7 @@ public class Database extends SQLiteOpenHelper
         return result != -1;
     }
 
-    public boolean insertBike(int isRented, int cena, String mname, int renterId, int categoryId, double lat, double longi, byte [] data)
+    public boolean insertBike(int isRented, int cena, String mname, int renterId, int categoryId, double lat, double longi, String data)
     {
         SQLiteDatabase db = this.getWritableDatabase();
 

@@ -56,8 +56,12 @@ public class RenterMapsActivity extends FragmentActivity implements OnMapReadyCa
                 String surn = i.getStringExtra("surn");
                 String tel = i.getStringExtra("tel");
                 String storeName = i.getStringExtra("storeName");
-                double lat = finalMarkerOptions.getPosition().latitude;
-                double longi = finalMarkerOptions.getPosition().longitude;
+                double lat = currentLocation.getLatitude();
+                double longi = currentLocation.getLongitude();
+                if(finalMarkerOptions.getPosition()!=null) {
+                    lat = finalMarkerOptions.getPosition().latitude;
+                    longi = finalMarkerOptions.getPosition().longitude;
+                }
                 Boolean insert = db.insertRenter(pass, email, name, surn, tel, storeName, lat, longi);
                 if(insert) {
                     Toast.makeText(v.getContext(), "Register Successful", Toast.LENGTH_SHORT).show();

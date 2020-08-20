@@ -1,24 +1,27 @@
 package com.example.mpip.freeride;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatButton;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.*;
+import com.example.mpip.freeride.domain.Location;
 
 import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.Arrays;
+import java.io.InputStream;
 
 public class AddBicycleActivity extends AppCompatActivity {
 
@@ -31,6 +34,7 @@ public class AddBicycleActivity extends AppCompatActivity {
     private EditText et;
     private EditText et2;
     Bitmap bitmap = null;
+    Uri uri = null;
     Database db;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,9 +57,22 @@ public class AddBicycleActivity extends AppCompatActivity {
         actv.setTextColor(Color.parseColor("#000000"));
         imageButton = findViewById(R.id.imageButton);
         imageButton.setOnClickListener(new View.OnClickListener() {
+
             @Override
             public void onClick(View view) {
-                startActivityForResult(new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.INTERNAL_CONTENT_URI), GET_FROM_GALLERY);
+                if(ActivityCompat.checkSelfPermission(AddBicycleActivity.this,
+                        Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED)
+                {
+                    ActivityCompat.requestPermissions(AddBicycleActivity.this,
+                            new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 100);
+
+                    return;
+                }
+
+                Intent i = new Intent(Intent.ACTION_GET_CONTENT);
+                i.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+                i.setType("image/*");
+                startActivityForResult(i, 1);
             }
         });
         changePic.setOnClickListener(new View.OnClickListener() {
@@ -67,7 +84,6 @@ public class AddBicycleActivity extends AppCompatActivity {
         addBike.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                byte[] data = getBitmapAsByteArray(bitmap);
                 int price = Integer.parseInt(et.getText().toString());
                 Intent i = getIntent();
                 String email = i.getStringExtra("email");
@@ -78,7 +94,7 @@ public class AddBicycleActivity extends AppCompatActivity {
                 String cat = actv.getText().toString();
                 int category_id = db.getCategoryID(cat);
                 String modelName = et2.getText().toString();
-                Boolean insert = db.insertBike(0, price, modelName, renter_id, category_id, lat, longi, data);
+                Boolean insert = db.insertBike(0, price, modelName, renter_id, category_id, lat, longi, uri.toString());
                 if(insert) {
                     Toast.makeText(view.getContext(), "You added the bike successfully!", Toast.LENGTH_SHORT).show();
                     Intent intent1 = new Intent(AddBicycleActivity.this, RenterMainActivity.class);
@@ -91,18 +107,19 @@ public class AddBicycleActivity extends AppCompatActivity {
     }
     public static byte[] getBitmapAsByteArray(Bitmap bitmap) {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.PNG, 0, outputStream);
+        bitmap.compress(Bitmap.CompressFormat.PNG, 1, outputStream);
         return outputStream.toByteArray();
     }
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         //Detects request codes
-        if(requestCode==GET_FROM_GALLERY && resultCode == Activity.RESULT_OK) {
-            Uri selectedImage = data.getData();
+        if(requestCode==1 && resultCode == Activity.RESULT_OK) {
+            uri = data.getData();
             bitmap = null;
             try {
-                bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), selectedImage);
+
+                bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), uri);
                 image.setImageBitmap(bitmap);
                 image.setVisibility(View.VISIBLE);
                 imageButton.setVisibility(View.INVISIBLE);
