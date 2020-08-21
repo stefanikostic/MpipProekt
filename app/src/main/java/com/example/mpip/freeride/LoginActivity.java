@@ -1,10 +1,13 @@
 package com.example.mpip.freeride;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v4.app.ActivityCompat;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -65,6 +68,14 @@ public class LoginActivity extends Activity
                 }
                 else
                 {
+                    if(ActivityCompat.checkSelfPermission(LoginActivity.this,
+                            Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED)
+                    {
+                        ActivityCompat.requestPermissions(LoginActivity.this,
+                                new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 100);
+
+                        return;
+                    }
                     if(check == 1) {
                         Intent i = new Intent(LoginActivity.this, ClientMainActivity.class);
                         //go to rent activity

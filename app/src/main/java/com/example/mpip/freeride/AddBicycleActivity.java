@@ -60,15 +60,6 @@ public class AddBicycleActivity extends AppCompatActivity {
 
             @Override
             public void onClick(View view) {
-                if(ActivityCompat.checkSelfPermission(AddBicycleActivity.this,
-                        Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED)
-                {
-                    ActivityCompat.requestPermissions(AddBicycleActivity.this,
-                            new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 100);
-
-                    return;
-                }
-
                 Intent i = new Intent(Intent.ACTION_GET_CONTENT);
                 i.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
                 i.setType("image/*");
