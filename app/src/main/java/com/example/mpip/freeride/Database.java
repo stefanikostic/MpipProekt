@@ -5,14 +5,10 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.os.strictmode.SqliteObjectLeakedViolation;
 import android.util.Log;
-import android.widget.Toast;
+import com.example.mpip.freeride.domain.Location;
 
-import java.net.URI;
 import java.util.ArrayList;
-
-import static android.support.constraint.Constraints.TAG;
 
 public class Database extends SQLiteOpenHelper
 {
@@ -44,11 +40,15 @@ public class Database extends SQLiteOpenHelper
     //Creating table_renters columns
     private static final String renter_id = "renter_id";
     private static final String store_name = "store_name";
+    private static final String latitude = "latitude";
+    private static final String longitude = "longitude";
     private static final String create_table_renters = "CREATE TABLE "
             + table_renters + "(" + id + " INTEGER PRIMARY KEY AUTOINCREMENT, "
             + email + " TEXT, " + telephone + " TEXT, " + password + " TEXT, " + name + " TEXT, "
             + surname + " TEXT, "
-            + store_name + " TEXT);";
+            + store_name + " TEXT, "
+            + latitude + " REAL, "
+            + longitude + " REAL);";
 
     //Creating table_categories columns
     private static final String category = "Category";
@@ -57,13 +57,13 @@ public class Database extends SQLiteOpenHelper
             + table_categories + "(" + id + " INTEGER PRIMARY KEY AUTOINCREMENT, "
             + category + " TEXT, " + description + " TEXT);";
 
-    //Crating table_locations columns
+    /*//Crating table_locations columns
     private static final String longitude = "Longitude";
     private static final String latitude = "Latitude";
     private static final String create_table_locations = "CREATE TABLE "
             + table_locations + "(" + id + " INTEGER, "
             + longitude + " TEXT, " + latitude + " TEXT, "
-            + renter_id + " INTEGER, FOREIGN KEY (" + renter_id + ") REFERENCES " + table_rents + " (" + id + "));";
+            + renter_id + " INTEGER, FOREIGN KEY (" + renter_id + ") REFERENCES " + table_rents + " (" + id + "));";*/
 
     //Crating table_bikes columns
     private static final String price = "Price";
@@ -71,14 +71,18 @@ public class Database extends SQLiteOpenHelper
     private static final String category_id = "category_id";
     private static final String location_id = "location_id";
     private static final String image_url = "image_url";
+    private static final String model_name = "model_name";
 
     private static final String create_table_bikes = "CREATE TABLE "
             + table_bikes + "(" + id + " INTEGER PRIMARY KEY AUTOINCREMENT, "
-            + renter_id + " INTEGER, " + image_url + " TEXT, " + price + " INTEGER, " + category_id + " INTEGER, " + location_id + " INTEGER, "
+            + renter_id + " INTEGER, " + price + " INTEGER, " + category_id + " INTEGER, "
+            + model_name + " TEXT, "
+            + latitude + " REAL, "
+            + longitude + " REAL, "
             + rented + " INTEGER, "
+            + image_url + " TEXT, "
             + " FOREIGN KEY (" + renter_id + ") REFERENCES " + table_renters + " (" + id  + "),"
-            + " FOREIGN KEY (" + category_id + ") REFERENCES " + table_categories + " (" + id + "),"
-            + " FOREIGN KEY (" + location_id + ") REFERENCES " + table_locations + " (" + id + "));";
+            + " FOREIGN KEY (" + category_id + ") REFERENCES " + table_categories + " (" + id + "));";
 
     //Crating table_rents columns
     private static final String date_from = "date_from";
@@ -104,11 +108,42 @@ public class Database extends SQLiteOpenHelper
     public void onCreate(SQLiteDatabase db)
     {
         db.execSQL(create_table_users);
-        db.execSQL(create_table_locations);
         db.execSQL(create_table_categories);
         db.execSQL(create_table_renters);
         db.execSQL(create_table_bikes);
         db.execSQL(create_table_rents);
+
+        ContentValues values = new ContentValues();
+
+        values.put(category, "Mountain Bikes");
+        values.put(description, "Mountain Bikes offer riding off-road, often over rough terrain");
+        db.insert(table_categories, null, values);
+
+        values = new ContentValues();
+        values.put(category, "Hybrid/Comfort Bike");
+        values.put(description, "Hybrids and Sport Comfort Bikes share the same comfort features but are distinguished by wheel size");
+        db.insert(table_categories, null, values);
+
+        values = new ContentValues();
+        values.put(category, "Road Bike");
+        values.put(description, "Road bikes rule the road due to their extreme efficiency and speed");
+        db.insert(table_categories, null, values);
+
+        values = new ContentValues();
+        values.put(category, "Commuting Bike");
+        values.put(description, "Simply put, a commuting bike is any bicycle used as general transportation, regardless of the style");
+        db.insert(table_categories, null, values);
+
+        values = new ContentValues();
+        values.put(category, "Beach Cruiser");
+        values.put(description, "A Beach Cruiser is a bicycle designed for riding short distances on flat terrain, like a boardwalk");
+        db.insert(table_categories, null, values);
+
+        values = new ContentValues();
+        values.put(category, "BMX/Trick Bike");
+        values.put(description, "BMXs are often very robust and durable and would be the best selection for anyone intending to do jumps or tricks");
+        db.insert(table_categories, null, values);
+
     }
 
     @Override
@@ -125,24 +160,8 @@ public class Database extends SQLiteOpenHelper
     }
 
 
-    public void addCategories()
-    {
-        SQLiteDatabase db = this.getWritableDatabase();
 
-        db.delete(table_categories, null, null);
-
-        ContentValues values = new ContentValues();
-        values.put(category, "Mountain Bike");
-        db.insert(table_categories, null, values);
-
-        values.put(category, "Everyday");
-        db.insert(table_categories, null, values);
-
-        values.put(category, "Sports");
-        db.insert(table_categories, null, values);
-    }
-
-    public ArrayList getCategories()
+    public ArrayList<String> getCategories()
     {
         ArrayList<String> list = new ArrayList<>();
 
@@ -237,7 +256,7 @@ public class Database extends SQLiteOpenHelper
     }
 
 
-    public boolean insertRenter(String pass, String Email, String n, String s, String tel, String storeName)
+    public boolean insertRenter(String pass, String Email, String n, String s, String tel, String storeName, Double lat, Double longi)
     {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
@@ -247,12 +266,14 @@ public class Database extends SQLiteOpenHelper
         values.put(surname, s);
         values.put(telephone, tel);
         values.put(store_name, storeName);
+        values.put(latitude, lat);
+        values.put(longitude, longi);
         long result = db.insert(table_renters, null, values);
 
         return result != -1;
     }
 
-    public boolean insertBike(int isRented, int cena, int renterId, int categoryId, int locationId, String imageUrl)
+    public boolean insertBike(int isRented, int cena, String mname, int renterId, int categoryId, double lat, double longi, String data)
     {
         SQLiteDatabase db = this.getWritableDatabase();
 
@@ -260,10 +281,12 @@ public class Database extends SQLiteOpenHelper
 
         values.put(renter_id, renterId);
         values.put(category_id, categoryId);
+        values.put(model_name, mname);
         values.put(price, cena);
-        values.put(image_url, imageUrl);
+        values.put(image_url, data);
         values.put(rented, isRented);
-        values.put(location_id, locationId);
+        values.put(latitude, lat);
+        values.put(longitude, longi);
 
         long result = db.insert(table_bikes, null, values);
 
@@ -327,6 +350,28 @@ public class Database extends SQLiteOpenHelper
         return db.rawQuery("Select * from Bike", null);
     }
 
+    public int getRenterId(String renterEmail) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String query = "Select * from Renter WHERE Email='" + renterEmail+"'";
+        Cursor cursor = db.rawQuery(query, null);
+        cursor.moveToFirst();
+        String key = cursor.getString(cursor.getColumnIndex(id));
+
+        return Integer.parseInt(key);
+    }
+
+    public Location getRenterLocation(String renterEmail) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String query = "Select * from Renter WHERE email ='" + renterEmail + "'";
+        Cursor cursor = db.rawQuery(query, null);
+        cursor.moveToFirst();
+        double lat = Double.parseDouble(cursor.getString(cursor.getColumnIndex(latitude)));
+        double longi = Double.parseDouble(cursor.getString(cursor.getColumnIndex(longitude)));
+        Location loc = new Location(lat, longi);
+
+        return loc;
+    }
+
     public boolean insertLocation(String longi, String lat, int renterId)
     {
         SQLiteDatabase db = this.getWritableDatabase();
@@ -368,4 +413,6 @@ public class Database extends SQLiteOpenHelper
 
         return db.rawQuery("Select * from Locations", null);
     }
+
+
 }
