@@ -43,7 +43,7 @@ public class LoginActivity extends Activity
         register.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent i = new Intent(getApplicationContext(), RegActivity.class);
+                Intent i = new Intent(getApplicationContext(), RegisterActivity.class);
                 startActivity(i);
             }
         });
@@ -98,9 +98,6 @@ public class LoginActivity extends Activity
                 }
             }
         });
-
-
-
     }
 
 }
