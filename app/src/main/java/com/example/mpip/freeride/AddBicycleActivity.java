@@ -60,7 +60,15 @@ public class AddBicycleActivity extends AppCompatActivity {
 
             @Override
             public void onClick(View view) {
-                Intent i = new Intent(Intent.ACTION_GET_CONTENT);
+                if(ActivityCompat.checkSelfPermission(AddBicycleActivity.this,
+                        Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED)
+                {
+                    ActivityCompat.requestPermissions(AddBicycleActivity.this,
+                            new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 100);
+
+                    return;
+                }
+                Intent i = new Intent(Intent.ACTION_OPEN_DOCUMENT);
                 i.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
                 i.setType("image/*");
                 startActivityForResult(i, 1);
@@ -69,7 +77,18 @@ public class AddBicycleActivity extends AppCompatActivity {
         changePic.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivityForResult(new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.INTERNAL_CONTENT_URI), GET_FROM_GALLERY);
+    /*            if(ActivityCompat.checkSelfPermission(AddBicycleActivity.this,
+                        Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED)
+                {
+                    ActivityCompat.requestPermissions(AddBicycleActivity.this,
+                            new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 100);
+
+                    return;
+                }
+                Intent i = new Intent(Intent.ACTION_GET_CONTENT);
+                i.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+                i.setType("image/*");
+                startActivityForResult(i, 2);*/
             }
         });
         addBike.setOnClickListener(new View.OnClickListener() {
@@ -105,7 +124,7 @@ public class AddBicycleActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         //Detects request codes
-        if(requestCode==1 && resultCode == Activity.RESULT_OK) {
+        if(resultCode == Activity.RESULT_OK) {
             uri = data.getData();
             bitmap = null;
             try {

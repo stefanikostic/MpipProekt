@@ -51,7 +51,6 @@ android:layout_width="match_parent">
 
         <!-- A CardView that contains a TextView -->
     <android.support.v7.widget.CardView
-            xmlns:card_view="http://schemas.android.com/apk/res-auto"
             android:id="@+id/card_view"
             android:layout_gravity="center"
             android:layout_width="match_parent"
@@ -65,7 +64,7 @@ android:layout_width="match_parent">
                 android:id="@+id/textView"
                 android:layout_marginEnd="40dp"
                 android:layout_marginStart="32dp"
-                android:textEditSideNoPasteWindowLayout="@android:color/holo_red_dark" android:textSize="30sp"
+                android:textSize="30sp"
                 android:fontFamily="sans-serif-medium" android:textColor="@android:color/black"
                 android:lineSpacingExtra="8sp" android:layout_marginBottom="16dp"
                 android:paddingStart="@dimen/fab_margin" android:paddingTop="8dp"/>
@@ -80,5 +79,8 @@ android:layout_width="match_parent">
                 android:layout_gravity="center_horizontal"
                 android:layout_marginBottom="611dp"
                 android:layout_marginTop="70dp"/>
+        <android.support.v7.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
     </android.support.v7.widget.CardView>
         </LinearLayout>

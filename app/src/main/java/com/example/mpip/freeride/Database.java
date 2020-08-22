@@ -366,6 +366,14 @@ public class Database extends SQLiteOpenHelper
         return Integer.parseInt(key);
     }
 
+   /* public String [] getImages()
+    {
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        Cursor cursor = db.rawQuery("Select * from Bike", null);
+
+    }*/
+
     public Location getRenterLocation(String renterEmail) {
         SQLiteDatabase db = this.getReadableDatabase();
         String query = "Select * from Renter WHERE email ='" + renterEmail + "'";

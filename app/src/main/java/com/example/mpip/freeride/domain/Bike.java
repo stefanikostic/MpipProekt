@@ -10,7 +10,7 @@ public class Bike {
     private int id;
     private String name;
     private float price;
-    private Bitmap imageUrl;
+    private String imageUrl;
     private int rented;
     private Location location;
     private int renter;
@@ -43,11 +43,11 @@ public class Bike {
         this.price = price;
     }
 
-    public Bitmap getImageUrl() {
+    public String getImageUrl() {
         return imageUrl;
     }
 
-    public void setImageUrl(Bitmap imageUrl) {
+    public void setImageUrl(String imageUrl) {
         this.imageUrl = imageUrl;
     }
 
@@ -83,7 +83,7 @@ public class Bike {
         this.category = category;
     }
 
-    public Bike(int id, String name, float price, Bitmap imageUrl, int rented, Location location, int renter, int category) {
+    public Bike(int id, String name, float price, String imageUrl, int rented, Location location, int renter, int category) {
         this.id = id;
         this.name = name;
         this.price = price;
