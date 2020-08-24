@@ -1,6 +1,7 @@
 package com.example.mpip.freeride;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -38,10 +39,9 @@ public class BikeAdapter extends BaseAdapter {
     }
 
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
+    public View getView(final int position, View convertView, ViewGroup parent) {
         LayoutInflater layoutInflater = (LayoutInflater)mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        View listing = layoutInflater.inflate(R.layout.gridview_item, parent, false);
-
+        final View listing = layoutInflater.inflate(R.layout.gridview_item, parent, false);
         Bitmap bitmap = bitmaps[position];
      /*   try {
             bitmap = MediaStore.Images.Media.getBitmap(mContext.getContentResolver(), uri);
@@ -52,6 +52,16 @@ public class BikeAdapter extends BaseAdapter {
         icon.setImageBitmap(bitmap); // set logo images
         TextView textView = (TextView) listing.findViewById(R.id.textView);
         textView.setText(bikes[position].getName());
+        listing.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(mContext, ClientBikeActivity.class);
+                i.putExtra("bikeId", bikes[position].getId());
+                i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                mContext.startActivity(i);
+            }
+        });
+
         return listing;
     }
 }

@@ -31,6 +31,7 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="title_activity_renter_main">RenterMainActivity</string>
     <string name="title_activity_add_bicycle">AddBicycleActivity</string>
+    <string name="message_hours">How many hours do you want to rent this bike?</string>
 
 
 </resources>
