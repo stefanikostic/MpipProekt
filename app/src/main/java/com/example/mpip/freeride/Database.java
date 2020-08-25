@@ -356,6 +356,14 @@ public class Database extends SQLiteOpenHelper
         return db.rawQuery("Select * from Bike where rented=0", null);
     }
 
+    public Cursor getRentersBikes(int id) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        return db.rawQuery("Select * from Bike where renter_id='" + id + "'", null);
+    }
+    public Cursor getBike(int id) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        return db.rawQuery("Select * from Bike where id='" + id + "'", null);
+    }
     public int getRenterId(String renterEmail) {
         SQLiteDatabase db = this.getReadableDatabase();
         String query = "Select * from Renter WHERE Email='" + renterEmail+"'";

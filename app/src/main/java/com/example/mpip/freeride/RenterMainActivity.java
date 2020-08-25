@@ -51,7 +51,8 @@ public class RenterMainActivity extends AppCompatActivity {
         fab = findViewById(R.id.fab1);
         setSupportActionBar(toolbar);
         db = new Database(this);
-        Cursor cursor = db.getAllAvailableBikes();
+        int id = db.getRenterId(getIntent().getStringExtra("email"));
+        Cursor cursor = db.getRentersBikes(id);
         int counter = cursor.getCount();
         int[] ids = new int[counter];
         String[] names = new String[counter];
