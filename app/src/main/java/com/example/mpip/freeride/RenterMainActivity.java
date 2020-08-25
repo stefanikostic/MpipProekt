@@ -40,6 +40,7 @@ public class RenterMainActivity extends AppCompatActivity {
     Bitmap bitmap = null;
     GridView gridView;
     FloatingActionButton fab;
+    @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

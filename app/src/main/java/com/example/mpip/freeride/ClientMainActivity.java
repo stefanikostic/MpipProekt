@@ -7,6 +7,7 @@ import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.location.Geocoder;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -15,23 +16,44 @@ import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.GridView;
+import android.widget.Toast;
 
 import com.example.mpip.freeride.domain.Bike;
+import com.example.mpip.freeride.domain.BikeDistance;
 import com.example.mpip.freeride.domain.Location;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Locale;
 
 public class ClientMainActivity extends AppCompatActivity {
 
+    double dis;
+    double myLat;
+    double myLong;
+    private static final int REQUEST_CODE = 101;
+
+    android.location.Location currentLocation;
+    FusedLocationProviderClient fusedLocationProviderClient;
+    Geocoder geocoder;
+
     Database db;
-    ArrayList<Bike> bikes = new ArrayList<Bike>();
+    ArrayList<BikeDistance> bikes = new ArrayList<BikeDistance>();
     Bitmap bitmap = null;
     Uri uri = null;
     ArrayList<Bitmap> bitmaps = new ArrayList<Bitmap>();
@@ -39,11 +61,16 @@ public class ClientMainActivity extends AppCompatActivity {
     GridView gridView;
     FloatingActionButton fab;
     ArrayList<String> bikes1 = new ArrayList<String>();
+    @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_client_main);
         Toolbar toolbar = findViewById(R.id.toolbar);
+
+        geocoder = new Geocoder(this, Locale.getDefault());
+        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
+        fetchLastLocation();
 
         gridView=(GridView) findViewById(R.id.gridview_bikes1);
         fab = findViewById(R.id.fab);
@@ -72,10 +99,15 @@ public class ClientMainActivity extends AppCompatActivity {
                         int rented = cursor.getInt(cursor.getColumnIndex("Rented"));
                         int renter_id = cursor.getInt(cursor.getColumnIndex("renter_id"));
                         Location location = new Location(latitudes[i], longitudes[i]);
-                        bikes.add(new Bike(ids[i], names[i], prices[i], images[i], rented, location, renter_id, category_ids[i]));
+                        dis=distance(myLat, myLong, latitudes[i], longitudes[i]);
+                        Bike b=new Bike(ids[i], names[i], prices[i], images[i], rented, location, renter_id, category_ids[i]);
+                        bikes.add(new BikeDistance(b, dis));
+
                     }
             }
         }
+
+
         requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
                 1);
 
@@ -107,73 +139,59 @@ public class ClientMainActivity extends AppCompatActivity {
 
     public void handdlee() throws FileNotFoundException {
         String[] niza = (String[]) bikes1.toArray(new String[0]);
-        for (int i = 0; i < niza.length; i++) {
-            Uri imageUri = Uri.parse(niza[i]);
+        Collections.sort(bikes);
+        Bike [] arr=new Bike[bikes.size()];
+        int i=0;
+        for(BikeDistance bd:bikes){
+            arr[i]=bd.getBike();
+            i++;
+        }
+        for (i = 0; i < niza.length; i++) {
+            int a=arr[i].getId()-1;
+            Uri imageUri = Uri.parse(niza[a]);
             InputStream is = getContentResolver().openInputStream(imageUri);
 
             Bitmap bitmap = BitmapFactory.decodeStream(is);
 
             bitmaps.add(bitmap);
         }
-        Bike [] arr = bikes.toArray(new Bike[0]);
-        BikeAdapter bikeAdapter = new BikeAdapter(getApplicationContext(), bikes.toArray(new Bike[0]), (Bitmap[]) bitmaps.toArray(new Bitmap[0]));
+        BikeAdapter bikeAdapter = new BikeAdapter(getApplicationContext(), arr, (Bitmap[]) bitmaps.toArray(new Bitmap[0]));
         gridView.setAdapter(bikeAdapter);
 
     }
 
-   /* @RequiresApi(api = Build.VERSION_CODES.KITKAT)
-    public ArrayList<Bike> readFileFromSQLite(Cursor cursor) throws IOException {
-        ArrayList<Bike> bicycles = new ArrayList<Bike>();
+    private void fetchLastLocation() {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_CODE);
 
-        for(int i = 0; i < cursor.getCount(); i++)
-        {
-            if(cursor != null)
-            {
-                if(cursor.moveToFirst())
-                {
-                    while(!cursor.isAfterLast())
-                    {
-                        ids[i] =
-                    }
-                int id = cursor.getColumnIndex("id");
-                String name = cursor.getString(cursor.getColumnIndex("model_name"));
-                int price = cursor.getInt(cursor.getColumnIndex("Price"));
-                int rented = cursor.getInt(cursor.getColumnIndex("Rented"));
-                int category_id = cursor.getInt(cursor.getColumnIndex("category_id"));
-                double latitude = cursor.getDouble(cursor.getColumnIndex("latitude"));
-                double longitude = cursor.getDouble(cursor.getColumnIndex("longitude"));
-                Uri uri = Uri.parse(cursor.getString(cursor.getColumnIndex("image_url")));
-                Bitmap bitmap = null;
-                Intent i = new Intent(Intent.ACTION_OPEN_DOCUMENT);
-                i.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
-                i.setType("image/*");
-                startActivityForResult(i, 2);
-                int renter_id = cursor.getInt(cursor.getColumnIndex("renter_id"));
-                Location location = new Location(latitude, longitude);
-                Bike bike = new Bike(id, name, price, bitmap, rented, location, renter_id, category_id);
-                bicycles.add(bike);
-            }
-            cursor.close();
+            return;
         }
-        return bicycles;
-    }*/
+        Task<android.location.Location> task = fusedLocationProviderClient.getLastLocation();
+        task.addOnSuccessListener(new OnSuccessListener<android.location.Location>() {
+            @Override
+            public void onSuccess(android.location.Location location) {
 
-    /*@Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        //Detects request codes
-        if(resultCode == Activity.RESULT_OK) {
-            uri = data.getData();
-            bitmap = null;
-            try {
-                bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), uri);
-            } catch (FileNotFoundException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            } catch (IOException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+                if (location != null) {
+                    currentLocation = location;
+                    myLat = location.getLatitude();
+                    myLong = location.getLongitude();
+                    currentLocation.setLatitude(myLat);
+                    currentLocation.setLongitude(myLong);
+                }
             }
-        }
-    }*/
+        });
+    }
+
+    public double distance(double myLat, double myLong, double latBike, double longBike) {
+        double radius = 6378137;
+        double deltaLat = latBike - myLat;
+        double deltaLon = longBike - myLong;
+        double angle = 2 * Math.asin( Math.sqrt(
+                Math.pow(Math.sin(deltaLat/2), 2) +
+                        Math.cos(myLat) * Math.cos(latBike) *
+                                Math.pow(Math.sin(deltaLon/2), 2) ) );
+        return radius * angle;
+    }
+
 }
