@@ -2,16 +2,22 @@ package com.example.mpip.freeride;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.location.Geocoder;
+import android.location.Location;
+import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
 import android.support.design.widget.FloatingActionButton;
@@ -25,7 +31,6 @@ import android.widget.Toast;
 
 import com.example.mpip.freeride.domain.Bike;
 import com.example.mpip.freeride.domain.BikeDistance;
-import com.example.mpip.freeride.domain.Location;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.SupportMapFragment;
@@ -46,11 +51,14 @@ public class ClientMainActivity extends AppCompatActivity {
     double dis;
     double myLat;
     double myLong;
+    private static final int REQUEST_LOCATION = 1;
     private static final int REQUEST_CODE = 101;
 
     android.location.Location currentLocation;
     FusedLocationProviderClient fusedLocationProviderClient;
     Geocoder geocoder;
+
+    LocationManager locationManager;
 
     Database db;
     ArrayList<BikeDistance> bikes = new ArrayList<BikeDistance>();
@@ -68,9 +76,12 @@ public class ClientMainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_client_main);
         Toolbar toolbar = findViewById(R.id.toolbar);
 
-        geocoder = new Geocoder(this, Locale.getDefault());
-        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
-        fetchLastLocation();
+        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+            buildAlertMessageNoGps();
+        } else if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+            getLocation();
+        }
 
         gridView=(GridView) findViewById(R.id.gridview_bikes1);
         fab = findViewById(R.id.fab);
@@ -98,7 +109,7 @@ public class ClientMainActivity extends AppCompatActivity {
                         bikes1.add(images[i]);
                         int rented = cursor.getInt(cursor.getColumnIndex("Rented"));
                         int renter_id = cursor.getInt(cursor.getColumnIndex("renter_id"));
-                        Location location = new Location(latitudes[i], longitudes[i]);
+                        com.example.mpip.freeride.domain.Location location = new com.example.mpip.freeride.domain.Location(latitudes[i], longitudes[i]);
                         dis=distance(myLat, myLong, latitudes[i], longitudes[i]);
                         Bike b=new Bike(ids[i], names[i], prices[i], images[i], rented, location, renter_id, category_ids[i]);
                         bikes.add(new BikeDistance(b, dis));
@@ -119,6 +130,23 @@ public class ClientMainActivity extends AppCompatActivity {
                         .setAction("Action", null).show();
             }
         });
+    }
+    protected void buildAlertMessageNoGps() {
+        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage("Please Turn ON your GPS Connection")
+                .setCancelable(false)
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    public void onClick(final DialogInterface dialog, final int id) {
+                        startActivity(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS));
+                    }
+                })
+                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    public void onClick(final DialogInterface dialog, final int id) {
+                        dialog.cancel();
+                    }
+                });
+        final AlertDialog alert = builder.create();
+        alert.show();
     }
     @Override
     public void onRequestPermissionsResult(final int requestCode, @NonNull final String[] permissions, @NonNull final int[] grantResults) {
@@ -160,39 +188,51 @@ public class ClientMainActivity extends AppCompatActivity {
 
     }
 
-    private void fetchLastLocation() {
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
-                && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_CODE);
+    private void getLocation() {
+        if (ActivityCompat.checkSelfPermission(ClientMainActivity.this, Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission
+                (ClientMainActivity.this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
 
-            return;
-        }
-        Task<android.location.Location> task = fusedLocationProviderClient.getLastLocation();
-        task.addOnSuccessListener(new OnSuccessListener<android.location.Location>() {
-            @Override
-            public void onSuccess(android.location.Location location) {
+            ActivityCompat.requestPermissions(ClientMainActivity.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_LOCATION);
 
-                if (location != null) {
-                    currentLocation = location;
-                    myLat = location.getLatitude();
-                    myLong = location.getLongitude();
-                    currentLocation.setLatitude(myLat);
-                    currentLocation.setLongitude(myLong);
-                }
+        } else {
+            Location location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+
+            Location location1 = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+
+            Location location2 = locationManager.getLastKnownLocation(LocationManager.PASSIVE_PROVIDER);
+
+            if (location != null) {
+                myLat = location.getLatitude();
+                myLong = location.getLongitude();
+            } else if (location1 != null) {
+                myLat = location1.getLatitude();
+                myLong = location1.getLongitude();
+            } else if (location2 != null) {
+                myLat = location2.getLatitude();
+                myLong = location2.getLongitude();
+
+            } else {
+                Toast.makeText(this, "Unble to Trace your location", Toast.LENGTH_SHORT).show();
             }
-        });
+        }
     }
 
-    public double distance(double myLat, double myLong, double latBike, double longBike) {
-        double radius = 6371;
-        double latDistance = Math.toRadians(myLat - latBike);
-        double lonDistance = Math.toRadians(myLong - longBike);
-        double a = Math.sin(latDistance / 2) * Math.sin(latDistance / 2)
-                + Math.cos(Math.toRadians(latBike)) * Math.cos(Math.toRadians(myLat))
-                * Math.sin(lonDistance / 2) * Math.sin(lonDistance / 2);
-        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-        double distance = radius * c * 1000;
-        return distance;
+
+    public float distance(double myLat, double myLong, double latBike, double longBike) {
+        Location locationA = new Location("point A");
+
+        locationA.setLatitude(myLat);
+        locationA.setLongitude(myLong);
+
+        Location locationB = new Location("point B");
+
+        locationB.setLatitude(latBike);
+        locationB.setLongitude(longBike);
+
+        float distance = locationA.distanceTo(locationB);
+
+       return distance;
     }
 
 }
