@@ -30,7 +30,7 @@ public class BikeDistance implements Comparable<BikeDistance>{
 
     @Override
     public int compareTo(BikeDistance bikeDistance) {
-        return Double.compare(distance, bikeDistance.getDistance());
+        return Double.compare(bikeDistance.getDistance(), distance);
 
     }
 }

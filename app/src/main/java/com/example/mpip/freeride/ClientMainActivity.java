@@ -184,14 +184,15 @@ public class ClientMainActivity extends AppCompatActivity {
     }
 
     public double distance(double myLat, double myLong, double latBike, double longBike) {
-        double radius = 6378137;
-        double deltaLat = latBike - myLat;
-        double deltaLon = longBike - myLong;
-        double angle = 2 * Math.asin( Math.sqrt(
-                Math.pow(Math.sin(deltaLat/2), 2) +
-                        Math.cos(myLat) * Math.cos(latBike) *
-                                Math.pow(Math.sin(deltaLon/2), 2) ) );
-        return radius * angle;
+        double radius = 6371;
+        double latDistance = Math.toRadians(myLat - latBike);
+        double lonDistance = Math.toRadians(myLong - longBike);
+        double a = Math.sin(latDistance / 2) * Math.sin(latDistance / 2)
+                + Math.cos(Math.toRadians(latBike)) * Math.cos(Math.toRadians(myLat))
+                * Math.sin(lonDistance / 2) * Math.sin(lonDistance / 2);
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        double distance = radius * c * 1000;
+        return distance;
     }
 
 }

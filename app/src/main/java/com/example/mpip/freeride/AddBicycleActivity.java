@@ -108,6 +108,7 @@ public class AddBicycleActivity extends AppCompatActivity {
                 if(insert) {
                     Toast.makeText(view.getContext(), "You added the bike successfully!", Toast.LENGTH_SHORT).show();
                     Intent intent1 = new Intent(AddBicycleActivity.this, RenterMainActivity.class);
+                    intent1.putExtra("email", email);
                     startActivity(intent1);
                 }
             }
