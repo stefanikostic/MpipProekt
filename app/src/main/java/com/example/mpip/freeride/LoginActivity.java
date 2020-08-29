@@ -46,16 +46,7 @@ public class LoginActivity extends Activity
         e2 = (EditText) findViewById(R.id.login_pass);
 
         db = new Database(this);
-/*
-        String[] permissionArrays = new String[] {Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.MANAGE_DOCUMENTS, Manifest.permission.MEDIA_CONTENT_CONTROL};
 
-        if(checkForPermission(this, Manifest.permission.MANAGE_DOCUMENTS)
-        && checkForPermission(this, Manifest.permission.MEDIA_CONTENT_CONTROL)) {
-            //Permission granted here
-            //TODO
-        } else {
-            requestPermissions(new String[]{Manifest.permission.MANAGE_DOCUMENTS, Manifest.permission.MEDIA_CONTENT_CONTROL}, 1);
-        }*/
 
         register.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -90,28 +81,6 @@ public class LoginActivity extends Activity
         });
     }
 
-   /* private static boolean checkForPermission(final Context context, String permission) {
-        int result = ContextCompat.checkSelfPermission(context, permission);
-        //If permission is granted then it returns 0 as result
-        if (result == PackageManager.PERMISSION_GRANTED) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        switch (requestCode) {
-            case 1:
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED && grantResults[1] == PackageManager.PERMISSION_GRANTED) {
-                    //Permission granted here
-                    //TODO
-
-                }
-                break;
-        }
-    }*/
 
     public void goToNextActivity(int c) {
         if (c == 1) {
