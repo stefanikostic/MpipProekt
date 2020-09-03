@@ -5,12 +5,11 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import androidx.appcompat.*;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatButton;
 import androidx.appcompat.widget.Toolbar;
@@ -19,11 +18,16 @@ import androidx.core.app.ActivityCompat;
 import android.view.View;
 import android.widget.*;
 import com.example.mpip.freeride.domain.Location;
+import com.parse.FindCallback;
+import com.parse.ParseException;
+import com.parse.ParseObject;
+import com.parse.ParseQuery;
 
 import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 public class AddBicycleActivity extends AppCompatActivity {
 
@@ -38,6 +42,8 @@ public class AddBicycleActivity extends AppCompatActivity {
     Bitmap bitmap = null;
     Uri uri = null;
     Database db;
+    
+    ArrayAdapter<String> adapter;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -51,12 +57,31 @@ public class AddBicycleActivity extends AppCompatActivity {
         et = (EditText) findViewById(R.id.price);
         et2 = (EditText) findViewById(R.id.model_name);
         setSupportActionBar(toolbar);
-        String[] categories = (String[]) db.getCategories().toArray(new String[0]);
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>
-                (this, R.layout.autocomplete_textview, categories);
-        actv.setThreshold(1);
-        actv.setAdapter(adapter);
-        actv.setTextColor(Color.parseColor("#000000"));
+        final ArrayList<String> list_categories =new ArrayList<>();
+        adapter = new ArrayAdapter<String>(this, R.layout.autocomplete_textview, list_categories);
+
+
+        ParseQuery<ParseObject> query = new ParseQuery<ParseObject>("Categories");
+        query.findInBackground(new FindCallback<ParseObject>() {
+            @Override
+            public void done(List<ParseObject> objects, ParseException e) {
+                if(e == null){
+                    if(objects.size() > 0){
+                        for(ParseObject object : objects){
+                            list_categories.add(object.getString("name"));
+                        }
+                        actv.setAdapter(adapter);
+                        actv.setThreshold(1);
+                        actv.setTextColor(Color.parseColor("#000000"));
+                    }else {
+                        e.printStackTrace();
+                    }
+                }else {
+                    e.printStackTrace();
+                }
+            }
+        });
+
         imageButton = findViewById(R.id.imageButton);
         imageButton.setOnClickListener(new View.OnClickListener() {
 
