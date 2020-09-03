@@ -6,11 +6,14 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.location.Location;
 import android.os.*;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.NotificationCompat;
+import androidx.appcompat.*;
 import android.util.Log;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.core.app.NotificationCompat;
+
 import com.example.mpip.freeride.ClientMainActivity;
 import com.example.mpip.freeride.R;
 import com.google.android.gms.location.*;

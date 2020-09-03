@@ -5,7 +5,7 @@
              android:layout_height="match_parent">
 
     <!-- TODO: Update blank fragment layout -->
-    <android.support.constraint.ConstraintLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             tools:context=".RegisterActivity"
@@ -65,7 +65,7 @@
                 android:fontFamily="sans-serif-medium"/>
 
 
-        <android.support.v7.widget.Toolbar
+        <androidx.appcompat.widget.Toolbar
                 android:layout_width="500dp"
                 android:layout_height="85dp"
                 android:theme="?attr/actionBarTheme"
@@ -98,6 +98,6 @@
                     android:textAlignment="center"
                     android:textColor="#ffffff" android:layout_width="180dp"
                     android:layout_height="match_parent"/>
-        </android.support.v7.widget.Toolbar>
-    </android.support.constraint.ConstraintLayout>
+        </androidx.appcompat.widget.Toolbar>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </FrameLayout>
