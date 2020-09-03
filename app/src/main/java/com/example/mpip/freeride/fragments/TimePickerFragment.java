@@ -4,9 +4,12 @@ package com.example.mpip.freeride.fragments;
 import android.app.Dialog;
 import android.app.TimePickerDialog;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.v4.app.DialogFragment;
+
 import android.text.format.DateFormat;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.*;
+import androidx.fragment.app.DialogFragment;
 
 import java.util.Calendar;
 

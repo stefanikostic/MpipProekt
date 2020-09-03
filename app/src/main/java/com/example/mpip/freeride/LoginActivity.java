@@ -9,12 +9,17 @@ import android.database.Cursor;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
+
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
+
+import com.parse.ParseAnalytics;
+import com.parse.ParseException;
+import com.parse.ParseObject;
+import com.parse.SaveCallback;
 
 public class LoginActivity extends Activity
 {
@@ -79,6 +84,20 @@ public class LoginActivity extends Activity
                 }
             }
         });
+        ParseObject object = new ParseObject("Stefani");
+        object.put("proba","andreja");
+        object.saveInBackground(new SaveCallback() {
+            @Override
+            public void done(ParseException e) {
+                if(e == null){
+                    Log.i("Save", "Yes");
+                }else {
+                    Log.i("Save","No");
+                }
+            }
+        });
+
+        ParseAnalytics.trackAppOpenedInBackground(getIntent());
     }
 
 
