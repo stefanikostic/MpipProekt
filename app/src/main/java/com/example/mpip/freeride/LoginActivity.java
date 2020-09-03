@@ -11,24 +11,40 @@ import android.os.Bundle;
 import android.os.Handler;
 
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Toast;
+
+import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.parse.ParseAnalytics;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.SaveCallback;
 
-public class LoginActivity extends Activity
-{
+public class LoginActivity extends Activity implements View.OnClickListener{
+
+    @Override
+    public void onClick(View view) {
+        if(view.getId() == R.id.constrainLayout || view.getId() == R.id.Logo){
+            InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+            inputMethodManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(),0);
+        }
+
+    }
+
     private static final int REQUEST_CODE = 101 ;
     Button register;
     Button sign;
 
 
     EditText e1, e2;
+    ConstraintLayout constraintLayout;
+    ImageView Logo;
 
     Database db;
 
@@ -39,6 +55,7 @@ public class LoginActivity extends Activity
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
+
         Activity acc = this;
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
@@ -49,6 +66,13 @@ public class LoginActivity extends Activity
 
         e1 = (EditText) findViewById(R.id.login_email);
         e2 = (EditText) findViewById(R.id.login_pass);
+
+        constraintLayout = (ConstraintLayout) findViewById(R.id.constrainLayout);
+        Logo = (ImageView) findViewById(R.id.Logo);
+
+        constraintLayout.setOnClickListener(this);
+        Logo.setOnClickListener(this);
+
 
         db = new Database(this);
 
@@ -84,18 +108,6 @@ public class LoginActivity extends Activity
                 }
             }
         });
-        ParseObject object = new ParseObject("Stefani");
-        object.put("proba","andreja");
-        object.saveInBackground(new SaveCallback() {
-            @Override
-            public void done(ParseException e) {
-                if(e == null){
-                    Log.i("Save", "Yes");
-                }else {
-                    Log.i("Save","No");
-                }
-            }
-        });
 
         ParseAnalytics.trackAppOpenedInBackground(getIntent());
     }
@@ -122,4 +134,6 @@ public class LoginActivity extends Activity
                 startActivity(i);
             }
     }
+
+
 }

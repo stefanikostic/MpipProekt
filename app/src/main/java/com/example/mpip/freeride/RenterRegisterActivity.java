@@ -3,18 +3,29 @@ package com.example.mpip.freeride;
 import android.content.Intent;
 import androidx.appcompat.*;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
 
 import android.os.Bundle;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.Toast;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
-public class RenterRegisterActivity extends AppCompatActivity {
+public class RenterRegisterActivity extends AppCompatActivity implements View.OnClickListener {
+    @Override
+    public void onClick(View view) {
+        if(view.getId() == R.id.constrainLayout){
+            InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+            inputMethodManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(),0);
+        }
+    }
+
     EditText et1, et2, et3, et4;
     FloatingActionButton fab;
     Database db;
+    ConstraintLayout constraintLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,6 +38,8 @@ public class RenterRegisterActivity extends AppCompatActivity {
         et3 = (EditText) findViewById(R.id.reg_tel);
         et4 = (EditText) findViewById(R.id.store_name);
         fab = (FloatingActionButton) findViewById(R.id.fab);
+        constraintLayout = (ConstraintLayout) findViewById(R.id.constrainLayout);
+        constraintLayout.setOnClickListener(this);
 
         fab.setOnClickListener(new View.OnClickListener() {
             @Override

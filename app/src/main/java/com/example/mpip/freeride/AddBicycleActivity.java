@@ -42,7 +42,7 @@ public class AddBicycleActivity extends AppCompatActivity {
     Bitmap bitmap = null;
     Uri uri = null;
     Database db;
-    
+
     ArrayAdapter<String> adapter;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
