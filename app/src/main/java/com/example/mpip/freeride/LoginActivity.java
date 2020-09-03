@@ -18,21 +18,31 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
+import android.widget.Toolbar;
 
+import androidx.annotation.RequiresApi;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
+import com.parse.FindCallback;
 import com.parse.ParseAnalytics;
 import com.parse.ParseException;
 import com.parse.ParseObject;
+import com.parse.ParseQuery;
+import com.parse.ParseUser;
 import com.parse.SaveCallback;
+import com.parse.SignUpCallback;
+
+import java.util.List;
+import java.util.Objects;
 
 public class LoginActivity extends Activity implements View.OnClickListener{
 
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
     public void onClick(View view) {
         if(view.getId() == R.id.constrainLayout || view.getId() == R.id.Logo){
             InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
-            inputMethodManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(),0);
+            inputMethodManager.hideSoftInputFromWindow(Objects.requireNonNull(getCurrentFocus()).getWindowToken(),0);
         }
 
     }
@@ -89,50 +99,118 @@ public class LoginActivity extends Activity implements View.OnClickListener{
             @Override
             public void onClick(View v) {
 
-
+                boolean flag = true;
                 s1 = e1.getText().toString();
                 s2 = e2.getText().toString();
 
-                int check = db.checkLogin(s1, s2);
 
-                if(check==0)
-                {
-                    //delete fields and show toast
-                    Toast.makeText(getApplicationContext(), "Wrong username or password", Toast.LENGTH_SHORT).show();
-                    e1.setText("");
-                    e2.setText("");
+                    final ParseQuery<ParseObject> query = new ParseQuery<ParseObject>("Renters");
+                    query.whereEqualTo("email",e1.getText().toString());
+                    query.findInBackground(new FindCallback<ParseObject>() {
+                        @Override
+                        public void done(List<ParseObject> objects, ParseException e) {
+                            if(e == null){
+                                if(objects.size()>0){
+                                 for(ParseObject object : objects){
+                                     if(object.getString("password").matches(e2.getText().toString())){
+                                         goToNextActivity(2);
+                                         Toast.makeText(getApplicationContext(),"SUCCESS", Toast.LENGTH_SHORT).show();
+
+                                     }else {
+                                         Toast.makeText(getApplicationContext(),"Incorrect password or username", Toast.LENGTH_SHORT).show();
+
+                                     }
+
+                                 }
+
+                                }else {
+                                    final ParseQuery<ParseObject> query = new ParseQuery<ParseObject>("Users");
+                                    query.whereEqualTo("email", e1.getText().toString());
+                                    query.findInBackground(new FindCallback<ParseObject>() {
+                                        @Override
+                                        public void done(List<ParseObject> objects, ParseException e) {
+                                            if(e == null){
+                                                if(objects.size() > 0 ){
+                                                    for(ParseObject object : objects){
+                                                        if(object.getString("password").matches(e2.getText().toString())){
+                                                            goToNextActivity(1);
+                                                            Toast.makeText(getApplicationContext(),"SUCCESS", Toast.LENGTH_SHORT).show();
+
+                                                        }else {
+                                                            Toast.makeText(getApplicationContext(),"Incorrect password or username", Toast.LENGTH_SHORT).show();
+
+                                                        }
+                                                    }
+                                                }
+                                                else {
+                                                    Toast.makeText(getApplicationContext(),"Incorrect password or username", Toast.LENGTH_SHORT).show();
+
+                                                }
+                                            }else {
+                                                Toast.makeText(getApplicationContext(),"Incorrect password or username", Toast.LENGTH_SHORT).show();
+                                            }
+                                        }
+                                    });
+                                }
+                            }else {
+
+
+
+
+                            }
+                        }
+                    });
+
                 }
-                else
-                {
-                    goToNextActivity(check);
-                }
-            }
+
         });
 
         ParseAnalytics.trackAppOpenedInBackground(getIntent());
     }
 
+    private void tryInRenters() {
+
+        ParseQuery<ParseObject> query = new ParseQuery<ParseObject>("Renters");
+        query.whereEqualTo("email",e1.getText().toString());
+        query.findInBackground(new FindCallback<ParseObject>() {
+            @Override
+            public void done(List<ParseObject> objects, ParseException e) {
+                if(e == null){
+                    if(objects.size()>0){
+                        for(ParseObject object : objects){
+                            if(object.getString("password").matches(e2.getText().toString())){
+                                goToNextActivity(2);
+                                Toast.makeText(getApplicationContext(),"SUCCESS", Toast.LENGTH_SHORT).show();
+
+                            }else {
+                                Toast.makeText(getApplicationContext(),"Incorrect password or username", Toast.LENGTH_SHORT).show();
+
+                            }
+
+                        }
+
+                    }else {
+                        e.printStackTrace();
+                    }
+                }else {
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
+
 
     public void goToNextActivity(int c) {
-        if (c == 1) {
-            Intent i = new Intent(LoginActivity.this, ClientMainActivity.class);
-            //go to rent activity
-            //Toast.makeText(getApplicationContext(), "Successful Login", Toast.LENGTH_SHORT).show();
-            Bundle extras = new Bundle();
-            extras.putString("email", s1);
-            extras.putString("password", s2);
-            i.putExtras(extras);
-            startActivity(i);
-        } else if(c==2){
-                Intent i = new Intent(LoginActivity.this, RenterMainActivity.class);
-                //go to rent activity
-                //Toast.makeText(getApplicationContext(), "Successful Login", Toast.LENGTH_SHORT).show();
-                Bundle extras = new Bundle();
-                extras.putString("email", s1);
-                extras.putString("password", s2);
-                i.putExtras(extras);
-                startActivity(i);
-            }
+        Intent i = new Intent(LoginActivity.this, ClientMainActivity.class);
+         if(c==2){
+             i = new Intent(LoginActivity.this, RenterMainActivity.class);
+         }
+        //Toast.makeText(getApplicationContext(), "Successful Login", Toast.LENGTH_SHORT).show();
+        Bundle extras = new Bundle();
+        extras.putString("email", s1);
+        extras.putString("password", s2);
+        i.putExtras(extras);
+        startActivity(i);
     }
 
 
