@@ -14,13 +14,11 @@ import com.example.mpip.freeride.domain.Bike;
 public class BikeAdapter extends BaseAdapter {
     private Context mContext;
     private final Bike[] bikes;
-    private final Bitmap[] bitmaps;
     LayoutInflater inflter;
 
-    public BikeAdapter(Context mContext, Bike[] bikes, Bitmap[] bitmaps){
+    public BikeAdapter(Context mContext, Bike[] bikes){
         this.mContext = mContext;
         this.bikes = bikes;
-        this.bitmaps = bitmaps;
         inflter = (LayoutInflater.from(mContext));
     }
     @Override
@@ -42,7 +40,7 @@ public class BikeAdapter extends BaseAdapter {
     public View getView(final int position, View convertView, ViewGroup parent) {
         LayoutInflater layoutInflater = (LayoutInflater)mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         final View listing = layoutInflater.inflate(R.layout.gridview_item, parent, false);
-        Bitmap bitmap = bitmaps[position];
+        Bitmap bitmap = bikes[position].getImage();
      /*   try {
             bitmap = MediaStore.Images.Media.getBitmap(mContext.getContentResolver(), uri);
         } catch (IOException e) {

@@ -5,12 +5,12 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.Point;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import androidx.appcompat.*;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatButton;
 import androidx.appcompat.widget.Toolbar;
@@ -19,11 +19,18 @@ import androidx.core.app.ActivityCompat;
 import android.view.View;
 import android.widget.*;
 import com.example.mpip.freeride.domain.Location;
+import com.parse.FindCallback;
+import com.parse.ParseException;
+import com.parse.ParseFile;
+import com.parse.ParseObject;
+import com.parse.ParseQuery;
+import com.parse.SaveCallback;
 
 import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 public class AddBicycleActivity extends AppCompatActivity {
 
@@ -38,6 +45,8 @@ public class AddBicycleActivity extends AppCompatActivity {
     Bitmap bitmap = null;
     Uri uri = null;
     Database db;
+
+    ArrayAdapter<String> adapter;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -51,12 +60,31 @@ public class AddBicycleActivity extends AppCompatActivity {
         et = (EditText) findViewById(R.id.price);
         et2 = (EditText) findViewById(R.id.model_name);
         setSupportActionBar(toolbar);
-        String[] categories = (String[]) db.getCategories().toArray(new String[0]);
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>
-                (this, R.layout.autocomplete_textview, categories);
-        actv.setThreshold(1);
-        actv.setAdapter(adapter);
-        actv.setTextColor(Color.parseColor("#000000"));
+        final ArrayList<String> list_categories =new ArrayList<>();
+        adapter = new ArrayAdapter<String>(this, R.layout.autocomplete_textview, list_categories);
+
+
+        ParseQuery<ParseObject> query = new ParseQuery<ParseObject>("Categories");
+        query.findInBackground(new FindCallback<ParseObject>() {
+            @Override
+            public void done(List<ParseObject> objects, ParseException e) {
+                if(e == null){
+                    if(objects.size() > 0){
+                        for(ParseObject object : objects){
+                            list_categories.add(object.getString("name"));
+                        }
+                        actv.setAdapter(adapter);
+                        actv.setThreshold(1);
+                        actv.setTextColor(Color.parseColor("#000000"));
+                    }else {
+                        e.printStackTrace();
+                    }
+                }else {
+                    e.printStackTrace();
+                }
+            }
+        });
+
         imageButton = findViewById(R.id.imageButton);
         imageButton.setOnClickListener(new View.OnClickListener() {
 
@@ -93,26 +121,70 @@ public class AddBicycleActivity extends AppCompatActivity {
                 startActivityForResult(i, 2);*/
             }
         });
-        addBike.setOnClickListener(new View.OnClickListener() {
+         addBike.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
-                int price = Integer.parseInt(et.getText().toString());
+            public void onClick(final View view) {
+                final int price = Integer.parseInt(et.getText().toString());
                 Intent i = getIntent();
-                String email = i.getStringExtra("email");
-                int renter_id = db.getRenterId(email);
-                Location location = db.getRenterLocation(email);
-                double lat = location.getLatitude();
-                double longi = location.getLongitude();
-                String cat = actv.getText().toString();
-                int category_id = db.getCategoryID(cat);
-                String modelName = et2.getText().toString();
-                Boolean insert = db.insertBike(0, price, modelName, renter_id, category_id, lat, longi, uri.toString());
-                if(insert) {
-                    Toast.makeText(view.getContext(), "You added the bike successfully!", Toast.LENGTH_SHORT).show();
-                    Intent intent1 = new Intent(AddBicycleActivity.this, RenterMainActivity.class);
-                    intent1.putExtra("email", email);
-                    startActivity(intent1);
-                }
+                final String email = i.getStringExtra("email");
+                final ParseQuery<ParseObject> query = new ParseQuery<ParseObject>("Renters");
+                query.whereEqualTo("email",getIntent().getStringExtra("email"));
+                query.findInBackground(new FindCallback<ParseObject>() {
+                    @Override
+                    public void done(List<ParseObject> objects, ParseException e) {
+                        if (e == null) {
+                            final String id = objects.get(0).getObjectId();
+                            final double lat = objects.get(0).getDouble("latitude");
+                            final double longi = objects.get(0).getDouble("longitude");
+                            final ParseQuery<ParseObject> query = new ParseQuery<ParseObject>("Categories");
+                            query.whereEqualTo("name",actv.getText().toString());
+                            query.findInBackground(new FindCallback<ParseObject>() {
+                                @Override
+                                public void done(List<ParseObject> objects, ParseException e) {
+                                    if(e == null) {
+                                        String category_id = objects.get(0).getObjectId();
+                                        String modelName = et2.getText().toString();
+                                        ParseObject object = new ParseObject("Bike");
+                                        object.put("price", price);
+                                        object.put("name", modelName);
+                                        object.put("renter_id", id);
+                                        object.put("category_id", category_id);
+                                        object.put("rented", false);
+                                        object.put("latitude", lat);
+                                        object.put("longitude", longi);
+                                        try {
+                                            Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), uri);
+                                            ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                                            bitmap.compress(Bitmap.CompressFormat.PNG, 100,stream);
+                                            final byte[] byteArray = stream.toByteArray();
+                                            final ParseFile file  = new ParseFile("image", byteArray);
+                                            object.put("image", file);
+                                            object.saveInBackground(new SaveCallback() {
+                                                @Override
+                                                public void done(ParseException e) {
+                                                    if(e == null){
+                                                        Toast.makeText(getApplicationContext(), "You added the bike successfully!", Toast.LENGTH_SHORT).show();
+                                                        Intent intent1 = new Intent(AddBicycleActivity.this, RenterMainActivity.class);
+                                                        intent1.putExtra("email", email);
+                                                        startActivity(intent1);
+                                                    }
+                                                }
+                                            });
+
+                                        } catch (IOException e1) {
+                                            e1.printStackTrace();
+                                        }
+                                    }
+                                }
+                            });
+
+                        } else{
+                            e.printStackTrace();
+                        }
+                    }});
+
+
+
             }
 
         });

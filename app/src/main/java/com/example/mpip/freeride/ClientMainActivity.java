@@ -47,8 +47,13 @@ import com.karumi.dexter.listener.PermissionGrantedResponse;
 import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
 import com.karumi.dexter.listener.single.PermissionListener;
+import com.parse.FindCallback;
+import com.parse.GetDataCallback;
 import com.parse.ParseAnalytics;
+import com.parse.ParseException;
+import com.parse.ParseFile;
 import com.parse.ParseObject;
+import com.parse.ParseQuery;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -131,35 +136,39 @@ public class ClientMainActivity extends AppCompatActivity implements SharedPrefe
         gridView=(GridView) findViewById(R.id.gridview_bikes1);
         fab = findViewById(R.id.fab);
         setSupportActionBar(toolbar);
-        db = new Database(this);
-        Cursor cursor = db.getAllAvailableBikes();
-        int counter = cursor.getCount();
-        int [] ids = new int[counter];
-        String [] names = new String[counter];
-        int [] prices = new int[counter];
-        int [] category_ids = new int[counter];
-        double [] latitudes = new double[counter];
-        double [] longitudes = new double[counter];
-        String [] images = new String [counter];
-        for(int i = 0; i < cursor.getCount(); i++) {
-            if (cursor != null) {
-                while(cursor.moveToNext()) {
-                        ids[i] = cursor.getInt(cursor.getColumnIndex("id"));
-                        names[i] = cursor.getString(cursor.getColumnIndex("model_name"));
-                        prices[i] = cursor.getInt(cursor.getColumnIndex("Price"));
-                        category_ids[i] = cursor.getInt(cursor.getColumnIndex("category_id"));
-                        latitudes[i] = cursor.getDouble(cursor.getColumnIndex("latitude"));
-                        longitudes[i] = cursor.getDouble(cursor.getColumnIndex("longitude"));
-                        images[i] = cursor.getString(cursor.getColumnIndex("image_url"));
-                        bikes1.add(images[i]);
-                        int rented = cursor.getInt(cursor.getColumnIndex("Rented"));
-                        int renter_id = cursor.getInt(cursor.getColumnIndex("renter_id"));
-                        com.example.mpip.freeride.domain.Location location = new com.example.mpip.freeride.domain.Location(latitudes[i], longitudes[i]);
-                        Bike b=new Bike(ids[i], names[i], prices[i], images[i], rented, location, renter_id, category_ids[i]);
-                        onlyBikes.add(b);
-                    }
+        final ParseQuery<ParseObject> query = new ParseQuery<ParseObject>("Bike");
+        query.findInBackground(new FindCallback<ParseObject>() {
+            @Override
+            public void done(List<ParseObject> objects, ParseException e) {
+                if (e == null) {
+                  if (objects.size() > 0) {
+                      for (ParseObject o : objects) {
+                          String id = o.getObjectId();
+                          String name = o.getString("name");
+                          int price = o.getInt("price");
+                          String category_id = o.getString("category_id");
+                          double latitude = o.getDouble("latitude");
+                          boolean rented = o.getBoolean("rented");
+                          double longitude = o.getDouble("longitude");
+                          String renter_id = o.getString("renter_id");
+                          com.example.mpip.freeride.domain.Location location = new com.example.mpip.freeride.domain.Location(latitude, longitude);
+                          ParseFile img = (ParseFile) o.get("image");
+                          try {
+                              assert img != null;
+                              Bitmap bitmap = BitmapFactory.decodeByteArray(img.getData(), 0, img.getData().length);
+                              Bike bike = new Bike(id, name, price, bitmap, rented, location, renter_id, category_id);
+                              onlyBikes.add(bike);
+                          } catch (ParseException ex) {
+                              ex.printStackTrace();
+                          }
+                      }
+                  }
+                } else {
+                    e.printStackTrace();
+                }
             }
-        }
+                    });
+
 
 
 
@@ -230,29 +239,15 @@ public class ClientMainActivity extends AppCompatActivity implements SharedPrefe
     }
 
     public void handdlee() throws FileNotFoundException {
-        bitmaps = new ArrayList<Bitmap>();
-        String[] niza = (String[]) bikes1.toArray(new String[0]);
         Bike [] arr = new Bike[bikes.size()];
         int i = 0;
         for(BikeDistance bd : bikes){
             arr[i] = bd.getBike();
             i++;
         }
-        for (i = 0; i < niza.length; i++) {
-            System.out.println(arr[i].getId());
-            int a = arr[i].getId()-1;
-            Uri imageUri = Uri.parse(niza[a]);
-
-           InputStream is = getBaseContext().getContentResolver().openInputStream(imageUri);
-
-           Bitmap bitmap = BitmapFactory.decodeStream(is);
-
-           bitmaps.add(bitmap);
-        }
-        BikeAdapter bikeAdapter = new BikeAdapter(getApplicationContext(), arr, (Bitmap[]) bitmaps.toArray(new Bitmap[0]));
+        BikeAdapter bikeAdapter = new BikeAdapter(getApplicationContext(), arr);
         gridView.setAdapter(bikeAdapter);
 //        bikeAdapter.notifyDataSetChanged();
-
     }
 
     public float distance(double myLat, double myLong, double latBike, double longBike) {
