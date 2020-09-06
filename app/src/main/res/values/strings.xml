@@ -1,4 +1,10 @@
 <resources>
+    <string name="back4app_server_url">http://54.172.146.249/parse/</string>
+
+    <!-- Change the following strings as required -->
+    <string name="back4app_app_id">myappID</string>
+    <string name="back4app_client_key">7PJgi208Ax3g</string>
+
     <string name="app_name">FreeRide</string>
     <string name="text_accounts">All Accounts</string>
     <string name="hint_name">Name</string>
@@ -32,6 +38,11 @@
     <string name="title_activity_renter_main">RenterMainActivity</string>
     <string name="title_activity_add_bicycle">AddBicycleActivity</string>
     <string name="message_hours">How many hours do you want to rent this bike?</string>
+    <string name="pick_time">Pick time</string>
+    <string name="pick_time_from">Start time</string>
+    <string name="pick_time_to">End time</string>
+    <string name="pick_date">Pick start date</string>
+    <string name="pick_date_to">Pick end date</string>
 
 
 </resources>

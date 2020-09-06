@@ -6,14 +6,26 @@ import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.text.InputType;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Toast;
 
-public class RegisterActivity extends Activity
-{
+import androidx.constraintlayout.widget.ConstraintLayout;
+
+public class RegisterActivity extends Activity implements View.OnClickListener{
+    @Override
+    public void onClick(View view) {
+        if(view.getId() == R.id.constrainLayout){
+            InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+            inputMethodManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(),0);
+        }
+
+    }
 
     EditText e2, e3, e4;
+    ConstraintLayout constraintLayout;
     Button signup, signup2;
 
     Database db;
@@ -29,7 +41,8 @@ public class RegisterActivity extends Activity
         e4 = (EditText) findViewById(R.id.reg_email);
         signup = (Button) findViewById(R.id.signup);
         signup2 = (Button) findViewById(R.id.signup2);
-
+        constraintLayout = (ConstraintLayout) findViewById(R.id.constrainLayout);
+        constraintLayout.setOnClickListener(this);
 
         signup.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -67,7 +80,7 @@ public class RegisterActivity extends Activity
                     startActivity(i);
                 }
                 else
-                    Toast.makeText(getApplicationContext(), "E-mail alredy exists", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), "E-mail already exists", Toast.LENGTH_SHORT).show();
             }
             else
             {

@@ -9,35 +9,36 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.RequiresApi;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
+import androidx.appcompat.*;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+
 import android.view.View;
 import android.widget.GridView;
 import android.widget.Toast;
 import com.example.mpip.freeride.domain.Bike;
 import com.example.mpip.freeride.domain.Location;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.parse.FindCallback;
+import com.parse.GetDataCallback;
+import com.parse.ParseException;
+import com.parse.ParseFile;
+import com.parse.ParseObject;
+import com.parse.ParseQuery;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.List;
 
 public class RenterMainActivity extends AppCompatActivity {
 
     Database db;
     ArrayList<Bike> bikes = new ArrayList<Bike>();
-    ArrayList<Bitmap> bitmaps = new ArrayList<Bitmap>();
-    public static final int GALLERY_INTENT_CALLED = 1;
-    public static final int GALLERY_KITKAT_INTENT_CALLED = 2;
-    ArrayList<String> bikes1 = new ArrayList<String>();
-    Uri uri;
-    Bitmap bitmap = null;
     GridView gridView;
     FloatingActionButton fab;
     @RequiresApi(api = Build.VERSION_CODES.M)
@@ -47,45 +48,54 @@ public class RenterMainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_renter_main);
         Toolbar toolbar = findViewById(R.id.toolbar);
 
-        gridView=(GridView) findViewById(R.id.gridview_renter);
+        gridView = (GridView) findViewById(R.id.gridview_bikes);
         fab = findViewById(R.id.fab1);
         setSupportActionBar(toolbar);
         db = new Database(this);
-        Intent in = getIntent();
-        String email = in.getStringExtra("email");
-        int id = db.getRenterId(email);
-        Cursor cursor = db.getRentersBikes(id);
-        int counter = cursor.getCount();
-        int[] ids = new int[counter];
-        String[] names = new String[counter];
-        int[] prices = new int[counter];
-        int[] category_ids = new int[counter];
-        double[] latitudes = new double[counter];
-        double[] longitudes = new double[counter];
-        String[] images = new String[counter];
-        for (int i = 0; i < cursor.getCount(); i++) {
-            if (cursor != null) {
-                    while(cursor.moveToNext()) {
-                        ids[i] = cursor.getInt(cursor.getColumnIndex("id"));
-                        names[i] = cursor.getString(cursor.getColumnIndex("model_name"));
-                        prices[i] = cursor.getInt(cursor.getColumnIndex("Price"));
-                        category_ids[i] = cursor.getInt(cursor.getColumnIndex("category_id"));
-                        latitudes[i] = cursor.getDouble(cursor.getColumnIndex("latitude"));
-                        longitudes[i] = cursor.getDouble(cursor.getColumnIndex("longitude"));
-                        images[i] = cursor.getString(cursor.getColumnIndex("image_url"));
-                        int rented = cursor.getInt(cursor.getColumnIndex("Rented"));
-                        int renter_id = cursor.getInt(cursor.getColumnIndex("renter_id"));
-                        Location location = new Location(latitudes[i], longitudes[i]);
-                        images[i] = cursor.getString(cursor.getColumnIndex("image_url"));
-                        bikes1.add(images[i]);
-                        Bike bike = new Bike(ids[i], names[i], prices[i], images[i], rented, location, renter_id, category_ids[i]);
-                        bikes.add(bike);
-                    }
-            }
-        }
-
-           requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
-                            1);
+        final Bitmap bitmap;
+        final ParseQuery<ParseObject> query = new ParseQuery<ParseObject>("Renters");
+        query.whereEqualTo("email", getIntent().getStringExtra("email"));
+        query.findInBackground(new FindCallback<ParseObject>() {
+                                   @Override
+                                   public void done(List<ParseObject> objects, ParseException e) {
+                                       if (e == null) {
+                                           final String renter_id = objects.get(0).getObjectId();
+                                           final ParseQuery<ParseObject> query1 = new ParseQuery<ParseObject>("Bike");
+                                           query1.whereEqualTo("renter_id", renter_id);
+                                           query1.findInBackground(new FindCallback<ParseObject>() {
+                                               @Override
+                                               public void done(List<ParseObject> objects, ParseException e) {
+                                                   if (e == null) {
+                                                       if (objects.size() > 0) {
+                                                           for (ParseObject o : objects) {
+                                                               final String id = o.getObjectId();
+                                                               final String name = o.getString("name");
+                                                               final int price = o.getInt("price");
+                                                               final String category_id = o.getString("category_id");
+                                                               double latitude = o.getDouble("latitude");
+                                                               final boolean rented = o.getBoolean("rented");
+                                                               double longitude = o.getDouble("longitude");
+                                                               final Location location = new Location(latitude, longitude);
+                                                               ParseFile img = (ParseFile) o.get("image");
+                                                               try {
+                                                                   assert img != null;
+                                                                   Bitmap bitmap = BitmapFactory.decodeByteArray(img.getData(), 0, img.getData().length);
+                                                                   Bike bike = new Bike(id, name, price, bitmap, rented, location, renter_id, category_id);
+                                                                   bikes.add(bike);
+                                                               } catch (ParseException ex) {
+                                                                   ex.printStackTrace();
+                                                               }
+                                                           }
+                                                           handdlee();
+                                                       }
+                                                   } else {
+                                                       e.printStackTrace();
+                                                   }
+                                               }
+                                           });
+                                       }
+                                   }
+                               });
 
                     // MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE is an
                     // app-defined int constant that should be quite unique
@@ -102,11 +112,9 @@ public class RenterMainActivity extends AppCompatActivity {
                 startActivity(i);
             }
         });
-
-
     }
 
-    @Override
+/*    @Override
     public void onRequestPermissionsResult(final int requestCode, @NonNull final String[] permissions, @NonNull final int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == 1) {
@@ -121,20 +129,10 @@ public class RenterMainActivity extends AppCompatActivity {
                 // User refused to grant permission.
             }
         }
-    }
+    }*/
 
-    public void handdlee() throws FileNotFoundException {
-        String[] niza = (String[]) bikes1.toArray(new String[0]);
-        for (int i = 0; i < niza.length; i++) {
-            Uri imageUri = Uri.parse(niza[i]);
-            InputStream is = getContentResolver().openInputStream(imageUri);
-
-            Bitmap bitmap = BitmapFactory.decodeStream(is);
-
-            bitmaps.add(bitmap);
-        }
-        Bike [] arr = bikes.toArray(new Bike[0]);
-        BikeAdapter bikeAdapter = new BikeAdapter(RenterMainActivity.this, bikes.toArray(new Bike[0]), (Bitmap[]) bitmaps.toArray(new Bitmap[0]));
+    public void handdlee() {
+        BikeAdapter bikeAdapter = new BikeAdapter(getApplicationContext(), bikes.toArray(new Bike[0]));
         gridView.setAdapter(bikeAdapter);
 
     }

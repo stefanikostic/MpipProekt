@@ -7,25 +7,18 @@ import android.net.Uri;
 import java.io.InputStream;
 
 public class Bike {
-    private int id;
+    private String id;
     private String name;
-    private float price;
-    private String imageUrl;
-    private int rented;
+    private int price;
+    private boolean rented;
     private Location location;
-    private int renter;
-    private int category;
+    private String renter;
+    private String category;
+    private Bitmap image;
 
     public Bike() {
     }
 
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
 
     public String getName() {
         return name;
@@ -35,27 +28,32 @@ public class Bike {
         this.name = name;
     }
 
-    public float getPrice() {
-        return price;
-    }
-
-    public void setPrice(float price) {
-        this.price = price;
-    }
-
-    public String getImageUrl() {
-        return imageUrl;
-    }
-
-    public void setImageUrl(String imageUrl) {
-        this.imageUrl = imageUrl;
-    }
-
-    public int isRented() {
+    public boolean getRented() {
         return rented;
     }
 
-    public void setRented(int rented) {
+    public Bitmap getImage() {
+        return image;
+    }
+
+    public void setImage(Bitmap image) {
+        this.image = image;
+    }
+
+    public int getPrice() {
+        return price;
+    }
+
+    public void setPrice(int price) {
+        this.price = price;
+    }
+
+
+   /* public boolean isRented() {
+        return rented;
+    }*/
+
+    public void setRented(boolean rented) {
         this.rented = rented;
     }
 
@@ -67,30 +65,38 @@ public class Bike {
         this.location = location;
     }
 
-    public int getRenter() {
-        return renter;
-    }
-
-    public void setRenter(int renter) {
-        this.renter = renter;
-    }
-
-    public int getCategory() {
-        return category;
-    }
-
-    public void setCategory(int category) {
-        this.category = category;
-    }
-
-    public Bike(int id, String name, float price, String imageUrl, int rented, Location location, int renter, int category) {
+    public Bike(String id, String name, int price, Bitmap image, boolean rented, Location location, String renter, String category) {
         this.id = id;
         this.name = name;
         this.price = price;
-        this.imageUrl = imageUrl;
+        this.image = image;
         this.rented = rented;
         this.location = location;
         this.renter = renter;
+        this.category = category;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getRenter() {
+        return renter;
+    }
+
+    public void setRenter(String renter) {
+        this.renter = renter;
+    }
+
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
         this.category = category;
     }
 }

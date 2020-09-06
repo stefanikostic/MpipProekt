@@ -5,10 +5,12 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Geocoder;
 import android.location.Location;
-import android.support.annotation.NonNull;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.FragmentActivity;
-import android.support.v7.app.AppCompatActivity;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.*;
+import androidx.core.app.ActivityCompat;
+import androidx.fragment.app.FragmentActivity;
+
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -24,6 +26,10 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.parse.ParseException;
+import com.parse.ParseObject;
+import com.parse.ParseQuery;
+import com.parse.SaveCallback;
 
 import java.util.Locale;
 
@@ -62,14 +68,35 @@ public class RenterMapsActivity extends FragmentActivity implements OnMapReadyCa
                     lat = finalMarkerOptions.getPosition().latitude;
                     longi = finalMarkerOptions.getPosition().longitude;
                 }
-                Boolean insert = db.insertRenter(pass, email, name, surn, tel, storeName, lat, longi);
-                if(insert) {
-                    Toast.makeText(v.getContext(), "Register Successful", Toast.LENGTH_SHORT).show();
-                    Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
-                    startActivity(intent);
-                } else {
-                    Toast.makeText(v.getContext(), "Registration failed!", Toast.LENGTH_SHORT).show();
-                }
+                ParseObject object = new ParseObject("Renters");
+                object.put("telephone", Integer.parseInt(tel));
+                object.put("name", name);
+                object.put("surname", surn);
+                object.put("email", email);
+                object.put("password", pass);
+                object.put("store_name", storeName);
+                object.put("latitude", lat);
+                object.put("longitude", longi);
+                object.saveInBackground(new SaveCallback() {
+                    @Override
+                    public void done(ParseException e) {
+                        if(e == null){
+                            Toast.makeText(getApplicationContext(), "Register Successful", Toast.LENGTH_SHORT).show();
+                            Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
+                            startActivity(intent);
+                        }else {
+                            Toast.makeText(getApplicationContext(), "Registration failed!", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+//                Boolean insert = db.insertRenter(pass, email, name, surn, tel, storeName, lat, longi);
+//                if(insert) {
+//                    Toast.makeText(v.getContext(), "Register Successful", Toast.LENGTH_SHORT).show();
+//                    Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
+//                    startActivity(intent);
+//                } else {
+//                    Toast.makeText(v.getContext(), "Registration failed!", Toast.LENGTH_SHORT).show();
+//                }
             }
         });
         fetchLastLocation();
