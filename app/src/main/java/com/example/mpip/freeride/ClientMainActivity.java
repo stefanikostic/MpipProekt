@@ -83,7 +83,7 @@ public class ClientMainActivity extends AppCompatActivity {
             getLocation();
         }
 
-        gridView=(GridView) findViewById(R.id.gridview_bikes1);
+        gridView=(GridView) findViewById(R.id.gridview_client);
         fab = findViewById(R.id.fab);
         setSupportActionBar(toolbar);
         db = new Database(this);
@@ -183,7 +183,7 @@ public class ClientMainActivity extends AppCompatActivity {
 
             bitmaps.add(bitmap);
         }
-        BikeAdapter bikeAdapter = new BikeAdapter(getApplicationContext(), arr, (Bitmap[]) bitmaps.toArray(new Bitmap[0]));
+        BikeAdapter bikeAdapter = new BikeAdapter(ClientMainActivity.this, arr, (Bitmap[]) bitmaps.toArray(new Bitmap[0]));
         gridView.setAdapter(bikeAdapter);
 
     }

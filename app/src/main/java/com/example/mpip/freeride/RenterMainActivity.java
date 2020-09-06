@@ -47,7 +47,7 @@ public class RenterMainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_renter_main);
         Toolbar toolbar = findViewById(R.id.toolbar);
 
-        gridView=(GridView) findViewById(R.id.gridview_bikes);
+        gridView=(GridView) findViewById(R.id.gridview_renter);
         fab = findViewById(R.id.fab1);
         setSupportActionBar(toolbar);
         db = new Database(this);
@@ -102,6 +102,8 @@ public class RenterMainActivity extends AppCompatActivity {
                 startActivity(i);
             }
         });
+
+
     }
 
     @Override
@@ -132,7 +134,7 @@ public class RenterMainActivity extends AppCompatActivity {
             bitmaps.add(bitmap);
         }
         Bike [] arr = bikes.toArray(new Bike[0]);
-        BikeAdapter bikeAdapter = new BikeAdapter(getApplicationContext(), bikes.toArray(new Bike[0]), (Bitmap[]) bitmaps.toArray(new Bitmap[0]));
+        BikeAdapter bikeAdapter = new BikeAdapter(RenterMainActivity.this, bikes.toArray(new Bike[0]), (Bitmap[]) bitmaps.toArray(new Bitmap[0]));
         gridView.setAdapter(bikeAdapter);
 
     }

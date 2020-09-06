@@ -56,24 +56,63 @@ public class AddBicycleActivity extends AppCompatActivity {
         actv.setAdapter(adapter);
         actv.setTextColor(Color.parseColor("#000000"));
         imageButton = findViewById(R.id.imageButton);
-        imageButton.setOnClickListener(new View.OnClickListener() {
+        Intent intent=getIntent();
+        int id=intent.getIntExtra("id", 0);
+        int catID=intent.getIntExtra("categoryId", 0);
+        String name=intent.getStringExtra("name");
+        String img=intent.getStringExtra("image");
+        float price=intent.getFloatExtra("price", 0);
+        if(id==0 || catID==0 || name.equals("") || img.equals("") || price==0){
+            imageButton.setOnClickListener(new View.OnClickListener() {
 
-            @Override
-            public void onClick(View view) {
-                if(ActivityCompat.checkSelfPermission(AddBicycleActivity.this,
-                        Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED)
-                {
-                    ActivityCompat.requestPermissions(AddBicycleActivity.this,
-                            new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 100);
+                @Override
+                public void onClick(View view) {
+                    if(ActivityCompat.checkSelfPermission(AddBicycleActivity.this,
+                            Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED)
+                    {
+                        ActivityCompat.requestPermissions(AddBicycleActivity.this,
+                                new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 100);
 
-                    return;
+                        return;
+                    }
+                    Intent i = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+                    i.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+                    i.setType("image/*");
+                    startActivityForResult(i, 1);
                 }
-                Intent i = new Intent(Intent.ACTION_OPEN_DOCUMENT);
-                i.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
-                i.setType("image/*");
-                startActivityForResult(i, 1);
+            });
+        }
+        else{
+            actv.setText(db.getCategoryByID(catID));
+            et2.setText(name);
+            Uri uri=Uri.parse(img);
+            Bitmap bitmap = null;
+            try {
+                bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), uri);
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-        });
+            image.setImageBitmap(bitmap);
+            et.setText(String.valueOf(price));
+            imageButton.setOnClickListener(new View.OnClickListener() {
+
+                @Override
+                public void onClick(View view) {
+                    if(ActivityCompat.checkSelfPermission(AddBicycleActivity.this,
+                            Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED)
+                    {
+                        ActivityCompat.requestPermissions(AddBicycleActivity.this,
+                                new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 100);
+
+                        return;
+                    }
+                    Intent i = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+                    i.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+                    i.setType("image/*");
+                    startActivityForResult(i, 1);
+                }
+            });
+        }
         changePic.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
