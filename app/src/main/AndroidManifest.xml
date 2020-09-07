@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           xmlns:tools="http://schemas.android.com/tools"
-          package="com.example.mpip.freeride">
+          package="com.example.mpip.freeride" >
 
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
@@ -21,6 +21,7 @@
 
 
     <application
+
             android:usesCleartextTraffic="true"
             android:name=".App"
             android:allowBackup="true"
@@ -29,7 +30,7 @@
             android:roundIcon="@mipmap/ic_launcher_round"
             android:supportsRtl="true"
             android:theme="@style/AppTheme"
-        tools:targetApi="m">
+        tools:targetApi="29">
 
         <activity android:name=".ClientBikeActivity"
             tools:ignore="Instantiatable">

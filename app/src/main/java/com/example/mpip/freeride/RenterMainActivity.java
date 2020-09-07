@@ -77,15 +77,17 @@ public class RenterMainActivity extends AppCompatActivity {
                                                                double longitude = o.getDouble("longitude");
                                                                final Location location = new Location(latitude, longitude);
                                                                ParseFile img = (ParseFile) o.get("image");
-                                                               try {
-                                                                   assert img != null;
-                                                                   Bitmap bitmap = BitmapFactory.decodeByteArray(img.getData(), 0, img.getData().length);
-                                                                   Bike bike = new Bike(id, name, price, bitmap, rented, location, renter_id, category_id);
+                                                               Bitmap bmp = null;
+                                                               if (img != null) {
+                                                                   try {
+                                                                       bmp = BitmapFactory.decodeStream(img.getDataStream());
+                                                                   } catch (ParseException ex) {
+                                                                       ex.printStackTrace();
+                                                                   }
+                                                                   Bike bike = new Bike(id, name, price, bmp, rented, location, renter_id, category_id);
                                                                    bikes.add(bike);
-                                                               } catch (ParseException ex) {
-                                                                   ex.printStackTrace();
-                                                               }
-                                                           }
+
+                                                           }}
                                                            handdlee();
                                                        }
                                                    } else {

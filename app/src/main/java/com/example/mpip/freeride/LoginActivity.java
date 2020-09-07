@@ -42,6 +42,7 @@ public class LoginActivity extends Activity implements View.OnClickListener{
     public void onClick(View view) {
         if(view.getId() == R.id.constrainLayout || view.getId() == R.id.Logo){
             InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+            assert inputMethodManager != null;
             inputMethodManager.hideSoftInputFromWindow(Objects.requireNonNull(getCurrentFocus()).getWindowToken(),0);
         }
 
