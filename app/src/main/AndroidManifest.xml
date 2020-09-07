@@ -19,6 +19,7 @@
 
 
     <application
+        android:networkSecurityConfig="@xml/security"
             android:usesCleartextTraffic="true"
             android:name=".App"
             android:allowBackup="true"
@@ -27,7 +28,7 @@
             android:roundIcon="@mipmap/ic_launcher_round"
             android:supportsRtl="true"
             android:theme="@style/AppTheme"
-        tools:targetApi="m">
+        tools:targetApi="n">
 
         <activity android:name=".ClientBikeActivity"
             tools:ignore="Instantiatable">
