@@ -43,7 +43,8 @@ public class LoginActivity extends Activity implements View.OnClickListener{
         if(view.getId() == R.id.constrainLayout || view.getId() == R.id.Logo){
             InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
             assert inputMethodManager != null;
-            inputMethodManager.hideSoftInputFromWindow(Objects.requireNonNull(getCurrentFocus()).getWindowToken(),0);
+           inputMethodManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+
         }
 
     }
@@ -51,6 +52,7 @@ public class LoginActivity extends Activity implements View.OnClickListener{
     private static final int REQUEST_CODE = 101 ;
     Button register;
     Button sign;
+    private String id;
 
 
     EditText e1, e2;
@@ -114,9 +116,8 @@ public class LoginActivity extends Activity implements View.OnClickListener{
                                 if(objects.size()>0){
                                  for(ParseObject object : objects){
                                      if(object.getString("password").matches(e2.getText().toString())){
+                                         id = object.getObjectId();
                                          goToNextActivity(2);
-                                         Toast.makeText(getApplicationContext(),"SUCCESS", Toast.LENGTH_SHORT).show();
-
                                      }else {
                                          Toast.makeText(getApplicationContext(),"Incorrect password or username", Toast.LENGTH_SHORT).show();
 
@@ -134,9 +135,8 @@ public class LoginActivity extends Activity implements View.OnClickListener{
                                                 if(objects.size() > 0 ){
                                                     for(ParseObject object : objects){
                                                         if(object.getString("password").matches(e2.getText().toString())){
+                                                            id = object.getObjectId();
                                                             goToNextActivity(1);
-                                                            Toast.makeText(getApplicationContext(),"SUCCESS", Toast.LENGTH_SHORT).show();
-
                                                         }else {
                                                             Toast.makeText(getApplicationContext(),"Incorrect password or username", Toast.LENGTH_SHORT).show();
 
@@ -169,36 +169,6 @@ public class LoginActivity extends Activity implements View.OnClickListener{
         ParseAnalytics.trackAppOpenedInBackground(getIntent());
     }
 
-    private void tryInRenters() {
-
-        ParseQuery<ParseObject> query = new ParseQuery<ParseObject>("Renters");
-        query.whereEqualTo("email",e1.getText().toString());
-        query.findInBackground(new FindCallback<ParseObject>() {
-            @Override
-            public void done(List<ParseObject> objects, ParseException e) {
-                if(e == null){
-                    if(objects.size()>0){
-                        for(ParseObject object : objects){
-                            if(object.getString("password").matches(e2.getText().toString())){
-                                goToNextActivity(2);
-                                Toast.makeText(getApplicationContext(),"SUCCESS", Toast.LENGTH_SHORT).show();
-
-                            }else {
-                                Toast.makeText(getApplicationContext(),"Incorrect password or username", Toast.LENGTH_SHORT).show();
-
-                            }
-
-                        }
-
-                    }else {
-                        e.printStackTrace();
-                    }
-                }else {
-                    e.printStackTrace();
-                }
-            }
-        });
-    }
 
 
     public void goToNextActivity(int c) {
@@ -206,8 +176,8 @@ public class LoginActivity extends Activity implements View.OnClickListener{
          if(c==2){
              i = new Intent(LoginActivity.this, RenterMainActivity.class);
          }
-        //Toast.makeText(getApplicationContext(), "Successful Login", Toast.LENGTH_SHORT).show();
         Bundle extras = new Bundle();
+        extras.putString("id", id);
         extras.putString("email", s1);
         extras.putString("password", s2);
         i.putExtras(extras);

@@ -43,6 +43,7 @@
     <string name="pick_time_to">End time</string>
     <string name="pick_date">Pick start date</string>
     <string name="pick_date_to">Pick end date</string>
+    <string name="title_activity_client_maps">Map</string>
 
 
 </resources>

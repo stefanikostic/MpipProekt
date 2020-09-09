@@ -14,7 +14,19 @@ import com.example.mpip.freeride.domain.Bike;
 public class BikeAdapter extends BaseAdapter {
     private Context mContext;
     private final Bike[] bikes;
+    double clientLat;
+    double clientLong;
+    String clientId;
     LayoutInflater inflter;
+
+    public BikeAdapter(Context mContext, Bike[] bikes, double latitude, double longitude, String clientId){
+        this.mContext = mContext;
+        this.bikes = bikes;
+        this.clientLat = latitude;
+        this.clientLong = longitude;
+        this.clientId = clientId;
+        inflter = (LayoutInflater.from(mContext));
+    }
 
     public BikeAdapter(Context mContext, Bike[] bikes){
         this.mContext = mContext;
@@ -55,6 +67,9 @@ public class BikeAdapter extends BaseAdapter {
             public void onClick(View v) {
                 Intent i = new Intent(mContext, ClientBikeActivity.class);
                 i.putExtra("bikeId", bikes[position].getId());
+                i.putExtra("client_id", clientId);
+                i.putExtra("latitude", clientLat);
+                i.putExtra("longitude", clientLong);
                 i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 mContext.startActivity(i);
             }

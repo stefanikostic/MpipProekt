@@ -1,44 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <RelativeLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior"
-        tools:showIn="@layout/activity_client_main"
-        tools:context=".ClientMainActivity">
+        tools:context=".RentedBikesActivity">
     <androidx.constraintlayout.widget.ConstraintLayout android:layout_width="match_parent"
                                                        android:layout_height="wrap_content"
                                                        android:orientation="horizontal">
 
         <TextView
-                android:text="Grab your nearest bicycle"
+                android:text="These bicycles are waiting for you!"
                 android:layout_width="458dp"
-                android:layout_height="64dp" android:id="@+id/textView3" app:layout_constraintStart_toStartOf="parent"
+                android:layout_height="64dp" android:id="@+id/availableBikes"
+                app:layout_constraintStart_toStartOf="parent"
                 android:layout_marginStart="32dp"
                 android:textSize="22sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 android:paddingStart="40dp"
+                android:textStyle="italic"
                 android:background="@drawable/textlines"
                 android:textColor="@color/common_google_signin_btn_text_dark_focused"
                 app:layout_constraintHorizontal_bias="0.413"
                 android:layout_marginEnd="8dp" android:lineSpacingExtra="8sp" android:typeface="sans"
                 android:textAppearance="@style/TextAppearance.AppCompat.Body1"
                 app:layout_constraintTop_toTopOf="parent"
-                android:layout_marginTop="8dp"/>
+                android:layout_marginTop="24dp" app:layout_constraintBottom_toTopOf="@+id/gridview_bikes2"
+                app:layout_constraintVertical_bias="1.0"/>
 
         <GridView
-                android:id="@+id/gridview_bikes1"
+                android:id="@+id/gridview_bikes2"
                 android:visibility="visible"
-                app:layout_constraintEnd_toEndOf="parent" android:layout_marginEnd="8dp"
-                android:layout_marginStart="8dp" app:layout_constraintStart_toStartOf="parent"
-                android:layout_height="690dp"
-                android:layout_width="490dp"
+                android:layout_height="649dp"
+                android:layout_width="482dp"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintHorizontal_bias="0.315"
-                app:layout_constraintTop_toBottomOf="@+id/textView3" app:layout_constraintVertical_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent" android:layout_marginEnd="8dp"
+                app:layout_constraintHorizontal_bias="0.341" app:layout_constraintTop_toBottomOf="@+id/availableBikes"
         />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -46,12 +45,11 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
-            android:id="@+id/navigation_view"
+            android:id="@+id/navigation_view2"
             android:background="#fff"
             app:itemTextColor="#000"
             app:menu="@menu/bottom_navigation_menu"
-          />
-
-
+    />
 
 </RelativeLayout>
+
