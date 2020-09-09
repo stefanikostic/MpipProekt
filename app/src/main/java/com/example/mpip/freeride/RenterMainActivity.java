@@ -134,7 +134,7 @@ public class RenterMainActivity extends AppCompatActivity {
     }*/
 
     public void handdlee() {
-        BikeAdapter bikeAdapter = new BikeAdapter(RenterMainActivity.this, bikes.toArray(new Bike[0]));
+        BikeAdapter bikeAdapter = new BikeAdapter(RenterMainActivity.this, bikes.toArray(new Bike[0]), getIntent().getStringExtra("email"));
         gridView.setAdapter(bikeAdapter);
 
     }

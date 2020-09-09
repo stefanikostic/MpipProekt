@@ -172,11 +172,12 @@ public class LoginActivity extends Activity implements View.OnClickListener{
 
 
     public void goToNextActivity(int c) {
+        Bundle extras = new Bundle();
         Intent i = new Intent(LoginActivity.this, ClientMainActivity.class);
          if(c==2){
              i = new Intent(LoginActivity.this, RenterMainActivity.class);
+             extras.putString("renter", "true");
          }
-        Bundle extras = new Bundle();
         extras.putString("id", id);
         extras.putString("email", s1);
         extras.putString("password", s2);

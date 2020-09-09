@@ -1,5 +1,6 @@
 package com.example.mpip.freeride;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -17,6 +18,7 @@ public class BikeAdapter extends BaseAdapter {
     double clientLat;
     double clientLong;
     String clientId;
+    String renterEmail;
     LayoutInflater inflter;
 
     public BikeAdapter(Context mContext, Bike[] bikes, double latitude, double longitude, String clientId){
@@ -33,6 +35,14 @@ public class BikeAdapter extends BaseAdapter {
         this.bikes = bikes;
         inflter = (LayoutInflater.from(mContext));
     }
+
+    public BikeAdapter(Context mContext, Bike[] toArray, String email) {
+        this.mContext = mContext;
+        this.bikes = toArray;
+        this.renterEmail = email;
+        inflter = (LayoutInflater.from(mContext));
+    }
+
     @Override
     public int getCount() {
         return bikes.length;
@@ -65,10 +75,21 @@ public class BikeAdapter extends BaseAdapter {
         listing.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent i = new Intent(mContext, ClientBikeActivity.class);
-                i.putExtra("bikeId", bikes[position].getId());
-                i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                mContext.startActivity(i);
+                Intent intent = ((Activity)mContext).getIntent();
+                String renter = intent.getStringExtra("renter");
+                if(renter==null){
+                    Intent i = new Intent(mContext, ClientBikeActivity.class);
+                    i.putExtra("bikeId", bikes[position].getId());
+                    i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    mContext.startActivity(i);
+                }
+                else{
+                    Intent i = new Intent(mContext, AddBicycleActivity.class);
+                    i.putExtra("id", bikes[position].getId());
+                    i.putExtra("email", renterEmail);
+                    i.putExtra("bikeExists", "true");
+                    mContext.startActivity(i);
+                }
             }
         });
 
