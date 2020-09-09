@@ -132,6 +132,7 @@ public class ClientMainActivity extends AppCompatActivity implements SharedPrefe
         fab = findViewById(R.id.fab);
         setSupportActionBar(toolbar);
         final ParseQuery<ParseObject> query = new ParseQuery<ParseObject>("Bike");
+        query.whereEqualTo("rented", false);
         query.findInBackground(new FindCallback<ParseObject>() {
             @Override
             public void done(List<ParseObject> objects, ParseException e) {
