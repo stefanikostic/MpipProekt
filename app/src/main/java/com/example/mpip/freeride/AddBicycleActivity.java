@@ -7,24 +7,26 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.Point;
+import android.net.ParseException;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+
+import android.view.View;
+import android.widget.*;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatButton;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 
-import android.view.View;
-import android.widget.*;
 import com.example.mpip.freeride.domain.Location;
 import com.parse.FindCallback;
-import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.SaveCallback;
+
 
 import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
@@ -67,7 +69,7 @@ public class AddBicycleActivity extends AppCompatActivity {
         ParseQuery<ParseObject> query = new ParseQuery<ParseObject>("Categories");
         query.findInBackground(new FindCallback<ParseObject>() {
             @Override
-            public void done(List<ParseObject> objects, ParseException e) {
+            public void done(List<ParseObject> objects, com.parse.ParseException e) {
                 if(e == null){
                     if(objects.size() > 0){
                         for(ParseObject object : objects){
@@ -83,6 +85,7 @@ public class AddBicycleActivity extends AppCompatActivity {
                     e.printStackTrace();
                 }
             }
+
         });
 
         imageButton = findViewById(R.id.imageButton);
@@ -131,17 +134,17 @@ public class AddBicycleActivity extends AppCompatActivity {
                 query.whereEqualTo("email",getIntent().getStringExtra("email"));
                 query.findInBackground(new FindCallback<ParseObject>() {
                     @Override
-                    public void done(List<ParseObject> objects, ParseException e) {
+                    public void done(List<ParseObject> objects, com.parse.ParseException e) {
                         if (e == null) {
                             final String id = objects.get(0).getObjectId();
                             final double lat = objects.get(0).getDouble("latitude");
                             final double longi = objects.get(0).getDouble("longitude");
                             final ParseQuery<ParseObject> query = new ParseQuery<ParseObject>("Categories");
-                            query.whereEqualTo("name",actv.getText().toString());
+                            query.whereEqualTo("name", actv.getText().toString());
                             query.findInBackground(new FindCallback<ParseObject>() {
                                 @Override
-                                public void done(List<ParseObject> objects, ParseException e) {
-                                    if(e == null) {
+                                public void done(List<ParseObject> objects, com.parse.ParseException e) {
+                                    if (e == null) {
                                         String category_id = objects.get(0).getObjectId();
                                         String modelName = et2.getText().toString();
                                         ParseObject object = new ParseObject("Bike");
@@ -155,20 +158,21 @@ public class AddBicycleActivity extends AppCompatActivity {
                                         try {
                                             Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), uri);
                                             ByteArrayOutputStream stream = new ByteArrayOutputStream();
-                                            bitmap.compress(Bitmap.CompressFormat.PNG, 100,stream);
+                                            bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
                                             final byte[] byteArray = stream.toByteArray();
-                                            final ParseFile file  = new ParseFile("image", byteArray);
+                                            final ParseFile file = new ParseFile("image", byteArray);
                                             object.put("image", file);
                                             object.saveInBackground(new SaveCallback() {
                                                 @Override
-                                                public void done(ParseException e) {
-                                                    if(e == null){
+                                                public void done(com.parse.ParseException e) {
+                                                    if (e == null) {
                                                         Toast.makeText(getApplicationContext(), "You added the bike successfully!", Toast.LENGTH_SHORT).show();
                                                         Intent intent1 = new Intent(AddBicycleActivity.this, RenterMainActivity.class);
                                                         intent1.putExtra("email", email);
                                                         startActivity(intent1);
                                                     }
                                                 }
+
                                             });
 
                                         } catch (IOException e1) {
@@ -176,12 +180,15 @@ public class AddBicycleActivity extends AppCompatActivity {
                                         }
                                     }
                                 }
+
                             });
 
-                        } else{
+                        } else {
                             e.printStackTrace();
                         }
-                    }});
+                    }
+
+                });
 
 
 

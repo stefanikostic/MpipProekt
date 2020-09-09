@@ -133,7 +133,7 @@ public class ClientMainActivity extends AppCompatActivity implements SharedPrefe
 
 
 
-        gridView=(GridView) findViewById(R.id.gridview_bikes1);
+        gridView=(GridView) findViewById(R.id.gridview_client);
         fab = findViewById(R.id.fab);
         setSupportActionBar(toolbar);
         final ParseQuery<ParseObject> query = new ParseQuery<ParseObject>("Bike");
@@ -245,7 +245,7 @@ public class ClientMainActivity extends AppCompatActivity implements SharedPrefe
             arr[i] = bd.getBike();
             i++;
         }
-        BikeAdapter bikeAdapter = new BikeAdapter(getApplicationContext(), arr);
+        BikeAdapter bikeAdapter = new BikeAdapter(ClientMainActivity.this, arr);
         gridView.setAdapter(bikeAdapter);
 //        bikeAdapter.notifyDataSetChanged();
     }
