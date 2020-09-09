@@ -226,8 +226,9 @@ public class Database extends SQLiteOpenHelper
     {
         SQLiteDatabase db = this.getReadableDatabase();
 
-        Cursor cursor = db.rawQuery("Select * from Categories where id=" + categoryId + "'", null);
+        Cursor cursor = db.rawQuery("Select * from " + table_categories + " where id=" + categoryId, null);
 
+        cursor.moveToFirst();
         return cursor.getString(cursor.getColumnIndex(category));
     }
 
