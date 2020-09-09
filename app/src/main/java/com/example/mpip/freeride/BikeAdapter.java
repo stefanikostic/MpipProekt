@@ -15,15 +15,34 @@ import com.example.mpip.freeride.domain.Bike;
 public class BikeAdapter extends BaseAdapter {
     private Context mContext;
     private final Bike[] bikes;
+    double clientLat;
+    double clientLong;
+    String clientId;
+    String renterEmail;
     LayoutInflater inflter;
-    Database db;
+
+    public BikeAdapter(Context mContext, Bike[] bikes, double latitude, double longitude, String clientId){
+        this.mContext = mContext;
+        this.bikes = bikes;
+        this.clientLat = latitude;
+        this.clientLong = longitude;
+        this.clientId = clientId;
+        inflter = (LayoutInflater.from(mContext));
+    }
 
     public BikeAdapter(Context mContext, Bike[] bikes){
         this.mContext = mContext;
         this.bikes = bikes;
         inflter = (LayoutInflater.from(mContext));
-        db=new Database(mContext);
     }
+
+    public BikeAdapter(Context mContext, Bike[] toArray, String email) {
+        this.mContext = mContext;
+        this.bikes = toArray;
+        this.renterEmail = email;
+        inflter = (LayoutInflater.from(mContext));
+    }
+
     @Override
     public int getCount() {
         return bikes.length;
@@ -56,17 +75,20 @@ public class BikeAdapter extends BaseAdapter {
         listing.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent=((Activity)mContext).getIntent();
-                String email=intent.getStringExtra("email");
-                if(db.checkMail(email)){
+                Intent intent = ((Activity)mContext).getIntent();
+                String renter = intent.getStringExtra("renter");
+                if(renter==null){
                     Intent i = new Intent(mContext, ClientBikeActivity.class);
                     i.putExtra("bikeId", bikes[position].getId());
+                    i.putExtra("client_id", clientId);
                     i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     mContext.startActivity(i);
                 }
                 else{
                     Intent i = new Intent(mContext, AddBicycleActivity.class);
                     i.putExtra("id", bikes[position].getId());
+                    i.putExtra("email", renterEmail);
+                    i.putExtra("bikeExists", "true");
                     mContext.startActivity(i);
                 }
             }

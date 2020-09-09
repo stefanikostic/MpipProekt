@@ -1,8 +1,6 @@
 package com.example.mpip.freeride;
 
 import android.Manifest;
-import android.annotation.TargetApi;
-import android.app.ActivityManager;
 import android.content.*;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -15,6 +13,7 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
 
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.GridView;
 import android.widget.Toast;
@@ -24,6 +23,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.appcompat.*;
 
+import androidx.viewpager.widget.ViewPager;
 import com.example.mpip.freeride.domain.Bike;
 import com.example.mpip.freeride.domain.BikeDistance;
 import com.example.mpip.freeride.service.Common;
@@ -32,8 +32,10 @@ import com.example.mpip.freeride.service.SendLocationToActivity;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
+import com.google.android.material.tabs.TabLayout;
 import com.karumi.dexter.Dexter;
 import com.karumi.dexter.MultiplePermissionsReport;
 import com.karumi.dexter.PermissionToken;
@@ -62,6 +64,7 @@ import java.util.*;
 public class ClientMainActivity extends AppCompatActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
     private LocationService locationService;
     private boolean mBound = false;
+
     private final ServiceConnection mServiceConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder iBinder) {
@@ -78,29 +81,42 @@ public class ClientMainActivity extends AppCompatActivity implements SharedPrefe
     };
     private double myLat;
     private double myLong;
+    private String clientId;
 
-
-    private Database db;
     private ArrayList<BikeDistance> bikes = new ArrayList<BikeDistance>();
-    private ArrayList<Bitmap> bitmaps = new ArrayList<Bitmap>();
     private ArrayList<Bike> onlyBikes = new ArrayList<>();
     private GridView gridView;
-    private FloatingActionButton fab;
-    private ArrayList<String> bikes1 = new ArrayList<String>();
-    public void updateLongLat(double lat, double lng) throws FileNotFoundException {
-        myLat = lat;
-        myLong = lng;
-        convertBikes();
-
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_client_main);
-        Toolbar toolbar = findViewById(R.id.toolbar);
+        gridView=(GridView) findViewById(R.id.gridview_bikes1);
+        clientId = getIntent().getStringExtra("id");
+        BottomNavigationView bottomNavigationView = (BottomNavigationView) findViewById(R.id.navigation_view);
+        bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                switch (item.getItemId()){
+                    case R.id.ic_home:
+                        finish();
+                        break;
+                    case R.id.ic_bikes:
+                        Intent i = getIntent();
+                        Intent intent = new Intent(ClientMainActivity.this, RentedBikesActivity.class);
+                        intent.putExtra("client_id", clientId);
+                        startActivity(intent);
+                        break;
+                    case R.id.ic_exit:
+                        Intent intent1 = new Intent(ClientMainActivity.this, LoginActivity.class);
+                        startActivity(intent1);
+                        break;
+                }
 
 
+                return false;
+            }
+        });
         Dexter.withActivity(this)
                 .withPermissions(Arrays.asList(
                         Manifest.permission.ACCESS_FINE_LOCATION,
@@ -125,12 +141,6 @@ public class ClientMainActivity extends AppCompatActivity implements SharedPrefe
                     }
                 }).check();
 
-
-
-
-        gridView=(GridView) findViewById(R.id.gridview_client);
-        fab = findViewById(R.id.fab);
-        setSupportActionBar(toolbar);
         final ParseQuery<ParseObject> query = new ParseQuery<ParseObject>("Bike");
         query.whereEqualTo("rented", false);
         query.findInBackground(new FindCallback<ParseObject>() {
@@ -171,14 +181,6 @@ public class ClientMainActivity extends AppCompatActivity implements SharedPrefe
             requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.MANAGE_DOCUMENTS},
                     1);
         }
-
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
 
 
     }
@@ -240,7 +242,7 @@ public class ClientMainActivity extends AppCompatActivity implements SharedPrefe
             arr[i] = bd.getBike();
             i++;
         }
-        BikeAdapter bikeAdapter = new BikeAdapter(ClientMainActivity.this, arr);
+        BikeAdapter bikeAdapter = new BikeAdapter(ClientMainActivity.this, arr, myLat, myLong, clientId);
         gridView.setAdapter(bikeAdapter);
 //        bikeAdapter.notifyDataSetChanged();
     }
