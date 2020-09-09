@@ -80,6 +80,7 @@ public class BikeAdapter extends BaseAdapter {
                 if(renter==null){
                     Intent i = new Intent(mContext, ClientBikeActivity.class);
                     i.putExtra("bikeId", bikes[position].getId());
+                    i.putExtra("client_id", clientId);
                     i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     mContext.startActivity(i);
                 }

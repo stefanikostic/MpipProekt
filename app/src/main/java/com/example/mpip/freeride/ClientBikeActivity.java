@@ -303,10 +303,32 @@ public class ClientBikeActivity extends AppCompatActivity {
             @Override
             public void done(ParseException e) {
                 if(e == null){
-                    Toast.makeText(getApplicationContext(), "You rented this bike successfully!", Toast.LENGTH_SHORT).show();
-                    Intent intent = new Intent(getApplicationContext(), RentedBikesActivity.class);
-                    intent.putExtra("client_id", getIntent().getStringExtra("clientId"));
-                    startActivity(intent);
+                    ParseQuery<ParseObject> bikeObj = new ParseQuery<ParseObject>("Bike");
+                    bikeObj.whereEqualTo("objectId", id);
+                    bikeObj.getFirstInBackground(new GetCallback<ParseObject>() {
+                        @Override
+                        public void done(ParseObject parseObject, ParseException e) {
+                            if(e == null) {
+                                parseObject.put("rented", true);
+                                parseObject.saveInBackground(new SaveCallback() {
+                                    @Override
+                                    public void done(ParseException e) {
+                                        if (e == null) {
+                                            Toast.makeText(getApplicationContext(), "You rented this bike successfully!", Toast.LENGTH_SHORT).show();
+                                            Intent intent = new Intent(getApplicationContext(), RentedBikesActivity.class);
+                                            intent.putExtra("client_id", getIntent().getStringExtra("client_id"));
+                                            startActivity(intent);
+                                        } else {
+                                            e.printStackTrace();
+                                        }
+                                    }
+                                });
+                            } else {
+                                e.printStackTrace();
+                            }
+                        }
+                    });
+
                 }else {
                     Toast.makeText(getApplicationContext(), "Rentering failed! Try again", Toast.LENGTH_SHORT).show();
                 }

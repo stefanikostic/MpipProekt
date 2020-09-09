@@ -142,6 +142,7 @@ public class ClientMainActivity extends AppCompatActivity implements SharedPrefe
                 }).check();
 
         final ParseQuery<ParseObject> query = new ParseQuery<ParseObject>("Bike");
+        query.whereEqualTo("rented", false);
         query.findInBackground(new FindCallback<ParseObject>() {
             @Override
             public void done(List<ParseObject> objects, ParseException e) {
@@ -241,7 +242,7 @@ public class ClientMainActivity extends AppCompatActivity implements SharedPrefe
             arr[i] = bd.getBike();
             i++;
         }
-        BikeAdapter bikeAdapter = new BikeAdapter(getApplicationContext(), arr, myLat, myLong, clientId);
+        BikeAdapter bikeAdapter = new BikeAdapter(ClientMainActivity.this, arr, myLat, myLong, clientId);
         gridView.setAdapter(bikeAdapter);
 //        bikeAdapter.notifyDataSetChanged();
     }
