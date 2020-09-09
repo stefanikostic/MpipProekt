@@ -2,12 +2,13 @@ package com.example.mpip.freeride;
 
 import android.Manifest;
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Point;
-import android.net.ParseException;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -22,6 +23,8 @@ import androidx.core.app.ActivityCompat;
 
 import com.example.mpip.freeride.domain.Location;
 import com.parse.FindCallback;
+import com.parse.GetDataCallback;
+import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
@@ -42,11 +45,14 @@ public class AddBicycleActivity extends AppCompatActivity {
     private AppCompatButton addBike;
     private AutoCompleteTextView actv;
     private Button changePic;
+    private Context mContext;
     private EditText et;
     private EditText et2;
     Bitmap bitmap = null;
     Uri uri = null;
     Database db;
+    Intent intent=getIntent();
+    String id=intent.getStringExtra("id");
 
     ArrayAdapter<String> adapter;
     @Override
@@ -86,6 +92,33 @@ public class AddBicycleActivity extends AppCompatActivity {
                 }
             }
 
+        });
+
+        query=new ParseQuery<ParseObject>("Bike");
+        query.findInBackground(new FindCallback<ParseObject>() {
+            @Override
+            public void done(List<ParseObject> objects, ParseException e) {
+                if(e == null){
+                    if(objects.size()>0){
+                        for(ParseObject object : objects){
+                            if(object.getObjectId().equals(id)){
+                                actv.setText(object.getObjectId());
+                                et2.setText(object.getString("name"));
+                                int br= (int) object.getNumber("price");
+                                et.setText(br);
+                                ParseFile imageFile = (ParseFile) object.get("image");
+                                imageFile.getDataInBackground(new GetDataCallback() {
+                                    @Override
+                                    public void done(byte[] data, ParseException e) {
+                                        Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
+                                        image.setImageBitmap(bitmap);
+                                    }
+                                });
+                            }
+                        }
+                    }
+                }
+            }
         });
 
         imageButton = findViewById(R.id.imageButton);

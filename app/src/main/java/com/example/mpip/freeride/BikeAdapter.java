@@ -67,11 +67,6 @@ public class BikeAdapter extends BaseAdapter {
                 else{
                     Intent i = new Intent(mContext, AddBicycleActivity.class);
                     i.putExtra("id", bikes[position].getId());
-                    i.putExtra("categoryId", bikes[position].getCategory());
-                    i.putExtra("name", bikes[position].getName());
-                    i.putExtra("image", bikes[position].getImage());
-                    i.putExtra("price", bikes[position].getPrice());
-                    i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     mContext.startActivity(i);
                 }
             }

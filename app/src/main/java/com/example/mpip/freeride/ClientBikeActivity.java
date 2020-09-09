@@ -30,7 +30,6 @@ import com.parse.ParseFile;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 
-import com.squareup.picasso.Picasso;
 import org.w3c.dom.Text;
 
 import java.io.FileNotFoundException;
