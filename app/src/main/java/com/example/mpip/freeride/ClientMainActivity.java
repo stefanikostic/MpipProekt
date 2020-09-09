@@ -1,19 +1,14 @@
 package com.example.mpip.freeride;
 
 import android.Manifest;
-import android.app.Activity;
-import android.app.AlertDialog;
-import android.app.PendingIntent;
+import android.annotation.TargetApi;
+import android.app.ActivityManager;
 import android.content.*;
 import android.content.pm.PackageManager;
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.location.Address;
-import android.location.Geocoder;
+
 import android.location.Location;
-import android.location.LocationManager;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -110,25 +105,25 @@ public class ClientMainActivity extends AppCompatActivity implements SharedPrefe
                 .withPermissions(Arrays.asList(
                         Manifest.permission.ACCESS_FINE_LOCATION,
                         Manifest.permission.ACCESS_COARSE_LOCATION))
-                                .withListener(new MultiplePermissionsListener() {
-                                    @Override
-                                    public void onPermissionsChecked(MultiplePermissionsReport report) {
-                                        new Handler().postDelayed(new Runnable() {
-                                            @Override
-                                            public void run() {
-                                                locationService.requestLocationUpdates();
-                                            }
-                                        }, 2000);
-                                        bindService(new Intent(ClientMainActivity.this, LocationService.class),
-                                                mServiceConnection,
-                                                Context.BIND_AUTO_CREATE);
-                                    }
+                .withListener(new MultiplePermissionsListener() {
+                    @Override
+                    public void onPermissionsChecked(MultiplePermissionsReport report) {
+                        new Handler().postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                locationService.requestLocationUpdates();
+                            }
+                        }, 2000);
+                        bindService(new Intent(ClientMainActivity.this, LocationService.class),
+                                mServiceConnection,
+                                Context.BIND_AUTO_CREATE);
+                    }
 
-                                    @Override
-                                    public void onPermissionRationaleShouldBeShown(List<PermissionRequest> permissions, PermissionToken token) {
+                    @Override
+                    public void onPermissionRationaleShouldBeShown(List<PermissionRequest> permissions, PermissionToken token) {
 
-                                    }
-                                }).check();
+                    }
+                }).check();
 
 
 
@@ -141,34 +136,33 @@ public class ClientMainActivity extends AppCompatActivity implements SharedPrefe
             @Override
             public void done(List<ParseObject> objects, ParseException e) {
                 if (e == null) {
-                  if (objects.size() > 0) {
-                      for (ParseObject o : objects) {
-                          String id = o.getObjectId();
-                          String name = o.getString("name");
-                          int price = o.getInt("price");
-                          String category_id = o.getString("category_id");
-                          double latitude = o.getDouble("latitude");
-                          boolean rented = o.getBoolean("rented");
-                          double longitude = o.getDouble("longitude");
-                          String renter_id = o.getString("renter_id");
-                          com.example.mpip.freeride.domain.Location location = new com.example.mpip.freeride.domain.Location(latitude, longitude);
-                          ParseFile img = (ParseFile) o.get("image");
-                          try {
-                              assert img != null;
-                              Bitmap bitmap = BitmapFactory.decodeByteArray(img.getData(), 0, img.getData().length);
-                              Bike bike = new Bike(id, name, price, bitmap, rented, location, renter_id, category_id);
-                              onlyBikes.add(bike);
-                          } catch (ParseException ex) {
-                              ex.printStackTrace();
-                          }
-                      }
-                  }
+                    if (objects.size() > 0) {
+                        for (ParseObject o : objects) {
+                            String id = o.getObjectId();
+                            String name = o.getString("name");
+                            int price = o.getInt("price");
+                            String category_id = o.getString("category_id");
+                            double latitude = o.getDouble("latitude");
+                            boolean rented = o.getBoolean("rented");
+                            double longitude = o.getDouble("longitude");
+                            String renter_id = o.getString("renter_id");
+                            com.example.mpip.freeride.domain.Location location = new com.example.mpip.freeride.domain.Location(latitude, longitude);
+                            ParseFile img = (ParseFile) o.get("image");
+                            try {
+                                assert img != null;
+                                Bitmap bitmap = BitmapFactory.decodeByteArray(img.getData(), 0, img.getData().length);
+                                Bike bike = new Bike(id, name, price, bitmap, rented, location, renter_id, category_id);
+                                onlyBikes.add(bike);
+                            } catch (ParseException ex) {
+                                ex.printStackTrace();
+                            }
+                        }
+                    }
                 } else {
                     e.printStackTrace();
                 }
             }
-                    });
-
+        });
 
 
 
@@ -263,7 +257,7 @@ public class ClientMainActivity extends AppCompatActivity implements SharedPrefe
 
         float distance = locationA.distanceTo(locationB);
 
-       return distance;
+        return distance;
     }
 
 
@@ -275,9 +269,9 @@ public class ClientMainActivity extends AppCompatActivity implements SharedPrefe
     @Subscribe(sticky = true, threadMode = ThreadMode.MAIN)
     public void onListenLocation(SendLocationToActivity event) throws FileNotFoundException {
         if(event != null) {
-           myLat = event.getLocation().getLatitude();
-           myLong = event.getLocation().getLongitude();
-           convertBikes();
+            myLat = event.getLocation().getLatitude();
+            myLong = event.getLocation().getLongitude();
+            convertBikes();
         }
     }
 }

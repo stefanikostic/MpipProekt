@@ -1,9 +1,9 @@
 <resources>
-    <string name="back4app_server_url">http://54.172.146.249/parse/</string>
+    <string name="back4app_server_url">http://54.87.172.190/parse/</string>
 
     <!-- Change the following strings as required -->
     <string name="back4app_app_id">myappID</string>
-    <string name="back4app_client_key">7PJgi208Ax3g</string>
+    <string name="back4app_client_key">3PsqglnCHLuJ</string>
 
     <string name="app_name">FreeRide</string>
     <string name="text_accounts">All Accounts</string>

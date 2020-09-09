@@ -111,12 +111,12 @@ public class LocationService extends Service {
                                 mLocation = task.getResult();
                             else
                                 Log.e("LocationService", "Failed to bet location");
-                            }
-                        });
-                    } catch (SecurityException ex){
-                         Log.e("LocationService", "Lost location permission. " + ex);
+                        }
+                    });
+        } catch (SecurityException ex){
+            Log.e("LocationService", "Lost location permission. " + ex);
 
-                    }
+        }
     }
 
     private void createLocationRequest() {

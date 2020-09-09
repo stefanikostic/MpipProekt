@@ -12,6 +12,7 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.widget.*;
@@ -29,6 +30,7 @@ import com.parse.ParseFile;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 
+import com.squareup.picasso.Picasso;
 import org.w3c.dom.Text;
 
 import java.io.FileNotFoundException;
@@ -45,7 +47,7 @@ public class ClientBikeActivity extends AppCompatActivity {
     private ImageView imageViewBike;
     private static final int START_TIME_PICKER_ID = 1;
     private static final int END_TIME_PICKER_ID = 2;
-    private TextView pickTimeFrom, pickTimeTo, pickDate, pickDateTo;
+    private TextView pickTimeFrom, pickTimeTo, pickDate, pickDateTo, bikeName;
     Button rentHourly, rentDaily;
     private Context mContext = this;
     ConstraintLayout cl1, chooseDateTime;
@@ -64,6 +66,7 @@ public class ClientBikeActivity extends AppCompatActivity {
         cl1 = (ConstraintLayout) findViewById(R.id.constraint1);
         chooseDateTime = (ConstraintLayout) findViewById(R.id.chooseDateTime);
         pickDateTo = (TextView) findViewById(R.id.pickDateTo);
+        bikeName = (TextView) findViewById(R.id.bikeName);
         final Calendar calendar = Calendar.getInstance();
         final int hour = calendar.get(Calendar.HOUR_OF_DAY);
         final int minute = calendar.get(Calendar.MINUTE);
@@ -88,19 +91,20 @@ public class ClientBikeActivity extends AppCompatActivity {
                                        final boolean rented = o.getBoolean("category_id");
                                        final Location location = new Location(latitude, longitude);
                                        final String renter_id = o.getString("renter_id");
-                                       final ParseFile image = o.getParseFile("image");
-                                       image.getDataInBackground(new GetDataCallback() {
-                                           @Override
-                                           public void done(byte[] data, ParseException e) {
-                                               if (e == null) {
-                                                   Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
-                                                   Bike bike = new Bike(id, name, price, bitmap, rented, location, renter_id, category_id);
-                                                   imageViewBike.setImageBitmap(bitmap);
-                                               } else {
-                                                   e.printStackTrace();
-                                               }
+                                       ParseFile image = (ParseFile) o
+                                               .get("image");
+                                       Bitmap bmp = null;
+                                       if (image != null) {
+                                           try {
+                                               bmp = BitmapFactory.decodeStream(image.getDataStream());
+                                           } catch (ParseException ex) {
+                                               ex.printStackTrace();
                                            }
-                                       });
+                                           Bike bike = new Bike(id, name, price, bmp, rented, location, renter_id, category_id);
+                                           imageViewBike.setImageBitmap(bmp);
+                                           bikeName.setText(name);
+                                       }
+
                                    }
             });
         rentHourly.setOnClickListener(new View.OnClickListener() {
@@ -155,9 +159,21 @@ public class ClientBikeActivity extends AppCompatActivity {
             public void onClick(View v) {
                 TimePickerDialog timePickerDialog = new TimePickerDialog(mContext, new TimePickerDialog.OnTimeSetListener() {
 
+                    @SuppressLint("ShowToast")
                     @Override
-                    public void onTimeSet(TimePicker timePicker, int hourOfDay, int minute) {
+                    public void onTimeSet(TimePicker timePicker, int hourOfDay, final int minute) {
                         pickTimeFrom.setText(hourOfDay + ":" + minute);
+                        Toast.makeText(getApplicationContext(), "Let's add end time!", Toast.LENGTH_LONG).show();
+                        new Handler().postDelayed(new Runnable() {
+
+                            @Override
+                            public void run() {
+                                funkcija(hour, minute);
+
+                            }
+                        }, 1000);
+
+
                     }
                 }, hour, minute, android.text.format.DateFormat.is24HourFormat(mContext));
                 timePickerDialog.show();
@@ -166,16 +182,29 @@ public class ClientBikeActivity extends AppCompatActivity {
         pickTimeTo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                TimePickerDialog timePickerDialog = new TimePickerDialog(mContext, new TimePickerDialog.OnTimeSetListener() {
+             /*   TimePickerDialog timePickerDialog = new TimePickerDialog(mContext, new TimePickerDialog.OnTimeSetListener() {
 
                     @Override
                     public void onTimeSet(TimePicker timePicker, int hourOfDay, int minute) {
                         pickTimeTo.setText(hourOfDay + ":" + minute);
                     }
                 }, hour, minute, android.text.format.DateFormat.is24HourFormat(mContext));
-                timePickerDialog.show();
+                timePickerDialog.show();*/
+             funkcija(hour, minute);
             }
         });
+
+    }
+
+    private void funkcija(int hour, int minute) {
+        TimePickerDialog timePickerDialog = new TimePickerDialog(mContext, new TimePickerDialog.OnTimeSetListener() {
+
+            @Override
+            public void onTimeSet(TimePicker timePicker, int hourOfDay, int minute) {
+                pickTimeTo.setText(hourOfDay + ":" + minute);
+            }
+        }, hour, minute, android.text.format.DateFormat.is24HourFormat(mContext));
+        timePickerDialog.show();
     }
 
 
