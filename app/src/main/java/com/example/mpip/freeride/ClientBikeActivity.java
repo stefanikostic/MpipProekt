@@ -1,15 +1,17 @@
 package com.example.mpip.freeride;
 
 import android.annotation.SuppressLint;
-import android.app.DatePickerDialog;
-import android.app.TimePickerDialog;
+import android.app.*;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 
+import android.media.RingtoneManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.os.Handler;
 import android.view.MenuItem;
 import android.view.View;
@@ -19,6 +21,8 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 import com.example.mpip.freeride.domain.Bike;
 import com.example.mpip.freeride.domain.Location;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -97,8 +101,6 @@ public class ClientBikeActivity extends AppCompatActivity {
                         startActivity(intent3);
                         break;
                 }
-
-
                 return false;
             }
         });
@@ -162,6 +164,7 @@ public class ClientBikeActivity extends AppCompatActivity {
                 final DatePickerDialog datePickerDialog = new DatePickerDialog(mContext, new DatePickerDialog.OnDateSetListener() {
                     @Override
                     public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
+                        counter(1*1000*60);
                         calendar.set(MONTH, month);
                         startMonth = month + 1;
                         startDay = dayOfMonth;
@@ -263,16 +266,22 @@ public class ClientBikeActivity extends AppCompatActivity {
         next.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(startHour < endHour){
-                    goToNextActivity();
-                } else if(startHour == endHour){
-                    if(startMinute < endMinute) {
+                if(pickDateTo.getVisibility()==View.VISIBLE) {
+                    if(startMonth < endMonth) {
+                        goToNextActivity();
+                    } else if(startMonth == endMonth && startDay < endDay) {
                         goToNextActivity();
                     } else {
                         Toast.makeText(getApplicationContext(), "Invalid values of start time and end time!", Toast.LENGTH_SHORT).show();
                     }
                 } else {
-                    Toast.makeText(getApplicationContext(), "Invalid values of start time and end time!", Toast.LENGTH_SHORT).show();
+                    if (startHour < endHour) {
+                        goToNextActivity();
+                    } else if (startHour == endHour && startMinute < endMinute) {
+                            goToNextActivity();
+                    } else {
+                        Toast.makeText(getApplicationContext(), "Invalid values of start time and end time!", Toast.LENGTH_SHORT).show();
+                    }
                 }
             }
         });
@@ -290,6 +299,7 @@ public class ClientBikeActivity extends AppCompatActivity {
     }
 
     private void goToNextActivity() {
+        counter(2*60*1000);
         Intent i = new Intent(ClientBikeActivity.this, RentedBikesActivity.class);
         ParseObject object = new ParseObject("Rents");
         object.put("client_id", clientId);
@@ -375,5 +385,58 @@ public class ClientBikeActivity extends AppCompatActivity {
         }
         return 0;
     }
+
+    private void counter(long min) {
+        CountDownTimer timer = new CountDownTimer(min, 1000) {
+            public void onTick(long millisUntilFinished) {
+                int seconds = (int) (millisUntilFinished / 1000) % 60;
+                int minutes = (int) ((millisUntilFinished / (1000 * 60)) % 60);
+                int hours = (int) ((millisUntilFinished / (1000 * 60 * 60)) % 24);
+                Toast.makeText(getApplicationContext(), String.format("%d:%d:%d", hours, minutes, seconds), Toast.LENGTH_SHORT).show();
+            }
+            public void onFinish() {
+                Notification();
+            }
+        };
+        timer.start();
+    }
+    public void Notification() {
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+            NotificationChannel notificationChannel =
+                    new NotificationChannel("n", "n", NotificationManager.IMPORTANCE_DEFAULT);
+            NotificationManager manager = getSystemService(NotificationManager.class);
+            manager.createNotificationChannel(notificationChannel);
+        }
+        Uri sound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, "n")
+                .setSmallIcon(R.drawable.freeridelogo)
+                .setSound(sound)
+                .setContentTitle("Reminder")
+                .setOngoing(true)
+                .setAutoCancel(true)
+                .setTicker("You need to pick up your reserved bicycle!")
+                .setContentText("You need to pick up your reserved bicycle!");
+
+        NotificationManagerCompat managerCompat = NotificationManagerCompat.from(this);
+        managerCompat.notify(999, builder.build());
+
+    }
+   /* public void doNotify() {
+        Uri sound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, new Intent(this, RentedBikesActivity.class), 0);
+        NotificationCompat.Builder nb = new NotificationCompat.Builder(this);
+        nb.addAction(R.drawable.ic_launch_black_24dp, "Launch", pendingIntent);
+        nb.setSmallIcon(R.drawable.freeridelogo);
+        nb.setSound(sound);
+        nb.setContentTitle("Reminder");
+        nb.setOngoing(true);
+        nb.setTicker("You need to pick up your reserved bicycle!");
+        nb.setContentText("You need to pick up your reserved bicycle!");
+        nb.setWhen(System.currentTimeMillis());
+        nb.setContentIntent(pendingIntent);
+        NotificationManager nm = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+        assert nm != null;
+        nm.notify(112, nb.build());
+    }*/
 }
 

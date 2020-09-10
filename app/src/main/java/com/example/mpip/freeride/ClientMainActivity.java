@@ -44,21 +44,13 @@ import com.karumi.dexter.listener.PermissionGrantedResponse;
 import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
 import com.karumi.dexter.listener.single.PermissionListener;
-import com.parse.FindCallback;
-import com.parse.GetDataCallback;
-import com.parse.ParseAnalytics;
-import com.parse.ParseException;
-import com.parse.ParseFile;
-import com.parse.ParseObject;
-import com.parse.ParseQuery;
+import com.parse.*;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
 import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.*;
 
 public class ClientMainActivity extends AppCompatActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
@@ -87,6 +79,7 @@ public class ClientMainActivity extends AppCompatActivity implements SharedPrefe
     private ArrayList<Bike> onlyBikes = new ArrayList<>();
     private GridView gridView;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -98,11 +91,7 @@ public class ClientMainActivity extends AppCompatActivity implements SharedPrefe
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 switch (item.getItemId()){
-                    case R.id.ic_home:
-                        finish();
-                        break;
                     case R.id.ic_bikes:
-                        Intent i = getIntent();
                         Intent intent = new Intent(ClientMainActivity.this, RentedBikesActivity.class);
                         intent.putExtra("client_id", clientId);
                         startActivity(intent);
@@ -112,8 +101,6 @@ public class ClientMainActivity extends AppCompatActivity implements SharedPrefe
                         startActivity(intent1);
                         break;
                 }
-
-
                 return false;
             }
         });
@@ -176,11 +163,6 @@ public class ClientMainActivity extends AppCompatActivity implements SharedPrefe
         });
 
 
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.MANAGE_DOCUMENTS},
-                    1);
-        }
 
 
     }

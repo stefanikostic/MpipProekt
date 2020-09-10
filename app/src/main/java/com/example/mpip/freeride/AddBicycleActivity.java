@@ -150,18 +150,7 @@ public class AddBicycleActivity extends AppCompatActivity {
         changePic.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-    /*            if(ActivityCompat.checkSelfPermission(AddBicycleActivity.this,
-                        Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED)
-                {
-                    ActivityCompat.requestPermissions(AddBicycleActivity.this,
-                            new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 100);
 
-                    return;
-                }
-                Intent i = new Intent(Intent.ACTION_GET_CONTENT);
-                i.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
-                i.setType("image/*");
-                startActivityForResult(i, 2);*/
             }
         });
         addBike.setOnClickListener(new View.OnClickListener() {
@@ -218,6 +207,8 @@ public class AddBicycleActivity extends AppCompatActivity {
                                             object.put("rented", false);
                                             object.put("latitude", lat);
                                             object.put("longitude", longi);
+                                            ParseGeoPoint parseGeoPoint = new ParseGeoPoint(lat, longi);
+                                            object.put("location", parseGeoPoint);
                                             try {
                                                 Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), uri);
                                                 ByteArrayOutputStream stream = new ByteArrayOutputStream();

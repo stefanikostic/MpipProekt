@@ -9,7 +9,6 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import com.example.mpip.freeride.domain.Bike;
-import com.example.mpip.freeride.domain.BikeDistance;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.parse.*;
 
@@ -89,7 +88,6 @@ public class RentedBikesActivity extends AppCompatActivity {
                                     }
                                 }
                             });
-
                         }
                     }
 
@@ -109,7 +107,7 @@ public class RentedBikesActivity extends AppCompatActivity {
             arr[j] = bd;
             j++;
         }
-        BikeAdapter bikeAdapter = new BikeAdapter(getApplicationContext(), arr);
+        RentedBikeAdapter bikeAdapter = new RentedBikeAdapter(RentedBikesActivity.this, arr, clientId);
         gridView.setAdapter(bikeAdapter);
     }
 }
