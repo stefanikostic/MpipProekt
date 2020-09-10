@@ -65,7 +65,6 @@ public class LoginActivity extends Activity implements View.OnClickListener{
     ConstraintLayout constraintLayout;
     ImageView Logo;
 
-    Database db;
 
     Handler handler = new Handler();
     String s1 = "";
@@ -96,9 +95,6 @@ public class LoginActivity extends Activity implements View.OnClickListener{
 
         constraintLayout.setOnClickListener(this);
         Logo.setOnClickListener(this);
-
-
-        db = new Database(this);
 
 
         register.setOnClickListener(new View.OnClickListener() {

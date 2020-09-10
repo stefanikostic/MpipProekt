@@ -24,14 +24,12 @@ public class RenterRegisterActivity extends AppCompatActivity implements View.On
 
     EditText et1, et2, et3, et4;
     FloatingActionButton fab;
-    Database db;
     ConstraintLayout constraintLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_renter_register);
-        db = new Database(this);
 
         et1 = (EditText) findViewById(R.id.reg_ime);
         et2 = (EditText) findViewById(R.id.reg_surname);

@@ -26,15 +26,12 @@ public class ClientRegisterActivity extends AppCompatActivity implements View.On
     }
     EditText et1, et2, et3;
     FloatingActionButton fab;
-    Database db;
     ConstraintLayout constraintLayout;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_client_register);
-        db = new Database(this);
 
 
         constraintLayout = (ConstraintLayout) findViewById(R.id.constrainLayout);

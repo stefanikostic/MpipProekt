@@ -40,7 +40,6 @@ public class RenterMapsActivity extends FragmentActivity implements OnMapReadyCa
     Geocoder geocoder;
     GoogleMap map;
     Button register;
-    Database db;
     MarkerOptions finalMarkerOptions = new MarkerOptions();
     private static final int REQUEST_CODE = 101;
 
@@ -48,7 +47,6 @@ public class RenterMapsActivity extends FragmentActivity implements OnMapReadyCa
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_renter_maps);
-        db = new Database(this);
         geocoder = new Geocoder(this, Locale.getDefault());
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
         register = (Button) findViewById(R.id.btn_renter);

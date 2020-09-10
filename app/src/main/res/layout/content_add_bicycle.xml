@@ -80,7 +80,7 @@
             app:layout_constraintEnd_toEndOf="parent" android:layout_marginEnd="8dp"
             app:layout_constraintHorizontal_bias="0.78"
             app:layout_constraintTop_toBottomOf="@+id/imageView" android:layout_marginTop="8dp"
-            android:textSize="12sp" android:textColor="@android:color/holo_blue_dark"
+            android:textSize="12sp" android:textColor="@color/colorPrimaryDark"
             android:background="@android:color/transparent"/>
 
     <androidx.appcompat.widget.AppCompatButton
@@ -89,7 +89,8 @@
             android:layout_height="65dp"
             android:text="Add Bike"
             android:textStyle="bold"
-            app:backgroundTint="@android:color/holo_blue_dark" android:layout_marginEnd="8dp"
+            android:textColor="#fff"
+            app:backgroundTint="@color/colorPrimaryDark" android:layout_marginEnd="8dp"
             app:layout_constraintEnd_toEndOf="parent"
             android:layout_marginStart="8dp" app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintBottom_toBottomOf="parent" app:layout_constraintHorizontal_bias="1.0"

@@ -8,6 +8,9 @@ import android.net.Uri;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 import com.example.mpip.freeride.R;
+import org.joda.time.DateTime;
+
+import java.util.Calendar;
 
 public class ReminderReceiver extends BroadcastReceiver {
     @Override
@@ -16,7 +19,8 @@ public class ReminderReceiver extends BroadcastReceiver {
         int hour = intent.getIntExtra("startHour", 0);
         int minute = intent.getIntExtra("startMin", 0);
         String month = intent.getStringExtra("startMonth");
-        String msg = "You need to pick up your reserved bicycle on " + day + " " + month + " at " + hour + ":" + minute + "!";
+        DateTime timerTest = DateTime.now();
+        String msg = "You need to pick up your reserved bicycle on " + day + " " + month + " at " + String.format("%02d", hour) + ":" + String.format("%02d", minute) + "!";
         Uri sound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, "n1")
                 .setSmallIcon(R.drawable.freeridelogo)
