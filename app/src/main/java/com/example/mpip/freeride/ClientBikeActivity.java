@@ -1,37 +1,33 @@
 package com.example.mpip.freeride;
 
 import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
 import android.app.*;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 
-import android.media.RingtoneManager;
 import android.net.Uri;
-import android.os.Build;
-import android.os.Bundle;
-import android.os.CountDownTimer;
-import android.os.Handler;
+import android.os.*;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.*;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
-import androidx.core.app.NotificationCompat;
-import androidx.core.app.NotificationManagerCompat;
-import com.example.mpip.freeride.domain.Bike;
 import com.example.mpip.freeride.domain.Location;
+import com.example.mpip.freeride.service.CancelRentReceiver;
+import com.example.mpip.freeride.service.ReminderLeaveReceiver;
+import com.example.mpip.freeride.service.ReminderReceiver;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.parse.*;
 
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
@@ -49,21 +45,22 @@ public class ClientBikeActivity extends AppCompatActivity {
     private double bLongitude;
     private int bPrice;
     ConstraintLayout cl1, chooseDateTime, constraint3;
-    TimePicker timePicker;
-    private TextView showTime;
-    private String id, clientId;
-    private Calendar date1, date2;
+    private String id, clientId, rentId;
+    private Calendar date1, date2, startAlarm, endAlarm, beforeEndAlarm;
+    private String startMonthName, endMonthName;
     int total;
     int hours;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getSupportActionBar().hide();
         setContentView(R.layout.activity_client_bike);
+        createNotificationChannel();
+        createNotificationChannelLeave();
         pickTimeFrom = (TextView) findViewById(R.id.pickTimeFrom);
         pickTimeTo = (TextView) findViewById(R.id.pickTimeTo);
         pickDate = (TextView) findViewById(R.id.pickDate);
-        showTime = (TextView) findViewById(R.id.time);
         rentHourly = (Button) findViewById(R.id.rentHourly);
         rentDaily = (Button) findViewById(R.id.rentDaily);
         clientId = getIntent().getStringExtra("client_id");
@@ -81,7 +78,6 @@ public class ClientBikeActivity extends AppCompatActivity {
         final int mMonth = calendar.get(MONTH);
         final int mYear = calendar.get(Calendar.YEAR);
         BottomNavigationView bottomNavigationView = (BottomNavigationView) findViewById(R.id.navigation_view3);
-        bottomNavigationView.getMenu().getItem(1).setChecked(true);
         bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
@@ -132,7 +128,6 @@ public class ClientBikeActivity extends AppCompatActivity {
                                            } catch (ParseException ex) {
                                                ex.printStackTrace();
                                            }
-                                           Bike bike = new Bike(id, name, bPrice, bmp, rented, location, renter_id, category_id);
                                            imageViewBike.setImageBitmap(bmp);
                                            bikeName.setText(name);
                                        }
@@ -164,25 +159,41 @@ public class ClientBikeActivity extends AppCompatActivity {
                 final DatePickerDialog datePickerDialog = new DatePickerDialog(mContext, new DatePickerDialog.OnDateSetListener() {
                     @Override
                     public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
-                        counter(1*1000*60);
                         calendar.set(MONTH, month);
                         startMonth = month + 1;
                         startDay = dayOfMonth;
-                        String monthName = calendar.getDisplayName(MONTH, Calendar.LONG, Locale.US);
+                        startMonthName = calendar.getDisplayName(MONTH, Calendar.LONG, Locale.US);
                         int dayB  = dayOfMonth;
                         int monthB = month;
                         int yearB = year;
                         date1 = Calendar.getInstance();
+                        startAlarm = Calendar.getInstance();
+                        endAlarm = Calendar.getInstance();
                         date1.set(Calendar.YEAR, yearB);
                         date1.set(MONTH, monthB);
                         date1.set(Calendar.DAY_OF_MONTH, dayB);
-                        date1.set(Calendar.HOUR_OF_DAY,2);
-                        date1.set(Calendar.MINUTE,00);
+                        date1.set(Calendar.HOUR_OF_DAY,9);
+                        date1.set(Calendar.MINUTE, 0);
                         date1.set(Calendar.SECOND,0);
                         date1.set(Calendar.MILLISECOND,0);
-                        pickDate.setText(dayOfMonth + ". " + monthName);
+                        if(pickTimeTo.getVisibility()==View.INVISIBLE) {
+                            startAlarm.set(Calendar.DAY_OF_MONTH, dayB);
+                            startAlarm.set(MONTH, monthB);
+                            startAlarm.set(Calendar.YEAR, yearB);
+                            endAlarm.set(Calendar.DAY_OF_MONTH, dayB);
+                            endAlarm.set(MONTH, monthB);
+                            endAlarm.set(Calendar.YEAR, yearB);
+                            beforeEndAlarm = endAlarm;
+                        } else {
+                            startAlarm = date1;
+                            startHour = 9;
+                            startMinute = 0;
+                        }
+                        pickDate.setText(dayOfMonth + ". " + startMonthName);
                     }
                 }, mYear, mMonth, mDay);
+                Calendar currentDay = Calendar.getInstance();
+                datePickerDialog.getDatePicker().setMinDate(currentDay.getTimeInMillis());
                 datePickerDialog.show();
             }
         });
@@ -195,33 +206,39 @@ public class ClientBikeActivity extends AppCompatActivity {
                         calendar.set(MONTH, month);
                         endMonth = month + 1;
                         endDay = dayOfMonth;
-                        String monthName = calendar.getDisplayName(MONTH, Calendar.LONG, Locale.US);
+                        endMonthName = calendar.getDisplayName(MONTH, Calendar.LONG, Locale.US);
                         if(!pickDate.getText().toString().equals("Pick start date")) {
                             if(startDay > endDay || startMonth > endMonth) {
-                                Toast.makeText(getApplicationContext(), "Invalid values of start date and end date!", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(getApplicationContext(), "Invalid values of start date and end date.\nTry again!", Toast.LENGTH_SHORT).show();
                             } else {
-                                pickDateTo.setText(dayOfMonth + ". " + monthName);
+                                pickDateTo.setText(dayOfMonth + ". " + endMonthName);
                                 int total = estimatePriceDaily(startDay, startMonth, endDay, endMonth);
                                 billingInfo.setText("Billing info ");
                                 totalPrice.setText("Total price: " + total + " denars");
                                 constraint3.setVisibility(View.VISIBLE);
                                 int dayB  = view.getDayOfMonth();
-                                int monthB= view.getMonth();
+                                int monthB = view.getMonth();
                                 int yearB = view.getYear();
                                 date2 = Calendar.getInstance();
                                 date2.set(Calendar.YEAR, yearB);
                                 date2.set(MONTH, monthB);
                                 date2.set(Calendar.DAY_OF_MONTH, dayB);
-                                date2.set(Calendar.HOUR_OF_DAY,2);
-                                date2.set(Calendar.MINUTE,00);
+                                date2.set(Calendar.HOUR_OF_DAY, 9);
+                                date2.set(Calendar.MINUTE, 0);
                                 date2.set(Calendar.SECOND,0);
                                 date2.set(Calendar.MILLISECOND,0);
+                                endAlarm = date2;
+                                beforeEndAlarm = endAlarm;
+                                endHour = 9;
+                                endMinute = 0;
                             }
                         } else {
                             Toast.makeText(getApplicationContext(), "You must enter start date!", Toast.LENGTH_SHORT).show();
                         }
                     }
                 }, mYear, mMonth, mDay);
+                Calendar currentDay = Calendar.getInstance();
+                datePickerDialog.getDatePicker().setMinDate(currentDay.getTimeInMillis());
                 datePickerDialog.show();
             }
         });
@@ -235,6 +252,10 @@ public class ClientBikeActivity extends AppCompatActivity {
                     public void onTimeSet(TimePicker timePicker, int hourOfDay, final int minute) {
                         startHour = hourOfDay;
                         startMinute = minute;
+                        startAlarm.set(Calendar.HOUR_OF_DAY, startHour - 1);
+                        startAlarm.set(Calendar.MINUTE,startMinute);
+                        startAlarm.set(Calendar.SECOND,0);
+                        startAlarm.set(Calendar.MILLISECOND,0);
                         pickTimeFrom.setText(String.format("%02d", hourOfDay)+ ":" + String.format("%02d", minute));
                         Toast.makeText(getApplicationContext(), "Let's add end time!", Toast.LENGTH_LONG).show();
                         new Handler().postDelayed(new Runnable() {
@@ -251,19 +272,13 @@ public class ClientBikeActivity extends AppCompatActivity {
         pickTimeTo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-             /*   TimePickerDialog timePickerDialog = new TimePickerDialog(mContext, new TimePickerDialog.OnTimeSetListener() {
-
-                    @Override
-                    public void onTimeSet(TimePicker timePicker, int hourOfDay, int minute) {
-                        pickTimeTo.setText(hourOfDay + ":" + minute);
-                    }
-                }, hour, minute, android.text.format.DateFormat.is24HourFormat(mContext));
-                timePickerDialog.show();*/
              funkcija(hour, minute);
             }
         });
 
         next.setOnClickListener(new View.OnClickListener() {
+            @TargetApi(Build.VERSION_CODES.KITKAT)
+            @RequiresApi(api = Build.VERSION_CODES.KITKAT)
             @Override
             public void onClick(View v) {
                 if(pickDateTo.getVisibility()==View.VISIBLE) {
@@ -298,14 +313,27 @@ public class ClientBikeActivity extends AppCompatActivity {
         });
     }
 
+    @TargetApi(Build.VERSION_CODES.KITKAT)
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     private void goToNextActivity() {
-        counter(2*60*1000);
-        Intent i = new Intent(ClientBikeActivity.this, RentedBikesActivity.class);
-        ParseObject object = new ParseObject("Rents");
+        Intent intent = new Intent(ClientBikeActivity.this, ReminderReceiver.class);
+        intent.putExtra("startDay", startDay);
+        intent.putExtra("startHour", startHour);
+        intent.putExtra("startMonth", startMonthName);
+        intent.putExtra("startMin", startMinute);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(ClientBikeActivity.this, 0, intent, 0);
+        AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+        long delay = startAlarm.getTimeInMillis() - Calendar.getInstance().getTimeInMillis();
+        if(delay > 0) {
+            long futureInMillis = SystemClock.elapsedRealtime() + delay;
+            alarmManager.set(AlarmManager.ELAPSED_REALTIME_WAKEUP,
+                    futureInMillis, pendingIntent);
+        }
+        final ParseObject object = new ParseObject("Rents");
         object.put("client_id", clientId);
         object.put("bike_id", id);
         object.put("price", total);
-        object.put("date_from", date1.getTime());
+        object.put("date_from", startAlarm.getTime());
         if(pickDateTo.getVisibility()!=View.INVISIBLE)
             object.put("date_to", date2.getTime());
         object.put("hours", hours);
@@ -313,6 +341,9 @@ public class ClientBikeActivity extends AppCompatActivity {
             @Override
             public void done(ParseException e) {
                 if(e == null){
+                    rentId = object.getObjectId();
+                    setAlarm();
+                    setAlarmBeforeLeavingBike();
                     ParseQuery<ParseObject> bikeObj = new ParseQuery<ParseObject>("Bike");
                     bikeObj.whereEqualTo("objectId", id);
                     bikeObj.getFirstInBackground(new GetCallback<ParseObject>() {
@@ -325,7 +356,7 @@ public class ClientBikeActivity extends AppCompatActivity {
                                     public void done(ParseException e) {
                                         if (e == null) {
                                             Toast.makeText(getApplicationContext(), "You rented this bike successfully!", Toast.LENGTH_SHORT).show();
-                                            Intent intent = new Intent(getApplicationContext(), RentedBikesActivity.class);
+                                            Intent intent = new Intent(ClientBikeActivity.this, RentedBikesActivity.class);
                                             intent.putExtra("client_id", getIntent().getStringExtra("client_id"));
                                             startActivity(intent);
                                         } else {
@@ -346,6 +377,39 @@ public class ClientBikeActivity extends AppCompatActivity {
         });
     }
 
+    private void setAlarmBeforeLeavingBike() {
+        Intent intent = new Intent(ClientBikeActivity.this, ReminderLeaveReceiver.class);
+        intent.putExtra("endDay", endDay);
+        intent.putExtra("endHour", endHour);
+        intent.putExtra("endMonth", endMonthName);
+        intent.putExtra("endMin", endMinute);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(ClientBikeActivity.this, 0, intent, 0);
+        AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+        long delay = endAlarm.getTimeInMillis() - Calendar.getInstance().getTimeInMillis();
+        if(delay > 0) {
+            long futureInMillis = SystemClock.elapsedRealtime() + delay;
+            alarmManager.set(AlarmManager.ELAPSED_REALTIME_WAKEUP,
+                    futureInMillis, pendingIntent);
+        }
+    }
+
+    private void setAlarm() {
+        AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+        Intent intent1 = new Intent(this, CancelRentReceiver.class);
+        intent1.putExtra("bikeId", id);
+        intent1.putExtra("rentId", rentId);
+        intent1.putExtra("endMonth", endMonthName);
+        intent1.putExtra("endDay", endDay);
+        intent1.putExtra("endHour", endHour);
+        intent1.putExtra("endMin", endMinute);
+        PendingIntent pi1 = PendingIntent.getBroadcast(this, 0, intent1, 0);
+        long delay = endAlarm.getTimeInMillis() - Calendar.getInstance().getTimeInMillis();
+        if(delay > 0) {
+            long futureInMillis = SystemClock.elapsedRealtime() + delay;
+            alarmManager.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, futureInMillis, pi1);
+        }
+    }
+
     private void funkcija(int hour, int minute) {
         TimePickerDialog timePickerDialog = new TimePickerDialog(mContext, new TimePickerDialog.OnTimeSetListener() {
             @Override
@@ -353,6 +417,12 @@ public class ClientBikeActivity extends AppCompatActivity {
                 if(!pickTimeFrom.getText().toString().equals("Pick start date")) {
                     endHour = hourOfDay;
                     endMinute = minute;
+                    endAlarm.set(Calendar.HOUR_OF_DAY, endHour);
+                    endAlarm.set(Calendar.MINUTE,endMinute);
+                    endAlarm.set(Calendar.SECOND,0);
+                    endAlarm.set(Calendar.MILLISECOND,0);
+                    beforeEndAlarm = endAlarm;
+                    beforeEndAlarm.set(Calendar.HOUR_OF_DAY, endHour - 1);
                     if(startHour >= endHour) {
                         Toast.makeText(getApplicationContext(), "Invalid values of start time and end time!", Toast.LENGTH_SHORT).show();
                     } else {
@@ -386,57 +456,26 @@ public class ClientBikeActivity extends AppCompatActivity {
         return 0;
     }
 
-    private void counter(long min) {
-        CountDownTimer timer = new CountDownTimer(min, 1000) {
-            public void onTick(long millisUntilFinished) {
-                int seconds = (int) (millisUntilFinished / 1000) % 60;
-                int minutes = (int) ((millisUntilFinished / (1000 * 60)) % 60);
-                int hours = (int) ((millisUntilFinished / (1000 * 60 * 60)) % 24);
-                Toast.makeText(getApplicationContext(), String.format("%d:%d:%d", hours, minutes, seconds), Toast.LENGTH_SHORT).show();
-            }
-            public void onFinish() {
-                Notification();
-            }
-        };
-        timer.start();
-    }
-    public void Notification() {
+    public void createNotificationChannel() {
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+            String description = "Channel for notifications before renting";
             NotificationChannel notificationChannel =
                     new NotificationChannel("n", "n", NotificationManager.IMPORTANCE_DEFAULT);
+            notificationChannel.setDescription(description);
             NotificationManager manager = getSystemService(NotificationManager.class);
             manager.createNotificationChannel(notificationChannel);
         }
-        Uri sound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, "n")
-                .setSmallIcon(R.drawable.freeridelogo)
-                .setSound(sound)
-                .setContentTitle("Reminder")
-                .setOngoing(true)
-                .setAutoCancel(true)
-                .setTicker("You need to pick up your reserved bicycle!")
-                .setContentText("You need to pick up your reserved bicycle!");
-
-        NotificationManagerCompat managerCompat = NotificationManagerCompat.from(this);
-        managerCompat.notify(999, builder.build());
-
     }
-   /* public void doNotify() {
-        Uri sound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, new Intent(this, RentedBikesActivity.class), 0);
-        NotificationCompat.Builder nb = new NotificationCompat.Builder(this);
-        nb.addAction(R.drawable.ic_launch_black_24dp, "Launch", pendingIntent);
-        nb.setSmallIcon(R.drawable.freeridelogo);
-        nb.setSound(sound);
-        nb.setContentTitle("Reminder");
-        nb.setOngoing(true);
-        nb.setTicker("You need to pick up your reserved bicycle!");
-        nb.setContentText("You need to pick up your reserved bicycle!");
-        nb.setWhen(System.currentTimeMillis());
-        nb.setContentIntent(pendingIntent);
-        NotificationManager nm = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-        assert nm != null;
-        nm.notify(112, nb.build());
-    }*/
+
+    public void createNotificationChannelLeave() {
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+            String description = "Channel for notifications before renting";
+            NotificationChannel notificationChannel =
+                    new NotificationChannel("n1", "n1", NotificationManager.IMPORTANCE_DEFAULT);
+            notificationChannel.setDescription(description);
+            NotificationManager manager = getSystemService(NotificationManager.class);
+            manager.createNotificationChannel(notificationChannel);
+        }
+    }
 }
 

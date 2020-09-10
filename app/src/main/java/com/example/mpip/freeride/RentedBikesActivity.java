@@ -10,6 +10,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import com.example.mpip.freeride.domain.Bike;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.parse.*;
 
 import java.util.ArrayList;
@@ -19,6 +20,7 @@ public class RentedBikesActivity extends AppCompatActivity {
     private ArrayList<Bike> onlyBikes = new ArrayList<>();
     private GridView gridView;
     private String clientId;
+    private ArrayList<String> rents_ids = new ArrayList<>();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -57,6 +59,7 @@ public class RentedBikesActivity extends AppCompatActivity {
                 if (e == null) {
                     if (objects.size() > 0) {
                         for (ParseObject o : objects) {
+                            rents_ids.add(o.getObjectId());
                             final ParseQuery<ParseObject> query1 = new ParseQuery<ParseObject>("Bike");
                             query1.whereEqualTo("objectId", o.getString("bike_id"));
                             query1.findInBackground(new FindCallback<ParseObject>() {
@@ -94,8 +97,6 @@ public class RentedBikesActivity extends AppCompatActivity {
                 } else {
                     e.printStackTrace();
                 }
-
-
             }
         });
     }
@@ -107,7 +108,7 @@ public class RentedBikesActivity extends AppCompatActivity {
             arr[j] = bd;
             j++;
         }
-        RentedBikeAdapter bikeAdapter = new RentedBikeAdapter(RentedBikesActivity.this, arr, clientId);
+        RentedBikeAdapter bikeAdapter = new RentedBikeAdapter(RentedBikesActivity.this, arr, rents_ids.toArray(new String[0]), clientId);
         gridView.setAdapter(bikeAdapter);
     }
 }
