@@ -45,7 +45,6 @@ public class AddBicycleActivity extends AppCompatActivity {
     private EditText et2;
     Bitmap bitmap = null;
     Uri uri = null;
-    Database db;
     String bikeId;
 
     ArrayAdapter<String> adapter;
@@ -54,7 +53,6 @@ public class AddBicycleActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_bicycle);
         Toolbar toolbar = findViewById(R.id.toolbar);
-        db = new Database(this);
         image = (ImageView) findViewById(R.id.imageView);
         changePic = (Button) findViewById(R.id.changePic);
         addBike = (AppCompatButton) findViewById(R.id.btn_add_bike);

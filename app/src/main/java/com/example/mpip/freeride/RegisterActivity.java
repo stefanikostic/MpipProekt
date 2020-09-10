@@ -3,16 +3,19 @@ package com.example.mpip.freeride;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.provider.ContactsContract;
-import android.text.InputType;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.constraintlayout.widget.ConstraintLayout;
+import com.parse.FindCallback;
+import com.parse.ParseException;
+import com.parse.ParseObject;
+import com.parse.ParseQuery;
+
+import java.util.List;
 
 public class RegisterActivity extends Activity implements View.OnClickListener{
     @Override
@@ -28,13 +31,10 @@ public class RegisterActivity extends Activity implements View.OnClickListener{
     ConstraintLayout constraintLayout;
     Button signup, signup2;
 
-    Database db;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
-
-        db = new Database(this);
 
         e2 = (EditText) findViewById(R.id.reg_pass);
         e3 = (EditText) findViewById(R.id.reg_confirm);
@@ -69,7 +69,7 @@ public class RegisterActivity extends Activity implements View.OnClickListener{
         {
             if(s2.equals(s3))
             {
-                boolean checkm = db.checkMail(s4);
+                boolean checkm = checkMail(s4)[0];
                 if(!checkm)
                 {
                     Intent i = new Intent(getApplicationContext(), RenterRegisterActivity.class);
@@ -89,5 +89,34 @@ public class RegisterActivity extends Activity implements View.OnClickListener{
                 e3.setText("");
             }
         }
+    }
+
+    private boolean[] checkMail(String s4) {
+        ParseQuery<ParseObject> query = new ParseQuery<ParseObject>("Users");
+        query.whereEqualTo("email", s4);
+        final boolean[] flag = {true};
+        query.findInBackground(new FindCallback<ParseObject>() {
+            @Override
+            public void done(List<ParseObject> list, ParseException e) {
+                if(e == null){
+                    if (list.size()>0) {
+                        flag[0] = false;
+                    }
+                }
+            }
+        });
+        query = new ParseQuery<ParseObject>("Renters");
+        query.whereEqualTo("email", s4);
+        query.findInBackground(new FindCallback<ParseObject>() {
+            @Override
+            public void done(List<ParseObject> list, ParseException e) {
+                if(e == null){
+                    if(list.size() > 0){
+                        flag[0] = false;
+                    }
+                }
+            }
+        });
+        return flag;
     }
 }

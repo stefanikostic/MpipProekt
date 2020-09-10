@@ -53,6 +53,14 @@ public class RentedBikeAdapter extends BaseAdapter {
         TextView textView = (TextView) listing.findViewById(R.id.textView);
         textView.setText(bikes[position].getName());
         FloatingActionButton fab = (FloatingActionButton) listing.findViewById(R.id.cancelBike);
+        ParseQuery<ParseObject> query1 = new ParseQuery<ParseObject>("Rents");
+        query1.whereEqualTo("objectId", rent_ids[position]);
+        query1.getFirstInBackground(new GetCallback<ParseObject>() {
+            @Override
+            public void done(ParseObject obj, ParseException e) {
+               // need to make columns for time from and time to in parse
+            }
+        });
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -78,7 +86,6 @@ public class RentedBikeAdapter extends BaseAdapter {
                                                 mContext.startActivity(intent);
                                             }
                                         });
-
                                     }
                                 });
                             }

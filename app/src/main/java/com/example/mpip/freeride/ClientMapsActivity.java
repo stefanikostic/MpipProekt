@@ -43,7 +43,6 @@ public class ClientMapsActivity extends FragmentActivity implements OnMapReadyCa
     FusedLocationProviderClient fusedLocationProviderClient;
     Geocoder geocoder;
     GoogleMap map;
-    Database db;
     MarkerOptions finalMarkerOptions = new MarkerOptions();
     double cLatitude, cLongitude, bLatitude, bLongitude;
     private static final int REQUEST_CODE = 101;

@@ -37,7 +37,6 @@ import java.util.List;
 
 public class RenterMainActivity extends AppCompatActivity {
 
-    Database db;
     ArrayList<Bike> bikes = new ArrayList<Bike>();
     GridView gridView;
     FloatingActionButton fab;
@@ -51,7 +50,6 @@ public class RenterMainActivity extends AppCompatActivity {
         gridView = (GridView) findViewById(R.id.gridview_renter);
         fab = findViewById(R.id.fab1);
         setSupportActionBar(toolbar);
-        db = new Database(this);
         final Bitmap bitmap;
         final ParseQuery<ParseObject> query = new ParseQuery<ParseObject>("Renters");
         query.whereEqualTo("email", getIntent().getStringExtra("email"));
