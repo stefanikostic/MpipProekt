@@ -8,6 +8,8 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.net.Uri;
 import android.os.*;
 import android.view.MenuItem;
@@ -35,6 +37,10 @@ import static java.util.Calendar.MONTH;
 
 public class ClientBikeActivity extends AppCompatActivity {
 
+    LocationManager locationManager;
+
+    LocationListener locationListener;
+
     private ImageView imageViewBike;
     FloatingActionButton next, viewMap;
     private TextView pickTimeFrom, pickTimeTo, pickDate, pickDateTo, bikeName, totalPrice, billingInfo;
@@ -50,6 +56,44 @@ public class ClientBikeActivity extends AppCompatActivity {
     private String startMonthName, endMonthName;
     int total;
     int hours;
+
+
+    public void updateView(android.location.Location location){
+
+        final ParseQuery<ParseObject> query = new ParseQuery<ParseObject>("Bike");
+        final ParseGeoPoint geoPointLocation = new ParseGeoPoint(location.getLatitude(), location.getLongitude());
+        query.whereEqualTo("objectId", id);
+        query.whereNear("location", geoPointLocation);
+        query.findInBackground(new FindCallback<ParseObject>() {
+            @Override
+            public void done(List<ParseObject> objects, ParseException e) {
+                ParseObject o = objects.get(0);
+                final String name = o.getString("name");
+                bPrice = o.getInt("price");
+                final String category_id = o.getString("category_id");
+                bLatitude = o.getDouble("latitude");
+                bLongitude = o.getDouble("longitude");
+                final boolean rented = o.getBoolean("category_id");
+                final Location location = new Location(bLatitude, bLatitude);
+                final String renter_id = o.getString("renter_id");
+                ParseFile image = (ParseFile) o
+                        .get("image");
+                Bitmap bmp = null;
+                if (image != null) {
+                    try {
+                        bmp = BitmapFactory.decodeStream(image.getDataStream());
+                    } catch (ParseException ex) {
+                        ex.printStackTrace();
+                    }
+                    imageViewBike.setImageBitmap(bmp);
+                    bikeName.setText(name);
+                }
+
+            }
+        });
+
+
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -105,35 +149,44 @@ public class ClientBikeActivity extends AppCompatActivity {
         billingInfo = (TextView) findViewById(R.id.billingInfo);
         viewMap = (FloatingActionButton) findViewById(R.id.view_map);
         id = getIntent().getStringExtra("bikeId");
-        final ParseQuery<ParseObject> query = new ParseQuery<ParseObject>("Bike");
-        query.whereEqualTo("objectId", id);
-        query.findInBackground(new FindCallback<ParseObject>() {
-                                   @Override
-                                   public void done(List<ParseObject> objects, ParseException e) {
-                                       ParseObject o = objects.get(0);
-                                       final String name = o.getString("name");
-                                       bPrice = o.getInt("price");
-                                       final String category_id = o.getString("category_id");
-                                       bLatitude = o.getDouble("latitude");
-                                       bLongitude = o.getDouble("longitude");
-                                       final boolean rented = o.getBoolean("category_id");
-                                       final Location location = new Location(bLatitude, bLatitude);
-                                       final String renter_id = o.getString("renter_id");
-                                       ParseFile image = (ParseFile) o
-                                               .get("image");
-                                       Bitmap bmp = null;
-                                       if (image != null) {
-                                           try {
-                                               bmp = BitmapFactory.decodeStream(image.getDataStream());
-                                           } catch (ParseException ex) {
-                                               ex.printStackTrace();
-                                           }
-                                           imageViewBike.setImageBitmap(bmp);
-                                           bikeName.setText(name);
-                                       }
 
-                                   }
-            });
+
+
+        locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+        locationListener = new LocationListener() {
+
+            @Override
+            public void onLocationChanged(android.location.Location location) {
+                updateView(location);
+
+                ParseObject object_driver = new ParseObject("Bike");
+                ParseGeoPoint geo = new ParseGeoPoint(location.getLatitude(), location.getLongitude());
+                object_driver.put("location_driver", geo);
+                object_driver.saveInBackground();
+
+            }
+
+            @Override
+            public void onStatusChanged(String s, int i, Bundle bundle) {
+
+            }
+
+            @Override
+            public void onProviderEnabled(String s) {
+
+            }
+
+            @Override
+            public void onProviderDisabled(String s) {
+
+            }
+        };
+
+
+
+
+
+
         rentHourly.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
