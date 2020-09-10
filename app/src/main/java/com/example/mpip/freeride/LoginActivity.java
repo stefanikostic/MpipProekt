@@ -46,7 +46,7 @@ public class LoginActivity extends Activity implements View.OnClickListener{
 
 
         if(getCurrentFocus() != null) {
-            if (view.getId() == R.id.layout || view.getId() == R.id.Logo) {
+            if (view.getId() == R.id.constrainLayout || view.getId() == R.id.Logo) {
                 inputMethodManager.hideSoftInputFromWindow(Objects.requireNonNull(getCurrentFocus()).getWindowToken(), 0);
             }
         }
@@ -54,7 +54,7 @@ public class LoginActivity extends Activity implements View.OnClickListener{
 
         }
 
-        
+
     private static final int REQUEST_CODE = 101 ;
     Button register;
     Button sign;
