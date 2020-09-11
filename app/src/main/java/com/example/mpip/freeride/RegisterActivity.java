@@ -70,7 +70,7 @@ public class RegisterActivity extends Activity implements View.OnClickListener{
             if(s2.equals(s3))
             {
                 boolean checkm = checkMail(s4)[0];
-                if(!checkm)
+                if(checkm)
                 {
                     Intent i = new Intent(getApplicationContext(), RenterRegisterActivity.class);
                     if(act.equals("Client"))
