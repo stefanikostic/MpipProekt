@@ -61,7 +61,7 @@ public class RegisterActivity extends Activity implements View.OnClickListener{
         String s2 = e2.getText().toString();
         String s3 = e3.getText().toString();
         String s4 = e4.getText().toString();
-        if(s2.equals("") || s3.equals("") || s4.equals(""))
+        if(s2.equals("") || s3.equals("") || s4.equals("") || !validateEmail() || !validatePassword())
         {
             Toast.makeText(getApplicationContext(), "Please fill out all the fields.", Toast.LENGTH_SHORT).show();
         }
@@ -118,5 +118,31 @@ public class RegisterActivity extends Activity implements View.OnClickListener{
             }
         });
         return flag;
+    }
+
+    private Boolean validateEmail() {
+        String val = e4.getText().toString();
+        String emailPattern = "[a-zA-Z0-9._-]+@[a-z]+.+[a-z]+";
+
+        if (!val.matches(emailPattern)) {
+            e4.setError("Invalid email address");
+            return false;
+        } else {
+            e4.setError(null);
+            return true;
+        }
+    }
+
+    private Boolean validatePassword() {
+        String val = e2.getText().toString();
+        String passwordVal = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{4,}$";
+
+        if (!val.matches(passwordVal)) {
+            e2.setError("Password is too weak");
+            return false;
+        } else {
+            e2.setError(null);
+            return true;
+        }
     }
 }

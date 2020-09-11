@@ -27,6 +27,7 @@ public class ClientRegisterActivity extends AppCompatActivity implements View.On
     EditText et1, et2, et3;
     FloatingActionButton fab;
     ConstraintLayout constraintLayout;
+    Boolean valid;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,12 +49,13 @@ public class ClientRegisterActivity extends AppCompatActivity implements View.On
                 String surname = et2.getText().toString();
                 String tel = et3.getText().toString();
 
-                if(name.equals("") || surname.equals("") || tel.equals(""))
+                if(name.equals("") || surname.equals("") || tel.equals("") || !validateName() || !validateSurname() || !validatePhoneNo())
                 {
                     Toast.makeText(v.getContext(), "Please fill out all the fields.", Toast.LENGTH_SHORT).show();
                 }
                 else
                 {
+
                     Intent fromIntent = getIntent();
                     String email = fromIntent.getStringExtra("email");
                     String pass = fromIntent.getStringExtra("pass");
@@ -78,5 +80,41 @@ public class ClientRegisterActivity extends AppCompatActivity implements View.On
                 }
             }
         });
+    }
+
+    private Boolean validateName() {
+        String val = et1.getText().toString();
+        String namePattern="^[A-Z][a-z]{2,19}";
+        if (!val.matches(namePattern)) {
+            et1.setError("Enter a valid name!");
+            return false;
+        } else {
+            et1.setError(null);
+            return true;
+        }
+    }
+
+    private Boolean validateSurname() {
+        String val = et2.getText().toString();
+        String phonePattern="^[A-Z][a-z]{2,19}";
+        if (!val.matches(phonePattern)) {
+            et2.setError("Enter a valid sururname!");
+            return false;
+        } else {
+            et2.setError(null);
+            return true;
+        }
+    }
+
+    private Boolean validatePhoneNo() {
+        String val = et3.getText().toString();
+        String phonePattern="^07[0-9]{7}";
+        if (!val.matches(phonePattern)) {
+            et3.setError("Incorrect phone number!");
+            return false;
+        } else {
+            et3.setError(null);
+            return true;
+        }
     }
 }
