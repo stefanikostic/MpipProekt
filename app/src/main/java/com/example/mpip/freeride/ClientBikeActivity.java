@@ -425,6 +425,8 @@ public class ClientBikeActivity extends AppCompatActivity {
             @Override
             public void onTimeSet(TimePicker timePicker, int hourOfDay, int minute) {
                 if(!pickTimeFrom.getText().toString().equals("Pick start date")) {
+                    endDay = startDay;
+                    endMonth = startMonth;
                     endHour = hourOfDay;
                     endMinute = minute;
                     endAlarm.set(Calendar.HOUR_OF_DAY, endHour);
