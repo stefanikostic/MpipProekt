@@ -9,9 +9,31 @@
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
         tools:showIn="@layout/activity_client_main"
         tools:context=".ClientMainActivity">
+    <RelativeLayout android:layout_width="match_parent" android:layout_height="match_parent" android:id="@+id/rl">
+
+    <ProgressBar android:layout_width="200dp"
+                 android:layout_height="350dp"
+                 android:layout_centerInParent="true"
+                 android:background="@drawable/circle_shape"
+                 android:progressDrawable="@drawable/circle_progress_foreground"
+                 android:id="@+id/progressbar">
+
+    </ProgressBar>
+        <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+                  android:text="Loading ..."
+                  android:textColor="@color/colorPrimaryDark"
+                  android:gravity="bottom|center"
+                  android:layout_alignLeft="@id/progressbar"
+                  android:layout_alignTop="@id/progressbar"
+                  android:layout_alignRight="@id/progressbar"
+                  android:layout_alignBottom="@id/progressbar"
+                  android:textSize="24sp"/>
+
+    </RelativeLayout>
     <androidx.constraintlayout.widget.ConstraintLayout android:layout_width="match_parent"
                                                        android:layout_height="wrap_content"
-                                                       android:orientation="horizontal">
+                                                       android:orientation="horizontal"
+                                                       android:id="@+id/constraintClient">
 
         <TextView
                 android:text="Grab your nearest bicycle"
@@ -51,7 +73,5 @@
             app:itemTextColor="#000"
             app:menu="@menu/bottom_navigation_menu"
           />
-
-
 
 </RelativeLayout>

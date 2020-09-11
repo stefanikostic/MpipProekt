@@ -18,6 +18,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.GridView;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -25,6 +26,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.appcompat.*;
 
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.viewpager.widget.ViewPager;
 import com.example.mpip.freeride.domain.Bike;
 import com.example.mpip.freeride.domain.BikeDistance;
@@ -56,6 +58,10 @@ import java.io.FileNotFoundException;
 import java.util.*;
 
 public class ClientMainActivity extends AppCompatActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
+    private ProgressBar progressBar;
+    private ConstraintLayout constraintLayout;
+    int count = 0;
+    Timer timer;
     private LocationService locationService;
     private boolean mBound = false;
 
@@ -76,17 +82,63 @@ public class ClientMainActivity extends AppCompatActivity implements SharedPrefe
     private double myLat;
     private double myLong;
     private String clientId;
-
     private ArrayList<BikeDistance> bikes = new ArrayList<BikeDistance>();
     private ArrayList<Bike> onlyBikes = new ArrayList<>();
     private GridView gridView;
+    BikeAdapter bikeAdapter = null;
+    RelativeLayout rl;
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        timer = new Timer();
+        progressBar.setVisibility(View.VISIBLE);
+        rl.setVisibility(View.VISIBLE);
+        constraintLayout.setVisibility(View.INVISIBLE);
+        count = 0;
+        TimerTask timerTask = new TimerTask() {
+            @Override
+            public void run() {
+                count++;
+                progressBar.setProgress(count);
+                if(count == 15){
+                    timer.cancel();
+                    if(bikeAdapter != null){
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                convertBikes();
+                            }
+                        });
+
+                    }
+                }
+            }
+        };
+        timer.schedule(timerTask, 0, 100);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_client_main);
         gridView=(GridView) findViewById(R.id.gridview_bikes1);
+        constraintLayout = (ConstraintLayout) findViewById(R.id.constraintClient);
+        progressBar = (ProgressBar) findViewById(R.id.progressbar);
+        rl = (RelativeLayout) findViewById(R.id.rl);
+        constraintLayout.setVisibility(View.INVISIBLE);
+   /*     timer = new Timer();
+        TimerTask timerTask = new TimerTask() {
+            @Override
+            public void run() {
+                count++;
+                progressBar.setProgress(count);
+                if(count == 100){
+                    timer.cancel();
+                }
+            }
+        };
+        timer.schedule(timerTask, 0, 100);*/
         clientId = getIntent().getStringExtra("id");
         BottomNavigationView bottomNavigationView = (BottomNavigationView) findViewById(R.id.navigation_view);
         bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -163,10 +215,6 @@ public class ClientMainActivity extends AppCompatActivity implements SharedPrefe
                 }
             }
         });
-
-
-
-
     }
 
     @Override
@@ -196,18 +244,14 @@ public class ClientMainActivity extends AppCompatActivity implements SharedPrefe
         if (requestCode == 1) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 // Permission granted.
-                try {
-                    convertBikes();
-                } catch (FileNotFoundException e) {
-                    e.printStackTrace();
-                }
+                convertBikes();
             } else {
                 // User refused to grant permission.
             }
         }
     }
 
-    private void convertBikes() throws FileNotFoundException {
+    private void convertBikes() {
         bikes = new ArrayList<>();
         for(Bike b : onlyBikes){
             com.example.mpip.freeride.domain.Location l = b.getLocation();
@@ -219,16 +263,18 @@ public class ClientMainActivity extends AppCompatActivity implements SharedPrefe
         this.handdlee();
     }
 
-    public void handdlee() throws FileNotFoundException {
+    public void handdlee() {
         Bike [] arr = new Bike[bikes.size()];
         int i = 0;
         for(BikeDistance bd : bikes){
             arr[i] = bd.getBike();
             i++;
         }
-        BikeAdapter bikeAdapter = new BikeAdapter(ClientMainActivity.this, arr, myLat, myLong, clientId);
+        bikeAdapter = new BikeAdapter(ClientMainActivity.this, arr, myLat, myLong, clientId);
         gridView.setAdapter(bikeAdapter);
-//        bikeAdapter.notifyDataSetChanged();
+        progressBar.setVisibility(View.INVISIBLE);
+        rl.setVisibility(View.INVISIBLE);
+        constraintLayout.setVisibility(View.VISIBLE);
     }
 
     public float distance(double myLat, double myLong, double latBike, double longBike) {
