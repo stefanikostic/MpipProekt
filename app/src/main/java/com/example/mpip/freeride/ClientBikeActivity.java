@@ -32,6 +32,7 @@ import com.parse.*;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
+import java.util.TimeZone;
 
 import static java.util.Calendar.MONTH;
 
@@ -340,6 +341,7 @@ public class ClientBikeActivity extends AppCompatActivity {
         object.put("bike_id", id);
         object.put("price", total);
         object.put("date_from", startAlarm.getTime());
+
         if(pickDateTo.getVisibility()!=View.INVISIBLE)
             object.put("date_to", date2.getTime());
         else
