@@ -9,6 +9,19 @@
         tools:showIn="@layout/activity_add_bicycle"
         tools:context=".AddBicycleActivity">
 
+    <TextView
+            android:text="per hour"
+            android:layout_width="153dp"
+            android:layout_height="48dp" android:id="@+id/perHour"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:textColor="#000"
+            android:gravity="center|center_vertical"
+            android:textSize="18sp"
+            android:layout_marginEnd="24dp" android:layout_marginTop="32dp"
+            app:layout_constraintTop_toBottomOf="@+id/changePic" app:layout_constraintStart_toEndOf="@+id/price"
+            android:layout_marginStart="16dp" app:layout_constraintHorizontal_bias="1.0"
+            android:layout_marginBottom="8dp" app:layout_constraintBottom_toTopOf="@+id/btn_add_bike"
+            app:layout_constraintVertical_bias="0.047"/>
     <AutoCompleteTextView
             android:layout_width="340dp"
             android:layout_height="60dp"
@@ -40,18 +53,18 @@
             app:layout_constraintHorizontal_bias="0.151" android:layout_marginTop="8dp"
             app:layout_constraintTop_toBottomOf="@+id/category"/>
     <EditText
-            android:layout_width="177dp"
+            android:layout_width="195dp"
             android:layout_height="55dp"
             android:inputType="textPersonName"
             android:ems="10"
-            android:hint="Enter price"
+            android:hint="Enter price per hour"
             android:textColor="#000000"
+            android:gravity="center"
             android:id="@+id/price"
-            android:layout_marginStart="8dp"
-            app:layout_constraintStart_toStartOf="parent" android:layout_marginEnd="8dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginTop="76dp" app:layout_constraintTop_toBottomOf="@+id/imageView"
-            android:textColorHint="@android:color/darker_gray" app:layout_constraintHorizontal_bias="0.165"/>
+            android:layout_marginStart="32dp"
+            app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginTop="72dp" app:layout_constraintTop_toBottomOf="@+id/imageView"
+            android:textColorHint="@android:color/darker_gray"/>
     <ImageButton
             android:layout_width="234dp"
             android:layout_height="199dp" app:srcCompat="@drawable/addpicture"

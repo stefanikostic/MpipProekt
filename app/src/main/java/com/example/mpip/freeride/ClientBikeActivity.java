@@ -44,7 +44,7 @@ public class ClientBikeActivity extends AppCompatActivity {
 
     private ImageView imageViewBike;
     FloatingActionButton next, viewMap;
-    private TextView pickTimeFrom, pickTimeTo, pickDate, pickDateTo, bikeName, totalPrice, billingInfo;
+    private TextView pickTimeFrom, pickTimeTo, pickDate, pickDateTo, bikeName, totalPrice, billingInfo, titleFrom, titleTo;
     Button rentHourly, rentDaily;
     private Context mContext = this;
     private int startMonth, endMonth, startDay, endDay, startHour, startMinute, endHour, endMinute;
@@ -68,14 +68,18 @@ public class ClientBikeActivity extends AppCompatActivity {
         pickTimeFrom = (TextView) findViewById(R.id.pickTimeFrom);
         pickTimeTo = (TextView) findViewById(R.id.pickTimeTo);
         pickDate = (TextView) findViewById(R.id.pickDate);
+        pickDate.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_date, 0, 0, 0);
         rentHourly = (Button) findViewById(R.id.rentHourly);
         rentDaily = (Button) findViewById(R.id.rentDaily);
         clientId = getIntent().getStringExtra("client_id");
         cl1 = (ConstraintLayout) findViewById(R.id.constraint1);
         chooseDateTime = (ConstraintLayout) findViewById(R.id.chooseDateTime);
         pickDateTo = (TextView) findViewById(R.id.pickDateTo);
+        pickDateTo.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_date, 0, 0, 0);
         bikeName = (TextView) findViewById(R.id.bikeName);
         totalPrice = (TextView) findViewById(R.id.totalPrice);
+        titleFrom = (TextView) findViewById(R.id.titleTimeFrom);
+        titleTo = (TextView) findViewById(R.id.titleTimeTo);
         constraint3 = (ConstraintLayout) findViewById(R.id.constraint3);
         next = (FloatingActionButton) findViewById(R.id.next);
         final Calendar calendar = Calendar.getInstance();
@@ -207,79 +211,92 @@ public class ClientBikeActivity extends AppCompatActivity {
         pickDateTo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                DatePickerDialog datePickerDialog = new DatePickerDialog(mContext, new DatePickerDialog.OnDateSetListener() {
-                    @Override
-                    public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
-                        calendar.set(MONTH, month);
-                        endMonth = month + 1;
-                        endDay = dayOfMonth;
-                        endMonthName = calendar.getDisplayName(MONTH, Calendar.LONG, Locale.US);
-                        if(!pickDate.getText().toString().equals("Pick start date")) {
-                            if(startDay > endDay || startMonth > endMonth) {
-                                Toast.makeText(getApplicationContext(), "Invalid values of start date and end date.\nTry again!", Toast.LENGTH_SHORT).show();
+                if (pickDate.getText().toString().equals("Pick start date"))
+                    Toast.makeText(getApplicationContext(), "Enter start date first!", Toast.LENGTH_SHORT).show();
+                else {
+                    DatePickerDialog datePickerDialog = new DatePickerDialog(mContext, new DatePickerDialog.OnDateSetListener() {
+                        @Override
+                        public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
+                            calendar.set(MONTH, month);
+                            endMonth = month + 1;
+                            endDay = dayOfMonth;
+                            endMonthName = calendar.getDisplayName(MONTH, Calendar.LONG, Locale.US);
+                            if (!pickDate.getText().toString().equals("Pick start date")) {
+                                if (startDay > endDay || startMonth > endMonth) {
+                                    Toast.makeText(getApplicationContext(), "Invalid values of start date and end date.\nTry again!", Toast.LENGTH_SHORT).show();
+                                } else {
+                                    pickDateTo.setText(dayOfMonth + ". " + endMonthName);
+                                    int total = estimatePriceDaily(startDay, startMonth, endDay, endMonth);
+                                    billingInfo.setText("Billing info ");
+                                    totalPrice.setText("Total price: " + total + " denars");
+                                    constraint3.setVisibility(View.VISIBLE);
+                                    int dayB = view.getDayOfMonth();
+                                    int monthB = view.getMonth();
+                                    int yearB = view.getYear();
+                                    date2 = Calendar.getInstance();
+                                    date2.set(Calendar.YEAR, yearB);
+                                    date2.set(MONTH, monthB);
+                                    date2.set(Calendar.DAY_OF_MONTH, dayB);
+                                    date2.set(Calendar.HOUR_OF_DAY, 9);
+                                    date2.set(Calendar.MINUTE, 0);
+                                    date2.set(Calendar.SECOND, 0);
+                                    date2.set(Calendar.MILLISECOND, 0);
+                                    endAlarm = date2;
+                                    beforeEndAlarm = endAlarm;
+                                    endHour = 9;
+                                    endMinute = 0;
+                                }
                             } else {
-                                pickDateTo.setText(dayOfMonth + ". " + endMonthName);
-                                int total = estimatePriceDaily(startDay, startMonth, endDay, endMonth);
-                                billingInfo.setText("Billing info ");
-                                totalPrice.setText("Total price: " + total + " denars");
-                                constraint3.setVisibility(View.VISIBLE);
-                                int dayB  = view.getDayOfMonth();
-                                int monthB = view.getMonth();
-                                int yearB = view.getYear();
-                                date2 = Calendar.getInstance();
-                                date2.set(Calendar.YEAR, yearB);
-                                date2.set(MONTH, monthB);
-                                date2.set(Calendar.DAY_OF_MONTH, dayB);
-                                date2.set(Calendar.HOUR_OF_DAY, 9);
-                                date2.set(Calendar.MINUTE, 0);
-                                date2.set(Calendar.SECOND,0);
-                                date2.set(Calendar.MILLISECOND,0);
-                                endAlarm = date2;
-                                beforeEndAlarm = endAlarm;
-                                endHour = 9;
-                                endMinute = 0;
+                                Toast.makeText(getApplicationContext(), "You must enter start date!", Toast.LENGTH_SHORT).show();
                             }
-                        } else {
-                            Toast.makeText(getApplicationContext(), "You must enter start date!", Toast.LENGTH_SHORT).show();
                         }
-                    }
-                }, mYear, mMonth, mDay);
-                Calendar currentDay = Calendar.getInstance();
-                datePickerDialog.getDatePicker().setMinDate(currentDay.getTimeInMillis());
-                datePickerDialog.show();
+                    }, mYear, mMonth, mDay);
+                    Calendar currentDay = startAlarm;
+                    currentDay.set(Calendar.DAY_OF_MONTH, startDay + 1);
+                    datePickerDialog.getDatePicker().setMinDate(currentDay.getTimeInMillis());
+                    datePickerDialog.show();
+                }
             }
         });
         pickTimeFrom.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                TimePickerDialog timePickerDialog = new TimePickerDialog(mContext, new TimePickerDialog.OnTimeSetListener() {
-
-                    @SuppressLint("ShowToast")
-                    @Override
-                    public void onTimeSet(TimePicker timePicker, int hourOfDay, final int minute) {
-                        startHour = hourOfDay;
-                        startMinute = minute;
-                        startAlarm.set(Calendar.HOUR_OF_DAY, startHour - 1);
-                        startAlarm.set(Calendar.MINUTE,startMinute);
-                        startAlarm.set(Calendar.SECOND,0);
-                        startAlarm.set(Calendar.MILLISECOND,0);
-                        pickTimeFrom.setText(String.format("%02d", hourOfDay)+ ":" + String.format("%02d", minute));
-                        Toast.makeText(getApplicationContext(), "Let's add end time!", Toast.LENGTH_LONG).show();
-                        new Handler().postDelayed(new Runnable() {
-                            @Override
-                            public void run() {
-                                funkcija(hour, minute);
-                            }
-                        }, 350);
-                    }
-                }, hour, minute, android.text.format.DateFormat.is24HourFormat(mContext));
-                timePickerDialog.show();
+                if (pickDate.getText().toString().equals("Pick start date"))
+                    Toast.makeText(getApplicationContext(), "Enter the date first!", Toast.LENGTH_SHORT).show();
+                else {
+                    TimePickerDialog timePickerDialog = new TimePickerDialog(mContext, new TimePickerDialog.OnTimeSetListener() {
+                        @SuppressLint("ShowToast")
+                        @Override
+                        public void onTimeSet(TimePicker timePicker, int hourOfDay, final int minute) {
+                            startHour = hourOfDay;
+                            startMinute = minute;
+                            startAlarm.set(Calendar.HOUR_OF_DAY, startHour - 1);
+                            startAlarm.set(Calendar.MINUTE, startMinute);
+                            startAlarm.set(Calendar.SECOND, 0);
+                            startAlarm.set(Calendar.MILLISECOND, 0);
+                            pickTimeFrom.setText(String.format("%02d", hourOfDay) + ":" + String.format("%02d", minute));
+                            Toast.makeText(getApplicationContext(), "Let's add end time!", Toast.LENGTH_LONG).show();
+                            new Handler().postDelayed(new Runnable() {
+                                @Override
+                                public void run() {
+                                    titleFrom.setVisibility(View.VISIBLE);
+                                    funkcija(hour, minute);
+                                }
+                            }, 350);
+                        }
+                    }, hour, minute, android.text.format.DateFormat.is24HourFormat(mContext));
+                    timePickerDialog.show();
+                }
             }
         });
+
         pickTimeTo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-             funkcija(hour, minute);
+                if(!pickTimeFrom.getText().toString().matches("^[0-9]{2}\\:[0-9]{2}$"))
+                    Toast.makeText(getApplicationContext(), "Enter start time first!", Toast.LENGTH_SHORT).show();
+                else
+                    funkcija(hour, minute);
             }
         });
 
@@ -410,10 +427,10 @@ public class ClientBikeActivity extends AppCompatActivity {
         intent1.putExtra("rentId", rentId);
         intent1.putExtra("endMonth", endMonthName);
         intent1.putExtra("endDay", endDay);
-        intent1.putExtra("endHour", endHour);
+        intent1.putExtra("endHour", beforeEndAlarm.get(Calendar.DAY_OF_MONTH));
         intent1.putExtra("endMin", endMinute);
         PendingIntent pi1 = PendingIntent.getBroadcast(this, 0, intent1, 0);
-        long delay = endAlarm.getTimeInMillis() - Calendar.getInstance().getTimeInMillis();
+        long delay = beforeEndAlarm.getTimeInMillis() - Calendar.getInstance().getTimeInMillis();
         if(delay > 0) {
             long futureInMillis = SystemClock.elapsedRealtime() + delay;
             alarmManager.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, futureInMillis, pi1);
@@ -429,6 +446,7 @@ public class ClientBikeActivity extends AppCompatActivity {
                     endMonth = startMonth;
                     endHour = hourOfDay;
                     endMinute = minute;
+                    endMonthName = startMonthName;
                     endAlarm.set(Calendar.HOUR_OF_DAY, endHour);
                     endAlarm.set(Calendar.MINUTE, endMinute);
                     endAlarm.set(Calendar.SECOND, 0);
@@ -440,10 +458,13 @@ public class ClientBikeActivity extends AppCompatActivity {
                     } else {
                         pickTimeTo.setText(String.format("%02d", hourOfDay)+ ":" + String.format("%02d", minute));
                         total = estimatePriceHourly();
+                        titleTo.setVisibility(View.VISIBLE);
                         billingInfo.setText("Billing info ");
                         totalPrice.setText("Total price: " + total + " denars");
                         constraint3.setVisibility(View.VISIBLE);
                     }
+                } else {
+                    Toast.makeText(getApplicationContext(), "Enter start time first!", Toast.LENGTH_SHORT).show();
                 }
             }
         }, hour, minute, android.text.format.DateFormat.is24HourFormat(mContext));
@@ -481,7 +502,7 @@ public class ClientBikeActivity extends AppCompatActivity {
 
     public void createNotificationChannelLeave() {
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
-            String description = "Channel for notifications before renting";
+            String description = "Channel for notifications before leaving the bike";
             NotificationChannel notificationChannel =
                     new NotificationChannel("n1", "n1", NotificationManager.IMPORTANCE_DEFAULT);
             notificationChannel.setDescription(description);
