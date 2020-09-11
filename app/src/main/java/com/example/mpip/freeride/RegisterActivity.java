@@ -58,14 +58,24 @@ public class RegisterActivity extends Activity implements View.OnClickListener{
         });
     }
     public void checkFields(String act) {
+        boolean flag = true;
+        if(!validateEmail()){
+            flag = false;
+            Toast.makeText(getApplicationContext(), "Invalid email", Toast.LENGTH_SHORT).show();
+        }
+        if(!validatePassword()){
+            flag = false;
+            Toast.makeText(getApplicationContext(), "Invalid password", Toast.LENGTH_SHORT).show();
+        }
         String s2 = e2.getText().toString();
         String s3 = e3.getText().toString();
         String s4 = e4.getText().toString();
-        if(s2.equals("") || s3.equals("") || s4.equals("") || !validateEmail() || !validatePassword())
+        if(s2.equals("") || s3.equals("") || s4.equals(""))
         {
+            flag = false;
             Toast.makeText(getApplicationContext(), "Please fill out all the fields.", Toast.LENGTH_SHORT).show();
         }
-        else
+        if(flag)
         {
             if(s2.equals(s3))
             {
@@ -123,7 +133,8 @@ public class RegisterActivity extends Activity implements View.OnClickListener{
     private Boolean validateEmail() {
         String val = e4.getText().toString();
         String emailPattern = "[a-zA-Z0-9._-]+@[a-z]+.+[a-z]+";
-
+        if(val.equals(""))
+            return true;
         if (!val.matches(emailPattern)) {
             e4.setError("Invalid email address");
             return false;
@@ -135,7 +146,9 @@ public class RegisterActivity extends Activity implements View.OnClickListener{
 
     private Boolean validatePassword() {
         String val = e2.getText().toString();
-        String passwordVal = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{4,}$";
+        if(val.equals(""))
+            return true;
+        String passwordVal = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+!=/*])(?=\\S+$).{4,}$";
 
         if (!val.matches(passwordVal)) {
             e2.setError("Password is too weak");
