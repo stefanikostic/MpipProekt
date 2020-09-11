@@ -32,6 +32,7 @@ import com.parse.*;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
+import java.util.TimeZone;
 
 import static java.util.Calendar.MONTH;
 
@@ -178,10 +179,10 @@ public class ClientBikeActivity extends AppCompatActivity {
                         date1.set(Calendar.YEAR, yearB);
                         date1.set(MONTH, monthB);
                         date1.set(Calendar.DAY_OF_MONTH, dayB);
-                        date1.set(Calendar.HOUR_OF_DAY,9);
+                        date1.set(Calendar.HOUR_OF_DAY, 9);
                         date1.set(Calendar.MINUTE, 0);
-                        date1.set(Calendar.SECOND,0);
-                        date1.set(Calendar.MILLISECOND,0);
+                        date1.set(Calendar.SECOND, 0);
+                        date1.set(Calendar.MILLISECOND, 0);
                         if(pickTimeTo.getVisibility()==View.INVISIBLE) {
                             startAlarm.set(Calendar.DAY_OF_MONTH, dayB);
                             startAlarm.set(MONTH, monthB);
@@ -340,8 +341,11 @@ public class ClientBikeActivity extends AppCompatActivity {
         object.put("bike_id", id);
         object.put("price", total);
         object.put("date_from", startAlarm.getTime());
+
         if(pickDateTo.getVisibility()!=View.INVISIBLE)
             object.put("date_to", date2.getTime());
+        else
+            object.put("date_to", endAlarm.getTime());
         object.put("hours", hours);
         object.saveInBackground(new SaveCallback() {
             @Override
@@ -424,8 +428,8 @@ public class ClientBikeActivity extends AppCompatActivity {
                     endHour = hourOfDay;
                     endMinute = minute;
                     endAlarm.set(Calendar.HOUR_OF_DAY, endHour);
-                    endAlarm.set(Calendar.MINUTE,endMinute);
-                    endAlarm.set(Calendar.SECOND,0);
+                    endAlarm.set(Calendar.MINUTE, endMinute);
+                    endAlarm.set(Calendar.SECOND, 0);
                     endAlarm.set(Calendar.MILLISECOND,0);
                     beforeEndAlarm = endAlarm;
                     beforeEndAlarm.set(Calendar.HOUR_OF_DAY, endHour - 1);

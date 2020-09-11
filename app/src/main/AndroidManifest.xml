@@ -138,6 +138,16 @@
             </intent-filter>
         </receiver>
         <receiver
+                android:name=".service.ReminderLeaveReceiver"
+                android:enabled="true">
+            <intent-filter>
+                <action android:name="ALARM"/>
+                <action android:name="NOTIFICATION_SERVICE"/>
+
+                <category android:name="android.intent.category.DEFAULT"/>
+            </intent-filter>
+        </receiver>
+        <receiver
                 android:name=".service.CancelRentReceiver"
                 android:enabled="true">
             <intent-filter>

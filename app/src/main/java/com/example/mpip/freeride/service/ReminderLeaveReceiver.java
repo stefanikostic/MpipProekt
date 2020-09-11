@@ -18,7 +18,7 @@ public class ReminderLeaveReceiver extends BroadcastReceiver {
         String month = intent.getStringExtra("endMonth");
         Uri sound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         String msg = "You need to leave your reserved bicycle on " + day + " " + month + " at " + String.format("%02d", hour) + ":" + String.format("%02d", minute) + "!";
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(context, "n")
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(context, "n1")
                 .setSmallIcon(R.drawable.freeridelogo)
                 .setSound(sound)
                 .setContentTitle("Reminder")

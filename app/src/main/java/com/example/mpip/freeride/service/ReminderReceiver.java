@@ -22,7 +22,7 @@ public class ReminderReceiver extends BroadcastReceiver {
         DateTime timerTest = DateTime.now();
         String msg = "You need to pick up your reserved bicycle on " + day + " " + month + " at " + String.format("%02d", hour) + ":" + String.format("%02d", minute) + "!";
         Uri sound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(context, "n1")
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(context, "n")
                 .setSmallIcon(R.drawable.freeridelogo)
                 .setSound(sound)
                 .setStyle(new NotificationCompat.BigTextStyle()
