@@ -34,7 +34,7 @@
                 android:visibility="visible"
                 app:layout_constraintEnd_toEndOf="parent" android:layout_marginEnd="8dp"
                 android:layout_marginStart="8dp" app:layout_constraintStart_toStartOf="parent"
-                android:layout_height="690dp"
+                android:layout_height="607dp"
                 android:layout_width="490dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintHorizontal_bias="0.315"

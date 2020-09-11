@@ -12,7 +12,9 @@ import android.os.Handler;
 
 import android.util.Log;
 import android.view.KeyEvent;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
@@ -37,17 +39,21 @@ import java.util.Objects;
 
 public class LoginActivity extends Activity implements View.OnClickListener{
 
+    InputMethodManager inputMethodManager;
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
     public void onClick(View view) {
-        if(view.getId() == R.id.constrainLayout || view.getId() == R.id.Logo){
-            InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
-            assert inputMethodManager != null;
-           inputMethodManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+
+
+        if(getCurrentFocus() != null) {
+            if (view.getId() == R.id.constrainLayout || view.getId() == R.id.Logo) {
+                inputMethodManager.hideSoftInputFromWindow(Objects.requireNonNull(getCurrentFocus()).getWindowToken(), 0);
+            }
+        }
+
 
         }
 
-    }
 
     private static final int REQUEST_CODE = 101 ;
     Button register;
@@ -59,7 +65,6 @@ public class LoginActivity extends Activity implements View.OnClickListener{
     ConstraintLayout constraintLayout;
     ImageView Logo;
 
-    Database db;
 
     Handler handler = new Handler();
     String s1 = "";
@@ -68,6 +73,9 @@ public class LoginActivity extends Activity implements View.OnClickListener{
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
+
+
+ inputMethodManager =(InputMethodManager)  getSystemService(INPUT_METHOD_SERVICE);
 
         Activity acc = this;
         super.onCreate(savedInstanceState);
@@ -79,15 +87,14 @@ public class LoginActivity extends Activity implements View.OnClickListener{
 
         e1 = (EditText) findViewById(R.id.login_email);
         e2 = (EditText) findViewById(R.id.login_pass);
+        e1.setOnClickListener(this);
+        e2.setOnClickListener(this);
 
         constraintLayout = (ConstraintLayout) findViewById(R.id.constrainLayout);
         Logo = (ImageView) findViewById(R.id.Logo);
 
         constraintLayout.setOnClickListener(this);
         Logo.setOnClickListener(this);
-
-
-        db = new Database(this);
 
 
         register.setOnClickListener(new View.OnClickListener() {
@@ -102,7 +109,7 @@ public class LoginActivity extends Activity implements View.OnClickListener{
             @Override
             public void onClick(View v) {
 
-                boolean flag = true;
+
                 s1 = e1.getText().toString();
                 s2 = e2.getText().toString();
 

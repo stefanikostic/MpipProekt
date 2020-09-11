@@ -45,7 +45,6 @@ public class AddBicycleActivity extends AppCompatActivity {
     private EditText et2;
     Bitmap bitmap = null;
     Uri uri = null;
-    Database db;
     String bikeId;
 
     ArrayAdapter<String> adapter;
@@ -54,7 +53,6 @@ public class AddBicycleActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_bicycle);
         Toolbar toolbar = findViewById(R.id.toolbar);
-        db = new Database(this);
         image = (ImageView) findViewById(R.id.imageView);
         changePic = (Button) findViewById(R.id.changePic);
         addBike = (AppCompatButton) findViewById(R.id.btn_add_bike);
@@ -150,18 +148,7 @@ public class AddBicycleActivity extends AppCompatActivity {
         changePic.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-    /*            if(ActivityCompat.checkSelfPermission(AddBicycleActivity.this,
-                        Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED)
-                {
-                    ActivityCompat.requestPermissions(AddBicycleActivity.this,
-                            new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 100);
 
-                    return;
-                }
-                Intent i = new Intent(Intent.ACTION_GET_CONTENT);
-                i.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
-                i.setType("image/*");
-                startActivityForResult(i, 2);*/
             }
         });
         addBike.setOnClickListener(new View.OnClickListener() {
@@ -218,6 +205,8 @@ public class AddBicycleActivity extends AppCompatActivity {
                                             object.put("rented", false);
                                             object.put("latitude", lat);
                                             object.put("longitude", longi);
+                                            ParseGeoPoint parseGeoPoint = new ParseGeoPoint(lat, longi);
+                                            object.put("location", parseGeoPoint);
                                             try {
                                                 Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), uri);
                                                 ByteArrayOutputStream stream = new ByteArrayOutputStream();

@@ -63,11 +63,6 @@ public class BikeAdapter extends BaseAdapter {
         LayoutInflater layoutInflater = (LayoutInflater)mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         final View listing = layoutInflater.inflate(R.layout.gridview_item, parent, false);
         Bitmap bitmap = bikes[position].getImage();
-     /*   try {
-            bitmap = MediaStore.Images.Media.getBitmap(mContext.getContentResolver(), uri);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }*/
         ImageView icon = (ImageView) listing.findViewById(R.id.icon); // get the reference of ImageView
         icon.setImageBitmap(bitmap); // set logo images
         TextView textView = (TextView) listing.findViewById(R.id.textView);
@@ -81,6 +76,8 @@ public class BikeAdapter extends BaseAdapter {
                     Intent i = new Intent(mContext, ClientBikeActivity.class);
                     i.putExtra("bikeId", bikes[position].getId());
                     i.putExtra("client_id", clientId);
+                    i.putExtra("latitude", clientLat);
+                    i.putExtra("longitude", clientLong);
                     i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     mContext.startActivity(i);
                 }
