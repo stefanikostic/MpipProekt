@@ -13,6 +13,10 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.text.method.KeyListener;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.*;
 
@@ -39,6 +43,7 @@ public class AddBicycleActivity extends AppCompatActivity {
     private ImageButton imageButton;
     private AppCompatButton addBike;
     private AutoCompleteTextView actv;
+    private TextView perHour;
     private Button changePic;
     private Context mContext;
     private EditText et;
@@ -52,17 +57,16 @@ public class AddBicycleActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_bicycle);
-        Toolbar toolbar = findViewById(R.id.toolbar);
         image = (ImageView) findViewById(R.id.imageView);
         changePic = (Button) findViewById(R.id.changePic);
         addBike = (AppCompatButton) findViewById(R.id.btn_add_bike);
         actv = (AutoCompleteTextView) findViewById(R.id.category);
+        perHour = (TextView) findViewById(R.id.perHour);
+        perHour.setVisibility(View.INVISIBLE);
         et = (EditText) findViewById(R.id.price);
         et2 = (EditText) findViewById(R.id.model_name);
-        setSupportActionBar(toolbar);
         final ArrayList<String> list_categories = new ArrayList<>();
         adapter = new ArrayAdapter<String>(this, R.layout.autocomplete_textview, list_categories);
-
         Intent intent = getIntent();
         bikeId = intent.getStringExtra("id");
         final ParseQuery<ParseObject> queryCat = new ParseQuery<ParseObject>("Categories");
@@ -239,6 +243,22 @@ public class AddBicycleActivity extends AppCompatActivity {
                         }
                     }
                 });
+            }
+        });
+        et.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                perHour.setVisibility(View.VISIBLE);
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
             }
         });
     }
