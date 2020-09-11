@@ -1,5 +1,5 @@
 <resources>
-    <string name="back4app_server_url">http://54.87.172.190/parse/</string>
+    <string name="back4app_server_url">http://54.172.146.249/parse/</string>
 
     <!-- Change the following strings as required -->
     <string name="back4app_app_id">myappID</string>

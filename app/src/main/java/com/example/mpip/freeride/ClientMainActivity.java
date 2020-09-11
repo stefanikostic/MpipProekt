@@ -127,18 +127,7 @@ public class ClientMainActivity extends AppCompatActivity implements SharedPrefe
         progressBar = (ProgressBar) findViewById(R.id.progressbar);
         rl = (RelativeLayout) findViewById(R.id.rl);
         constraintLayout.setVisibility(View.INVISIBLE);
-   /*     timer = new Timer();
-        TimerTask timerTask = new TimerTask() {
-            @Override
-            public void run() {
-                count++;
-                progressBar.setProgress(count);
-                if(count == 100){
-                    timer.cancel();
-                }
-            }
-        };
-        timer.schedule(timerTask, 0, 100);*/
+
         clientId = getIntent().getStringExtra("id");
         BottomNavigationView bottomNavigationView = (BottomNavigationView) findViewById(R.id.navigation_view);
         bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
