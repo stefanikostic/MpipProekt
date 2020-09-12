@@ -17,16 +17,21 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.text.method.KeyListener;
 import android.view.KeyEvent;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.*;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatButton;
 import androidx.appcompat.widget.Toolbar;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
 
 import com.example.mpip.freeride.domain.Bike;
 import com.example.mpip.freeride.domain.Location;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.parse.*;
 
 
@@ -35,36 +40,73 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class AddBicycleActivity extends AppCompatActivity {
 
     public static final int GET_FROM_GALLERY = 3;
     private ImageView image;
     private ImageButton imageButton;
-    private AppCompatButton addBike;
+    private FloatingActionButton addBike;
     private AutoCompleteTextView actv;
     private TextView perHour;
     private Button changePic;
     private Context mContext;
     private EditText et;
+    private ProgressBar progressBar;
+    private Timer timer;
     private EditText et2;
     Bitmap bitmap = null;
+    RelativeLayout rlAdd;
+    ConstraintLayout constraintAddBicycle;
     Uri uri = null;
     String bikeId;
-
+    int count;
     ArrayAdapter<String> adapter;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_bicycle);
+//        getSupportActionBar().hide();
         image = (ImageView) findViewById(R.id.imageView);
         changePic = (Button) findViewById(R.id.changePic);
-        addBike = (AppCompatButton) findViewById(R.id.btn_add_bike);
+        addBike = (FloatingActionButton) findViewById(R.id.btn_add_bike);
         actv = (AutoCompleteTextView) findViewById(R.id.category);
         perHour = (TextView) findViewById(R.id.perHour);
         perHour.setVisibility(View.INVISIBLE);
+        progressBar = (ProgressBar) findViewById(R.id.progressbar);
+        changePic.setVisibility(View.INVISIBLE);
+        rlAdd = (RelativeLayout) findViewById(R.id.rlAdd);
+        constraintAddBicycle = (ConstraintLayout) findViewById(R.id.constraintAddBicycle);
+        rlAdd.setVisibility(View.INVISIBLE);
         et = (EditText) findViewById(R.id.price);
         et2 = (EditText) findViewById(R.id.model_name);
+        BottomNavigationView bottomNavigationView = (BottomNavigationView) findViewById(R.id.navigation_view);
+        bottomNavigationView.getMenu().setGroupCheckable(0, false, true);
+        final String email = getIntent().getStringExtra("email");
+        bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                switch (item.getItemId()){
+                    case R.id.ic_bikes:
+                        Intent intent0 = new Intent(AddBicycleActivity.this, RenterMainActivity.class);
+                        intent0.putExtra("email", email);
+                        startActivity(intent0);
+                        break;
+                    case R.id.ic_rented_bikes:
+                        Intent intent1 = new Intent(AddBicycleActivity.this, RenterRentedBikesActivity.class);
+                        intent1.putExtra("email", email);
+                        startActivity(intent1);
+                        break;
+                    case R.id.ic_exit:
+                        Intent intent2 = new Intent(AddBicycleActivity.this, LoginActivity.class);
+                        startActivity(intent2);
+                        break;
+                }
+                return false;
+            }
+        });
         final ArrayList<String> list_categories = new ArrayList<>();
         adapter = new ArrayAdapter<String>(this, R.layout.autocomplete_textview, list_categories);
         Intent intent = getIntent();
@@ -92,6 +134,7 @@ public class AddBicycleActivity extends AppCompatActivity {
         });
 
         final ParseQuery<ParseObject> query = new ParseQuery<ParseObject>("Bike");
+        query.whereEqualTo("objectId", bikeId);
         query.findInBackground(new FindCallback<ParseObject>() {
             @Override
             public void done(List<ParseObject> objects, ParseException e) {
@@ -107,6 +150,7 @@ public class AddBicycleActivity extends AppCompatActivity {
                                             ParseObject category = list.get(0);
                                             String nameCat = category.getString("name");
                                             actv.setText(nameCat);
+                                            imageButton.setVisibility(View.INVISIBLE);
                                             et2.setText(object.getString("name"));
                                             int br = object.getInt("price");
                                             et.setText(String.valueOf(br));
@@ -152,12 +196,30 @@ public class AddBicycleActivity extends AppCompatActivity {
         changePic.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                Intent i = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+                i.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+                i.setType("image/*");
+                startActivityForResult(i, 1);
             }
         });
         addBike.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(final View view) {
+                rlAdd.setVisibility(View.VISIBLE);
+                constraintAddBicycle.setVisibility(View.INVISIBLE);
+                timer = new Timer();
+                final int[] count = {0};
+                TimerTask timerTask = new TimerTask() {
+                    @Override
+                    public void run() {
+                        count[0]++;
+                        progressBar.setProgress(count[0]);
+                        if (count[0] == 15) {
+                            timer.cancel();
+                        }
+                    }
+                };
+                timer.schedule(timerTask, 0, 100);
                 final int price = Integer.parseInt(et.getText().toString());
                 final String modelName = et2.getText().toString();
                 Intent i = getIntent();
@@ -226,6 +288,8 @@ public class AddBicycleActivity extends AppCompatActivity {
                                                             Intent intent1 = new Intent(AddBicycleActivity.this, RenterMainActivity.class);
                                                             intent1.putExtra("email", email);
                                                             startActivity(intent1);
+                                                            rlAdd.setVisibility(View.INVISIBLE);
+                                                            constraintAddBicycle.setVisibility(View.VISIBLE);
                                                         }
                                                     }
 
@@ -253,7 +317,10 @@ public class AddBicycleActivity extends AppCompatActivity {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                perHour.setVisibility(View.VISIBLE);
+                if(s.toString().equals(""))
+                    perHour.setVisibility(View.INVISIBLE);
+                else
+                    perHour.setVisibility(View.VISIBLE);
             }
 
             @Override
@@ -262,11 +329,7 @@ public class AddBicycleActivity extends AppCompatActivity {
             }
         });
     }
-    public static byte[] getBitmapAsByteArray(Bitmap bitmap) {
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.PNG, 1, outputStream);
-        return outputStream.toByteArray();
-    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -275,7 +338,6 @@ public class AddBicycleActivity extends AppCompatActivity {
             uri = data.getData();
             bitmap = null;
             try {
-
                 bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), uri);
                 image.setImageBitmap(bitmap);
                 image.setVisibility(View.VISIBLE);

@@ -11,8 +11,7 @@ import android.os.Build;
 import android.os.Bundle;
 
 import android.view.MenuItem;
-import android.widget.ProgressBar;
-import android.widget.RelativeLayout;
+import android.widget.*;
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.*;
@@ -20,8 +19,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import android.view.View;
-import android.widget.GridView;
-import android.widget.Toast;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import com.example.mpip.freeride.domain.Bike;
 import com.example.mpip.freeride.domain.Location;
@@ -48,6 +45,7 @@ public class RenterMainActivity extends AppCompatActivity {
     ArrayList<Bike> bikes = new ArrayList<Bike>();
     GridView gridView;
     FloatingActionButton fab;
+    TextView noBikes;
     private ProgressBar progressBar;
     private ConstraintLayout constraintLayout;
     private RelativeLayout relativeLayout;
@@ -100,7 +98,8 @@ public class RenterMainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_renter_main);
         gridView = (GridView) findViewById(R.id.gridview_renter);
-        fab = findViewById(R.id.fab1);
+        fab = (FloatingActionButton) findViewById(R.id.fab1);
+        noBikes = (TextView) findViewById(R.id.noBikes);
         constraintLayout = (ConstraintLayout) findViewById(R.id.constraintRenter);
         progressBar = (ProgressBar) findViewById(R.id.progressbar1);
         relativeLayout = (RelativeLayout) findViewById(R.id.rl1);
@@ -158,6 +157,9 @@ public class RenterMainActivity extends AppCompatActivity {
 
                                                            }}
                                                            handdlee();
+                                                       } else {
+                                                           if(bikes.size() == 0)
+                                                               noBikes.setVisibility(View.VISIBLE);
                                                        }
                                                    } else {
                                                        e.printStackTrace();
@@ -190,5 +192,6 @@ public class RenterMainActivity extends AppCompatActivity {
         relativeLayout.setVisibility(View.INVISIBLE);
         progressBar.setVisibility(View.INVISIBLE);
         constraintLayout.setVisibility(View.VISIBLE);
+
     }
 }
