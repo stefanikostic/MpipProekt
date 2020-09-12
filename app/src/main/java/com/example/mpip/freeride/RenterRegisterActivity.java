@@ -47,12 +47,14 @@ public class RenterRegisterActivity extends AppCompatActivity implements View.On
                 String tel = et3.getText().toString();
                 String storeName = et4.getText().toString();
 
-                if(name.equals("") || surname.equals("") || tel.equals("") || !validateName() || !validateSurname() || !validatePhoneNo())
+                if(name.equals("") || surname.equals("") || tel.equals("") || storeName.equals(""))
                 {
                     Toast.makeText(v.getContext(), "Please fill out all the fields.", Toast.LENGTH_SHORT).show();
                 }
                 else
                 {
+                    if(!validateName() || !validateSurname() || !validatePhoneNo()){}
+                    else {
                         Intent fromIntent = getIntent();
                         String email = fromIntent.getStringExtra("email");
                         String pass = fromIntent.getStringExtra("pass");
@@ -65,6 +67,7 @@ public class RenterRegisterActivity extends AppCompatActivity implements View.On
                         i.putExtra("tel", tel);
                         i.putExtra("storeName", storeName);
                         startActivity(i);
+                    }
                 }
             }
         });

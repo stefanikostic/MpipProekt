@@ -49,34 +49,36 @@ public class ClientRegisterActivity extends AppCompatActivity implements View.On
                 String surname = et2.getText().toString();
                 String tel = et3.getText().toString();
 
-                if(name.equals("") || surname.equals("") || tel.equals("") || !validateName() || !validateSurname() || !validatePhoneNo())
+                if(name.equals("") || surname.equals("") || tel.equals(""))
                 {
                     Toast.makeText(v.getContext(), "Please fill out all the fields.", Toast.LENGTH_SHORT).show();
                 }
                 else
                 {
-
-                    Intent fromIntent = getIntent();
-                    String email = fromIntent.getStringExtra("email");
-                    String pass = fromIntent.getStringExtra("pass");
-                    ParseObject object = new ParseObject("Users");
-                    object.put("email", email);
-                    object.put("name", name);
-                    object.put("surname", surname);
-                    object.put("password", pass);
-                    object.put("telephone", Integer.parseInt(tel));
-                    object.saveInBackground(new SaveCallback() {
-                        @Override
-                        public void done(ParseException e) {
-                            if(e == null){
-                                Toast.makeText(getApplicationContext(), "Registration as client is successful!", Toast.LENGTH_SHORT).show();
-                                Intent i = new Intent(getApplicationContext(), LoginActivity.class);
-                                startActivity(i);
-                            }else {
-                                Toast.makeText(getApplicationContext(), "Registration failed!", Toast.LENGTH_SHORT).show();
+                    if(!validateName() || !validateSurname() || !validatePhoneNo()){}
+                    else {
+                        Intent fromIntent = getIntent();
+                        String email = fromIntent.getStringExtra("email");
+                        String pass = fromIntent.getStringExtra("pass");
+                        ParseObject object = new ParseObject("Users");
+                        object.put("email", email);
+                        object.put("name", name);
+                        object.put("surname", surname);
+                        object.put("password", pass);
+                        object.put("telephone", Integer.parseInt(tel));
+                        object.saveInBackground(new SaveCallback() {
+                            @Override
+                            public void done(ParseException e) {
+                                if (e == null) {
+                                    Toast.makeText(getApplicationContext(), "Registration as client is successful!", Toast.LENGTH_SHORT).show();
+                                    Intent i = new Intent(getApplicationContext(), LoginActivity.class);
+                                    startActivity(i);
+                                } else {
+                                    Toast.makeText(getApplicationContext(), "Registration failed!", Toast.LENGTH_SHORT).show();
+                                }
                             }
-                        }
-                    });
+                        });
+                    }
                 }
             }
         });
