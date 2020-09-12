@@ -125,7 +125,7 @@ public class RegisterActivity extends Activity implements View.OnClickListener{
         String emailPattern = "[a-zA-Z0-9._-]+@[a-z]+.+[a-z]+";
 
         if (!val.matches(emailPattern)) {
-            e4.setError("Invalid email address");
+            e4.setError("Enter a valid email address!");
             return false;
         } else {
             e4.setError(null);
@@ -138,7 +138,7 @@ public class RegisterActivity extends Activity implements View.OnClickListener{
         String passwordVal = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{4,}$";
 
         if (!val.matches(passwordVal)) {
-            e2.setError("Password is too weak");
+            e2.setError("Enter a stronger password!");
             return false;
         } else {
             e2.setError(null);
