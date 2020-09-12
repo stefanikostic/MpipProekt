@@ -71,8 +71,8 @@ public class BikeAdapter extends BaseAdapter {
             @Override
             public void onClick(View v) {
                 Intent intent = ((Activity)mContext).getIntent();
-                String renter = intent.getStringExtra("renter");
-                if(renter==null){
+                String email = intent.getStringExtra("email");
+                if(email==null){
                     Intent i = new Intent(mContext, ClientBikeActivity.class);
                     i.putExtra("bikeId", bikes[position].getId());
                     i.putExtra("client_id", clientId);

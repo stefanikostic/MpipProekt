@@ -182,11 +182,11 @@ public class LoginActivity extends Activity implements View.OnClickListener{
         Bundle extras = new Bundle();
         Intent i = new Intent(LoginActivity.this, ClientMainActivity.class);
          if(c==2){
+             extras.putString("email", s1);
              i = new Intent(LoginActivity.this, RenterMainActivity.class);
              extras.putString("renter", "true");
          }
         extras.putString("id", id);
-        extras.putString("email", s1);
         extras.putString("password", s2);
         i.putExtras(extras);
         startActivity(i);
