@@ -9,6 +9,7 @@ import android.view.View;
 import android.widget.GridView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
@@ -34,6 +35,7 @@ public class RenterRentedBikesActivity extends AppCompatActivity {
     private ProgressBar progressBar;
     private ConstraintLayout constraintLayout;
     private RelativeLayout relativeLayout;
+    TextView available;
     Timer timer;
     BikeAdapter bikeAdapter = null;
     int count;
@@ -64,6 +66,8 @@ public class RenterRentedBikesActivity extends AppCompatActivity {
                             @Override
                             public void run() {
                                 constraintLayout.setVisibility(View.VISIBLE);
+                                if(bikes.size()==0)
+                                    available.setVisibility(View.VISIBLE);
                                 progressBar.setVisibility(View.INVISIBLE);
                                 relativeLayout.setVisibility(View.INVISIBLE);
                             }
@@ -83,7 +87,9 @@ public class RenterRentedBikesActivity extends AppCompatActivity {
         getSupportActionBar().hide();
         setContentView(R.layout.activity_renter_rented_bikes);
         gridView = (GridView) findViewById(R.id.gridview_renter);
-        fab = findViewById(R.id.fab1);
+        fab = (FloatingActionButton) findViewById(R.id.fab1);
+        available = (TextView) findViewById(R.id.available);
+        available.setVisibility(View.INVISIBLE);
         constraintLayout = (ConstraintLayout) findViewById(R.id.constraintRenter);
         progressBar = (ProgressBar) findViewById(R.id.progressbar1);
         relativeLayout = (RelativeLayout) findViewById(R.id.rl1);
@@ -95,7 +101,8 @@ public class RenterRentedBikesActivity extends AppCompatActivity {
                 switch (item.getItemId()){
                     case R.id.ic_bikes:
                         Intent intent1 = new Intent(RenterRentedBikesActivity.this, RenterMainActivity.class);
-                        intent1.putExtra("email", getIntent().getStringExtra("email"));
+                        String email = getIntent().getStringExtra("email");
+                        intent1.putExtra("email", email);
                         startActivity(intent1);
                         break;
                     case R.id.ic_exit:
@@ -115,6 +122,7 @@ public class RenterRentedBikesActivity extends AppCompatActivity {
                     final String renter_id = objects.get(0).getObjectId();
                     final ParseQuery<ParseObject> query1 = new ParseQuery<ParseObject>("Bike");
                     query1.whereEqualTo("renter_id", renter_id);
+                    query1.whereEqualTo("rented", true);
                     query1.findInBackground(new FindCallback<ParseObject>() {
                         @Override
                         public void done(List<ParseObject> objects, ParseException e) {
@@ -139,8 +147,7 @@ public class RenterRentedBikesActivity extends AppCompatActivity {
                                             }
                                             Bike bike = new Bike(id, name, price, bmp, rented, location, renter_id, category_id);
                                             bikes.add(bike);
-
-                                        }}
+                                        }};
                                     handdlee();
                                 }
                             } else {
@@ -171,6 +178,7 @@ public class RenterRentedBikesActivity extends AppCompatActivity {
         relativeLayout.setVisibility(View.INVISIBLE);
         progressBar.setVisibility(View.INVISIBLE);
         constraintLayout.setVisibility(View.VISIBLE);
+        if(bikes.size() == 0)
+            available.setVisibility(View.VISIBLE);
     }
-
 }
