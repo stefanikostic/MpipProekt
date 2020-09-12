@@ -74,7 +74,7 @@ public class RentedBikeAdapter extends BaseAdapter {
                             @Override
                             public void done(ParseException e) {
                                 ParseQuery<ParseObject> query1 = new ParseQuery<ParseObject>("Rents");
-                                query1.whereEqualTo("objectId", rent_ids[position]);
+                                query1.whereEqualTo("bike_id", bikes[position].getId());
                                 query1.getFirstInBackground(new GetCallback<ParseObject>() {
                                     @Override
                                     public void done(ParseObject obj, ParseException e) {

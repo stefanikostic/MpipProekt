@@ -15,8 +15,7 @@
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
-
-    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.WAKE_LOCK"/>
     <uses-permission
             android:name="android.permission.MANAGE_DOCUMENTS"
             tools:ignore="ProtectedPermissions"/>
@@ -25,7 +24,6 @@
             tools:ignore="ProtectedPermissions"/>
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
     <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION"/>
-
 
     <application
             android:name=".App"
@@ -37,6 +35,8 @@
             android:theme="@style/AppTheme"
             android:usesCleartextTraffic="true"
             tools:targetApi="29">
+        <activity android:name=".RenterRentedBikesActivity">
+        </activity>
         <activity android:name=".RentedBikesActivity">
         </activity>
         <!--
@@ -97,11 +97,7 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-        <activity android:name=".OfferActivity">
-            <intent-filter>
-                <category android:name="android.intent.category.LAUNCHER"/>
-            </intent-filter>
-        </activity>
+
         <activity
                 android:name=".ClientRegisterActivity"
                 tools:ignore="Instantiatable">
@@ -130,17 +126,34 @@
                 android:name=".service.LocationService"
                 android:enabled="true"
                 android:exported="false"/>
-        <receiver android:name=".service.ReminderReceiver" android:enabled="true">
+
+        <receiver
+                android:name=".service.ReminderReceiver"
+                android:enabled="true">
             <intent-filter>
-                <action android:name="ALARM" />
-                <action android:name="NOTIFICATION_SERVICE" />
-                <category android:name="android.intent.category.DEFAULT" />
+                <action android:name="ALARM"/>
+                <action android:name="NOTIFICATION_SERVICE"/>
+
+                <category android:name="android.intent.category.DEFAULT"/>
             </intent-filter>
         </receiver>
-        <receiver android:name=".service.CancelRentReceiver" android:enabled="true">
+        <receiver
+                android:name=".service.ReminderLeaveReceiver"
+                android:enabled="true">
             <intent-filter>
-                <action android:name="ALARM" />
-                <category android:name="android.intent.category.DEFAULT" />
+                <action android:name="ALARM"/>
+                <action android:name="NOTIFICATION_SERVICE"/>
+
+                <category android:name="android.intent.category.DEFAULT"/>
+            </intent-filter>
+        </receiver>
+        <receiver
+                android:name=".service.CancelRentReceiver"
+                android:enabled="true">
+            <intent-filter>
+                <action android:name="ALARM"/>
+
+                <category android:name="android.intent.category.DEFAULT"/>
             </intent-filter>
         </receiver>
     </application>
