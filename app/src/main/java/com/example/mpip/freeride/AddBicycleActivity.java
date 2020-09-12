@@ -49,6 +49,7 @@ public class AddBicycleActivity extends AppCompatActivity {
     private ImageView image;
     private ImageButton imageButton;
     private FloatingActionButton addBike;
+    private FloatingActionButton deleteBike;
     private AutoCompleteTextView actv;
     private TextView perHour;
     private Button changePic;
@@ -72,6 +73,8 @@ public class AddBicycleActivity extends AppCompatActivity {
         image = (ImageView) findViewById(R.id.imageView);
         changePic = (Button) findViewById(R.id.changePic);
         addBike = (FloatingActionButton) findViewById(R.id.btn_add_bike);
+        deleteBike = (FloatingActionButton) findViewById(R.id.deleteBike);
+        deleteBike.setVisibility(View.INVISIBLE);
         actv = (AutoCompleteTextView) findViewById(R.id.category);
         perHour = (TextView) findViewById(R.id.perHour);
         perHour.setVisibility(View.INVISIBLE);
@@ -142,6 +145,7 @@ public class AddBicycleActivity extends AppCompatActivity {
                     if (objects.size() > 0) {
                         for (final ParseObject object : objects) {
                             if (object.getObjectId().equals(bikeId)) {
+                                deleteBike.setVisibility(View.VISIBLE);
                                 queryCat.whereEqualTo("objectId", object.getString("category_id"));
                                 queryCat.findInBackground(new FindCallback<ParseObject>() {
                                     @Override
@@ -202,11 +206,38 @@ public class AddBicycleActivity extends AppCompatActivity {
                 startActivityForResult(i, 1);
             }
         });
+        deleteBike.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ParseQuery<ParseObject> query1 = new ParseQuery<ParseObject>("Bike");
+                query1.whereEqualTo("objectId", bikeId);
+                query1.findInBackground(new FindCallback<ParseObject>() {
+                    @Override
+                    public void done(List<ParseObject> objects, ParseException e) {
+                        ParseObject object_for_delete = objects.get(0);
+                        object_for_delete.deleteInBackground(new DeleteCallback() {
+                            @Override
+                            public void done(ParseException e) {
+                                if(e == null){
+                                    Toast.makeText(getApplicationContext(),"Successfully removed bike!", Toast.LENGTH_SHORT).show();
+                                    Intent intent1 = new Intent(getApplicationContext(), RenterMainActivity.class);
+                                    startActivity(intent1);
+                                }else {
+                                    Toast.makeText(getApplicationContext(),"The Bike cant be removed at the moment!", Toast.LENGTH_SHORT).show();
+                                }
+                            }
+                        });
+                    }
+                });
+            }
+        });
         addBike.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(final View view) {
                 rlAdd.setVisibility(View.VISIBLE);
                 constraintAddBicycle.setVisibility(View.INVISIBLE);
+
+
                 timer = new Timer();
                 final int[] count = {0};
                 TimerTask timerTask = new TimerTask() {
@@ -257,6 +288,7 @@ public class AddBicycleActivity extends AppCompatActivity {
                                                                 Intent intent1 = new Intent(AddBicycleActivity.this, RenterMainActivity.class);
                                                                 intent1.putExtra("email", email);
                                                                 startActivity(intent1);
+
                                                             }
                                                         }
                                                     });
@@ -343,6 +375,7 @@ public class AddBicycleActivity extends AppCompatActivity {
                 image.setVisibility(View.VISIBLE);
                 imageButton.setVisibility(View.INVISIBLE);
                 changePic.setVisibility(View.VISIBLE);
+
             } catch (FileNotFoundException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
