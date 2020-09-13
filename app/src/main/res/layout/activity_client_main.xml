@@ -18,17 +18,5 @@
         android:id="@+id/include2"
         layout="@layout/content_client_main"/>
 
-    <ImageButton
-        android:id="@+id/fam"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="end|top"
-        android:layout_marginTop="6dp"
-        android:layout_marginRight="15dp"
-
-        app:srcCompat="@drawable/ic_baseline_dehaze_24"
-        tools:ignore="RtlHardcoded,VectorDrawableCompat"
-
-        />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
