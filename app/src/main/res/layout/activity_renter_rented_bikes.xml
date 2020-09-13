@@ -14,6 +14,7 @@
                      android:layout_height="350dp"
                      android:layout_centerInParent="true"
                      android:background="@drawable/circle_shape"
+                     android:indeterminateDrawable="@drawable/spinner"
                      android:progressDrawable="@drawable/circle_progress_foreground"
                      android:id="@+id/progressbar1">
 
@@ -38,7 +39,7 @@
             tools:showIn="@layout/activity_renter_main"
             tools:context=".RenterMainActivity">
         <TextView
-                android:text="Currently, all the bikes in your store are available."
+                android:text="  Currently, all the bikes in your store are available or you may not have added any bikes yet! \nTap on the plus button to add some."
                 android:layout_width="match_parent"
                 android:textSize="20sp"
                 android:gravity="center|center"

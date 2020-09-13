@@ -5,6 +5,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.text.SpannableString;
+import android.text.style.ImageSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -62,6 +64,7 @@ public class RentedBikeAdapter extends BaseAdapter {
         TextView textView = (TextView) listing.findViewById(R.id.textView);
         textView.setText(bikes[position].getName());
         final TextView rentDescription = (TextView) listing.findViewById(R.id.rentDescription);
+        final TextView rentDescription2 = (TextView) listing.findViewById(R.id.rentDescription2);
         FloatingActionButton fab = (FloatingActionButton) listing.findViewById(R.id.cancelBike);
         ParseQuery<ParseObject> query1 = new ParseQuery<ParseObject>("Rents");
         query1.whereEqualTo("objectId", rent_ids[position]);
@@ -75,10 +78,22 @@ public class RentedBikeAdapter extends BaseAdapter {
                 Date dateTo = (Date) obj.get("date_to");
                 assert dateTo != null;
                 String dateToString = getStringDateFromDate(dateTo);
-                String rentDesc = "You rented this bike from " + dateFromString + " until " + dateToString + ".";
+                String rentDesc = "  From: " + dateFromString;
+
+                ImageSpan imageSpan = new ImageSpan(((Activity)mContext).getApplicationContext(), R.drawable.ic_today);
+
+                int start = 0;
+                int end = 1;
+                int flag = 0;
                 rentDescription.setText(rentDesc);
-                rentDescription.setLines(2);
-                rentDescription.setVisibility(View.VISIBLE);
+                SpannableString spannableString = new SpannableString(rentDescription.getText());
+                spannableString.setSpan(imageSpan, start, end, flag);
+                rentDescription.setText(spannableString);
+                rentDesc = " To: " + dateToString;
+                rentDescription2.setText(rentDesc);
+                spannableString = new SpannableString(rentDescription2.getText());
+                spannableString.setSpan(imageSpan, start, end, flag);
+                rentDescription2.setText(spannableString);
             }
         });
         listing.setOnClickListener(new View.OnClickListener() {
@@ -138,11 +153,11 @@ public class RentedBikeAdapter extends BaseAdapter {
         String month = subs[1];
         String dayOfMonth = subs[2];
         String time = subs[3].substring(0, 5);
-        int hour = Integer.parseInt(time.substring(0, 2)) + 3;
+        int hour = Integer.parseInt(time.substring(0, 2));
         int minutes = Integer.parseInt(time.substring(3, 5));
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append(dayName);
-        stringBuilder.append(" ").append(month).append(" ").append(dayOfMonth).append(" ");
+        stringBuilder.append(", ").append(month).append(" ").append(dayOfMonth).append(" at ");
         stringBuilder.append(String.format("%02d", hour)).append(":").append(String.format("%02d", minutes));
         return stringBuilder.toString();
     }

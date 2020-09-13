@@ -29,10 +29,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.parse.*;
 
-import java.util.Calendar;
-import java.util.List;
-import java.util.Locale;
-import java.util.TimeZone;
+import java.util.*;
 
 import static java.util.Calendar.MONTH;
 
@@ -268,21 +265,26 @@ public class ClientBikeActivity extends AppCompatActivity {
                         @SuppressLint("ShowToast")
                         @Override
                         public void onTimeSet(TimePicker timePicker, int hourOfDay, final int minute) {
-                            startHour = hourOfDay;
-                            startMinute = minute;
-                            startAlarm.set(Calendar.HOUR_OF_DAY, startHour - 1);
-                            startAlarm.set(Calendar.MINUTE, startMinute);
-                            startAlarm.set(Calendar.SECOND, 0);
-                            startAlarm.set(Calendar.MILLISECOND, 0);
-                            pickTimeFrom.setText(String.format("%02d", hourOfDay) + ":" + String.format("%02d", minute));
-                            Toast.makeText(getApplicationContext(), "Let's add end time!", Toast.LENGTH_LONG).show();
-                            new Handler().postDelayed(new Runnable() {
-                                @Override
-                                public void run() {
-                                    titleFrom.setVisibility(View.VISIBLE);
-                                    funkcija(hour, minute);
-                                }
-                            }, 350);
+                            Calendar currentTime = Calendar.getInstance();
+                            if(hourOfDay <= currentTime.get(Calendar.HOUR_OF_DAY)){
+                                Toast.makeText(getApplicationContext(), "You can choose only an hour following from current time!", Toast.LENGTH_SHORT).show();
+                            } else {
+                                startHour = hourOfDay;
+                                startMinute = minute;
+                                startAlarm.set(Calendar.HOUR_OF_DAY, startHour - 1);
+                                startAlarm.set(Calendar.MINUTE, startMinute);
+                                startAlarm.set(Calendar.SECOND, 0);
+                                startAlarm.set(Calendar.MILLISECOND, 0);
+                                pickTimeFrom.setText(String.format("%02d", hourOfDay) + ":" + String.format("%02d", minute));
+                                Toast.makeText(getApplicationContext(), "Let's add end time!", Toast.LENGTH_LONG).show();
+                                new Handler().postDelayed(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        titleFrom.setVisibility(View.VISIBLE);
+                                        funkcija(hour, minute);
+                                    }
+                                }, 350);
+                            }
                         }
                     }, hour, minute, android.text.format.DateFormat.is24HourFormat(mContext));
                     timePickerDialog.show();
@@ -453,7 +455,7 @@ public class ClientBikeActivity extends AppCompatActivity {
                     endAlarm.set(Calendar.MILLISECOND,0);
                     beforeEndAlarm = endAlarm;
                     beforeEndAlarm.set(Calendar.HOUR_OF_DAY, endHour - 1);
-                    if(startHour >= endHour) {
+                    if(startHour >= endHour || endHour <= Calendar.getInstance().get(Calendar.HOUR_OF_DAY)) {
                         Toast.makeText(getApplicationContext(), "Invalid values of start time and end time!", Toast.LENGTH_SHORT).show();
                     } else {
                         pickTimeTo.setText(String.format("%02d", hourOfDay)+ ":" + String.format("%02d", minute));

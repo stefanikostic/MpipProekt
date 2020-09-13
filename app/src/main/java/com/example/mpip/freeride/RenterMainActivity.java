@@ -1,6 +1,7 @@
 package com.example.mpip.freeride;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
@@ -10,6 +11,8 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 
+import android.text.SpannableString;
+import android.text.style.ImageSpan;
 import android.view.MenuItem;
 import android.widget.*;
 import androidx.annotation.NonNull;
@@ -100,6 +103,14 @@ public class RenterMainActivity extends AppCompatActivity {
         gridView = (GridView) findViewById(R.id.gridview_renter);
         fab = (FloatingActionButton) findViewById(R.id.fab1);
         noBikes = (TextView) findViewById(R.id.noBikes);
+        SpannableString spannableString = new SpannableString(noBikes.getText());
+        ImageSpan imageSpan = new ImageSpan(getApplicationContext(), R.drawable.ic_cancel_red);
+        int start = 0;
+        int end = 1;
+        int flag = 0;
+        spannableString.setSpan(imageSpan, start, end, flag);
+        noBikes.setText(spannableString);
+
         constraintLayout = (ConstraintLayout) findViewById(R.id.constraintRenter);
         progressBar = (ProgressBar) findViewById(R.id.progressbar1);
         relativeLayout = (RelativeLayout) findViewById(R.id.rl1);
