@@ -10,11 +10,14 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
 import android.preference.PreferenceManager;
+import android.text.SpannableString;
+import android.text.style.ImageSpan;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.GridView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
@@ -43,6 +46,7 @@ public class RentedBikesActivity extends AppCompatActivity implements SharedPref
     int count = 0;
     Timer timer;
     private double myLong;
+    TextView noBikes;
     private ProgressBar progressBar;
     private ConstraintLayout constraintLayout;
     private RelativeLayout relativeLayout;
@@ -73,6 +77,7 @@ public class RentedBikesActivity extends AppCompatActivity implements SharedPref
         progressBar.setVisibility(View.VISIBLE);
         relativeLayout.setVisibility(View.VISIBLE);
         constraintLayout.setVisibility(View.INVISIBLE);
+
         count = 0;
         TimerTask timerTask = new TimerTask() {
             @Override
@@ -117,6 +122,15 @@ public class RentedBikesActivity extends AppCompatActivity implements SharedPref
         Intent i = getIntent();
         constraintLayout = (ConstraintLayout) findViewById(R.id.constraintRented);
         clientId = i.getStringExtra("client_id");
+        noBikes = (TextView) findViewById(R.id.noBikes);
+        SpannableString spannableString = new SpannableString(noBikes.getText());
+        ImageSpan imageSpan = new ImageSpan(getApplicationContext(), R.drawable.ic_cancel_red);
+        int start = 0;
+        int end = 1;
+        int flag = 0;
+        spannableString.setSpan(imageSpan, start, end, flag);
+        noBikes.setText(spannableString);
+
         BottomNavigationView bottomNavigationView = (BottomNavigationView) findViewById(R.id.navigation_view2);
         bottomNavigationView.getMenu().getItem(1).setChecked(true);
         bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -134,8 +148,6 @@ public class RentedBikesActivity extends AppCompatActivity implements SharedPref
                         startActivity(intent3);
                         break;
                 }
-
-
                 return false;
             }
         });
@@ -175,6 +187,8 @@ public class RentedBikesActivity extends AppCompatActivity implements SharedPref
                                             } catch (ParseException ex) {
                                                 ex.printStackTrace();
                                             }
+                                        } else {
+                                            noBikes.setVisibility(View.VISIBLE);
                                         }
                                     }
                                 }

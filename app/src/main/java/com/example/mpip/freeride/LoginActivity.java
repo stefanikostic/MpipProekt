@@ -45,8 +45,6 @@ public class LoginActivity extends Activity implements View.OnClickListener, Vie
         if(i == KeyEvent.KEYCODE_ENTER &&  keyEvent.getAction() == KeyEvent.ACTION_DOWN){
                 funkcija();
 
-
-
         }
 
         return false;
