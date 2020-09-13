@@ -6,13 +6,19 @@ import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Looper;
 import android.preference.PreferenceManager;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.GridView;
+import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import com.example.mpip.freeride.domain.Bike;
 import com.example.mpip.freeride.service.LocationService;
 import com.example.mpip.freeride.service.SendLocationToActivity;
@@ -26,16 +32,24 @@ import org.greenrobot.eventbus.ThreadMode;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class RentedBikesActivity extends AppCompatActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
     private ArrayList<Bike> onlyBikes = new ArrayList<>();
     private GridView gridView;
     private String clientId;
     private double myLat;
+    int count = 0;
+    Timer timer;
     private double myLong;
+    private ProgressBar progressBar;
+    private ConstraintLayout constraintLayout;
+    private RelativeLayout relativeLayout;
     private ArrayList<String> rents_ids = new ArrayList<>();
     private LocationService locationService;
     private boolean mBound = false;
+    RentedBikeAdapter bikeAdapter;
 
     private final ServiceConnection mServiceConnection = new ServiceConnection() {
         @Override
@@ -51,13 +65,57 @@ public class RentedBikesActivity extends AppCompatActivity implements SharedPref
             mBound = false;
         }
     };
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        timer = new Timer();
+        progressBar.setVisibility(View.VISIBLE);
+        relativeLayout.setVisibility(View.VISIBLE);
+        constraintLayout.setVisibility(View.INVISIBLE);
+        count = 0;
+        TimerTask timerTask = new TimerTask() {
+            @Override
+            public void run() {
+                count++;
+                progressBar.setProgress(count);
+                if(count == 15){
+                    timer.cancel();
+                    if(bikeAdapter != null){
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                handle();
+                            }
+                        });
+                    } else {
+                        new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                //Do something here
+                                constraintLayout.setVisibility(View.VISIBLE);
+                                //if(onlyBikes.size()==0)
+                                //  available.setVisibility(View.VISIBLE);
+                                progressBar.setVisibility(View.INVISIBLE);
+                                relativeLayout.setVisibility(View.INVISIBLE);
+                            }
+                        }, 2000);
+                    }
+                }
+            }
+        };
+        timer.schedule(timerTask, 0, 100);
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getSupportActionBar().hide();
         setContentView(R.layout.activity_rented_bikes);
         gridView = (GridView) findViewById(R.id.gridview_bikes2);
+        relativeLayout = (RelativeLayout) findViewById(R.id.rl1);
+        progressBar = (ProgressBar) findViewById(R.id.progressbar1);
         Intent i = getIntent();
+        constraintLayout = (ConstraintLayout) findViewById(R.id.constraintRented);
         clientId = i.getStringExtra("client_id");
         BottomNavigationView bottomNavigationView = (BottomNavigationView) findViewById(R.id.navigation_view2);
         bottomNavigationView.getMenu().getItem(1).setChecked(true);
@@ -138,8 +196,19 @@ public class RentedBikesActivity extends AppCompatActivity implements SharedPref
             arr[j] = bd;
             j++;
         }
-        RentedBikeAdapter bikeAdapter = new RentedBikeAdapter(RentedBikesActivity.this, arr, rents_ids.toArray(new String[0]), clientId, myLat, myLong);
+        bikeAdapter = new RentedBikeAdapter(RentedBikesActivity.this, arr, rents_ids.toArray(new String[0]), clientId, myLat, myLong);
         gridView.setAdapter(bikeAdapter);
+        new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                //Do something here
+                constraintLayout.setVisibility(View.VISIBLE);
+                //if(onlyBikes.size()==0)
+                //  available.setVisibility(View.VISIBLE);
+                progressBar.setVisibility(View.INVISIBLE);
+                relativeLayout.setVisibility(View.INVISIBLE);
+            }
+        }, 2000);
     }
 
     @Override
