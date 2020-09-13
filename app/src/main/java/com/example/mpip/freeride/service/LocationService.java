@@ -133,29 +133,6 @@ public class LocationService extends Service {
             mNotificationManager.notify(NOTI_ID, getNotification());*/
     }
 
-    private Notification getNotification() {
-        Intent intent = new Intent(this, LocationSettingsStates.class);
-        String text = Common.getLocationText(mLocation);
-        intent.putExtra(EXTRA_STARTED_FROM_NOTIFICATION, true);
-        PendingIntent servicePendingIntent = PendingIntent.getService(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-        PendingIntent activityPendingIntent = PendingIntent.getActivity(this, 0, new Intent(this, ClientMainActivity.class), 0);
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(this)
-                .addAction(R.drawable.ic_launch_black_24dp, "Launch", activityPendingIntent)
-                .addAction(R.drawable.ic_cancel_black_24dp, "Remove", servicePendingIntent)
-                .setContentText(text)
-                .setContentTitle(Common.getLocationTitle(this))
-                .setOngoing(true)
-                .setPriority(Notification.PRIORITY_HIGH)
-                .setSmallIcon(R.mipmap.ic_launcher)
-                .setTicker(text)
-                .setWhen(System.currentTimeMillis());
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
-        {
-            builder.setChannelId(CHANNEL_ID);
-        }
-        return builder.build();
-
-    }
 
     private boolean serviceIsRunningInForeGround(Context context) {
         ActivityManager manager = (ActivityManager) getApplicationContext().getSystemService(context.ACTIVITY_SERVICE);

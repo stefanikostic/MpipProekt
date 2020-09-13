@@ -35,7 +35,6 @@ import com.example.mpip.freeride.domain.BikeDistance;
 import com.example.mpip.freeride.service.Common;
 import com.example.mpip.freeride.service.LocationService;
 import com.example.mpip.freeride.service.SendLocationToActivity;
-import com.getbase.floatingactionbutton.FloatingActionsMenu;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
@@ -175,9 +174,11 @@ public class ClientMainActivity extends AppCompatActivity implements SharedPrefe
 
                     }
                 }).check();
-
+        String categoryId = getIntent().getStringExtra("categoryId");
         final ParseQuery<ParseObject> query = new ParseQuery<ParseObject>("Bike");
         query.whereEqualTo("rented", false);
+        if(categoryId!=null)
+            query.whereEqualTo("category_id", categoryId);
         query.findInBackground(new FindCallback<ParseObject>() {
             @Override
             public void done(List<ParseObject> objects, ParseException e) {
@@ -212,6 +213,7 @@ public class ClientMainActivity extends AppCompatActivity implements SharedPrefe
                     @Override
                     public void onClick(View v) {
                         Intent i = new Intent(ClientMainActivity.this, DialogActivity.class);
+                        i.putExtra("client_id", clientId);
                         startActivity(i);
                     }
                 });
