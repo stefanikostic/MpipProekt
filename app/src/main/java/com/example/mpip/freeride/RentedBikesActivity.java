@@ -1,26 +1,56 @@
 package com.example.mpip.freeride;
 
+import android.content.ComponentName;
 import android.content.Intent;
+import android.content.ServiceConnection;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.os.IBinder;
+import android.preference.PreferenceManager;
 import android.view.MenuItem;
 import android.widget.GridView;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import com.example.mpip.freeride.domain.Bike;
+import com.example.mpip.freeride.service.LocationService;
+import com.example.mpip.freeride.service.SendLocationToActivity;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.parse.*;
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class RentedBikesActivity extends AppCompatActivity {
+public class RentedBikesActivity extends AppCompatActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
     private ArrayList<Bike> onlyBikes = new ArrayList<>();
     private GridView gridView;
     private String clientId;
+    private double myLat;
+    private double myLong;
     private ArrayList<String> rents_ids = new ArrayList<>();
+    private LocationService locationService;
+    private boolean mBound = false;
+
+    private final ServiceConnection mServiceConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder iBinder) {
+            LocationService.LocalBinder binder = (LocationService.LocalBinder)iBinder;
+            locationService = binder.getService();
+            mBound = true;
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            locationService = null;
+            mBound = false;
+        }
+    };
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -108,7 +138,40 @@ public class RentedBikesActivity extends AppCompatActivity {
             arr[j] = bd;
             j++;
         }
-        RentedBikeAdapter bikeAdapter = new RentedBikeAdapter(RentedBikesActivity.this, arr, rents_ids.toArray(new String[0]), clientId);
+        RentedBikeAdapter bikeAdapter = new RentedBikeAdapter(RentedBikesActivity.this, arr, rents_ids.toArray(new String[0]), clientId, myLat, myLong);
         gridView.setAdapter(bikeAdapter);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        PreferenceManager.getDefaultSharedPreferences(this)
+                .registerOnSharedPreferenceChangeListener(this);
+        EventBus.getDefault().register(this);
+    }
+
+    @Override
+    protected void onStop() {
+        if(mBound) {
+            unbindService(mServiceConnection);
+            mBound = false;
+        }
+        PreferenceManager.getDefaultSharedPreferences(this)
+                .unregisterOnSharedPreferenceChangeListener(this);
+        EventBus.getDefault().unregister(this);
+        super.onStop();
+    }
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+//        if(key.equals(Common.KEY_REQUESTING_LOCATION_UPDATES))
+    }
+
+    @Subscribe(sticky = true, threadMode = ThreadMode.MAIN)
+    public void onListenLocation(SendLocationToActivity event) throws FileNotFoundException {
+        if(event != null) {
+            myLat = event.getLocation().getLatitude();
+            myLong = event.getLocation().getLongitude();
+        }
     }
 }
