@@ -1,6 +1,8 @@
 package com.example.mpip.freeride;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.Button;
 
 import androidx.annotation.Nullable;
@@ -14,6 +16,7 @@ public class DialogActivity extends AppCompatActivity {
     String id4="SupXrlr0Mv";
     String id5="aoKHGh6oF5";
     String id6="PuoiQal9ed";
+    Intent i;
 
 
     @Override
@@ -26,5 +29,59 @@ public class DialogActivity extends AppCompatActivity {
         roadBike=(Button)findViewById(R.id.button5);
         comfortBike=(Button)findViewById(R.id.button6);
         mountainBike=(Button)findViewById(R.id.button7);
+
+        bmx.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                i=new Intent(DialogActivity.this, ClientMainActivity.class);
+                i.putExtra("categoryId", id1);
+                startActivity(i);
+            }
+        });
+
+        beachCruiser.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                i=new Intent(DialogActivity.this, ClientMainActivity.class);
+                i.putExtra("categoryId", id2);
+                startActivity(i);
+            }
+        });
+
+        commutingBike.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                i=new Intent(DialogActivity.this, ClientMainActivity.class);
+                i.putExtra("categoryId", id3);
+                startActivity(i);
+            }
+        });
+
+        roadBike.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                i=new Intent(DialogActivity.this, ClientMainActivity.class);
+                i.putExtra("categoryId", id4);
+                startActivity(i);
+            }
+        });
+
+        comfortBike.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                i=new Intent(DialogActivity.this, ClientMainActivity.class);
+                i.putExtra("categoryId", id5);
+                startActivity(i);
+            }
+        });
+
+        mountainBike.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                i=new Intent(DialogActivity.this, ClientMainActivity.class);
+                i.putExtra("categoryId", id6);
+                startActivity(i);
+            }
+        });
     }
 }
