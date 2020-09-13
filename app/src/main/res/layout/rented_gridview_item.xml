@@ -97,12 +97,12 @@
                     android:src="@drawable/ic_cancel"
                     card_view:layout_constraintEnd_toEndOf="parent"
                     card_view:layout_constraintTop_toBottomOf="@+id/icon"
-                    card_view:layout_constraintStart_toEndOf="@+id/rentDescription" android:layout_marginTop="8dp"/>
+                    card_view:layout_constraintStart_toEndOf="@+id/rentDescription"/>
 
             <TextView
                     android:id="@+id/rentDescription"
-                    android:layout_width="246dp"
-                    android:layout_height="56dp"
+                    android:layout_width="178dp"
+                    android:layout_height="64dp"
                     android:layout_gravity="bottom"
                     android:text="TextView"
                     android:paddingStart="@dimen/fab_margin"
@@ -111,7 +111,7 @@
                     android:textColor="#000"
                     card_view:layout_constraintTop_toBottomOf="@+id/icon" android:layout_marginBottom="8dp"
                     card_view:layout_constraintBottom_toBottomOf="parent"
-                    card_view:layout_constraintStart_toStartOf="parent" card_view:layout_constraintVertical_bias="0.0"
+                    card_view:layout_constraintStart_toStartOf="parent" card_view:layout_constraintVertical_bias="0.142"
                     card_view:layout_constraintEnd_toStartOf="@+id/cancelBike"
             />
         </androidx.constraintlayout.widget.ConstraintLayout>

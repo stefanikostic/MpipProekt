@@ -39,7 +39,7 @@
         tools:showIn="@layout/activity_renter_main"
         tools:context=".RenterMainActivity">
     <TextView
-            android:text="Currently, all the bikes in your store are busy or you may not have added any bikes yet! \nClick on the plus button to add some."
+            android:text="Currently, all the bikes in your store are busy or you may not have added any bikes yet! \Tap on the plus button to add some."
             android:layout_width="match_parent"
             android:textSize="20sp"
             android:gravity="center_vertical"
