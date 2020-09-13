@@ -98,7 +98,14 @@
             </intent-filter>
         </activity>
 
-        <activity
+        <activity android:name=".DialogActivity">
+        <intent-filter>
+            <category android:name="android.intent.category.LAUNCHER"/>
+        </intent-filter>
+    </activity>
+
+
+    <activity
                 android:name=".ClientRegisterActivity"
                 tools:ignore="Instantiatable">
             <intent-filter>
