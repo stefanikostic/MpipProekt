@@ -1,6 +1,7 @@
 package com.example.mpip.freeride;
 
 import android.Manifest;
+import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.*;
 import android.content.pm.PackageManager;
@@ -17,6 +18,7 @@ import android.preference.PreferenceManager;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.GridView;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
@@ -33,6 +35,7 @@ import com.example.mpip.freeride.domain.BikeDistance;
 import com.example.mpip.freeride.service.Common;
 import com.example.mpip.freeride.service.LocationService;
 import com.example.mpip.freeride.service.SendLocationToActivity;
+import com.getbase.floatingactionbutton.FloatingActionsMenu;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
@@ -60,6 +63,7 @@ import java.util.*;
 public class ClientMainActivity extends AppCompatActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
     private ProgressBar progressBar;
     private ConstraintLayout constraintLayout;
+    ImageView fam;
     int count = 0;
     Timer timer;
     private LocationService locationService;
@@ -123,6 +127,7 @@ public class ClientMainActivity extends AppCompatActivity implements SharedPrefe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_client_main);
         gridView=(GridView) findViewById(R.id.gridview_bikes1);
+        fam = (ImageView) findViewById(R.id.fam);
         constraintLayout = (ConstraintLayout) findViewById(R.id.constraintClient);
         progressBar = (ProgressBar) findViewById(R.id.progressbar);
         rl = (RelativeLayout) findViewById(R.id.rl);
@@ -202,6 +207,14 @@ public class ClientMainActivity extends AppCompatActivity implements SharedPrefe
                 } else {
                     e.printStackTrace();
                 }
+
+                fam.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent i = new Intent(ClientMainActivity.this, DialogActivity.class);
+                        startActivity(i);
+                    }
+                });
             }
         });
     }
