@@ -37,7 +37,20 @@ import com.parse.SignUpCallback;
 import java.util.List;
 import java.util.Objects;
 
-public class LoginActivity extends Activity implements View.OnClickListener{
+public class LoginActivity extends Activity implements View.OnClickListener, View.OnKeyListener{
+
+    @Override
+    public boolean onKey(View view, int i, KeyEvent keyEvent) {
+
+        if(i == KeyEvent.KEYCODE_ENTER &&  keyEvent.getAction() == KeyEvent.ACTION_DOWN){
+                funkcija();
+
+
+
+        }
+
+        return false;
+    }
 
     InputMethodManager inputMethodManager;
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
@@ -88,6 +101,7 @@ public class LoginActivity extends Activity implements View.OnClickListener{
         e2 = (EditText) findViewById(R.id.login_pass);
         e1.setOnClickListener(this);
         e2.setOnClickListener(this);
+        e2.setOnKeyListener(this);
 
         constraintLayout = (ConstraintLayout) findViewById(R.id.constrainLayout);
         Logo = (ImageView) findViewById(R.id.Logo);
@@ -104,77 +118,75 @@ public class LoginActivity extends Activity implements View.OnClickListener{
             }
         });
 
+
         sign.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-
-                s1 = e1.getText().toString();
-                s2 = e2.getText().toString();
-
-
-                    final ParseQuery<ParseObject> query = new ParseQuery<ParseObject>("Renters");
-                    query.whereEqualTo("email",e1.getText().toString());
-                    query.findInBackground(new FindCallback<ParseObject>() {
-                        @Override
-                        public void done(List<ParseObject> objects, ParseException e) {
-                            if(e == null){
-                                if(objects.size()>0){
-                                 for(ParseObject object : objects){
-                                     if(object.getString("password").matches(e2.getText().toString())){
-                                         id = object.getObjectId();
-                                         goToNextActivity(2);
-                                     }else {
-                                         Toast.makeText(getApplicationContext(),"Incorrect password or username", Toast.LENGTH_SHORT).show();
-
-                                     }
-
-                                 }
-
-                                }else {
-                                    final ParseQuery<ParseObject> query = new ParseQuery<ParseObject>("Users");
-                                    query.whereEqualTo("email", e1.getText().toString());
-                                    query.findInBackground(new FindCallback<ParseObject>() {
-                                        @Override
-                                        public void done(List<ParseObject> objects, ParseException e) {
-                                            if(e == null){
-                                                if(objects.size() > 0 ){
-                                                    for(ParseObject object : objects){
-                                                        if(object.getString("password").matches(e2.getText().toString())){
-                                                            id = object.getObjectId();
-                                                            goToNextActivity(1);
-                                                        }else {
-                                                            Toast.makeText(getApplicationContext(),"Incorrect password or username", Toast.LENGTH_SHORT).show();
-
-                                                        }
-                                                    }
-                                                }
-                                                else {
-                                                    Toast.makeText(getApplicationContext(),"Incorrect password or username", Toast.LENGTH_SHORT).show();
-
-                                                }
-                                            }else {
-                                                Toast.makeText(getApplicationContext(),"Incorrect password or username", Toast.LENGTH_SHORT).show();
-                                            }
-                                        }
-                                    });
-                                }
-                            }else {
-
-
-
-
-                            }
-                        }
-                    });
-
+                funkcija();
                 }
-
         });
 
         ParseAnalytics.trackAppOpenedInBackground(getIntent());
     }
 
+    public void funkcija() {
+        s1 = e1.getText().toString();
+        s2 = e2.getText().toString();
+        final ParseQuery<ParseObject> query = new ParseQuery<ParseObject>("Renters");
+        query.whereEqualTo("email",e1.getText().toString());
+        query.findInBackground(new FindCallback<ParseObject>() {
+            @Override
+            public void done(List<ParseObject> objects, ParseException e) {
+                if(e == null){
+                    if(objects.size()>0){
+                        for(ParseObject object : objects){
+                            if(object.getString("password").matches(e2.getText().toString())){
+                                id = object.getObjectId();
+                                goToNextActivity(2);
+                            }else {
+                                Toast.makeText(getApplicationContext(),"Incorrect password or username", Toast.LENGTH_SHORT).show();
+
+                            }
+
+                        }
+
+                    }else {
+                        final ParseQuery<ParseObject> query = new ParseQuery<ParseObject>("Users");
+                        query.whereEqualTo("email", e1.getText().toString());
+                        query.findInBackground(new FindCallback<ParseObject>() {
+                            @Override
+                            public void done(List<ParseObject> objects, ParseException e) {
+                                if(e == null){
+                                    if(objects.size() > 0 ){
+                                        for(ParseObject object : objects){
+                                            if(object.getString("password").matches(e2.getText().toString())){
+                                                id = object.getObjectId();
+                                                goToNextActivity(1);
+                                            }else {
+                                                Toast.makeText(getApplicationContext(),"Incorrect password or username", Toast.LENGTH_SHORT).show();
+
+                                            }
+                                        }
+                                    }
+                                    else {
+                                        Toast.makeText(getApplicationContext(),"Incorrect password or username", Toast.LENGTH_SHORT).show();
+
+                                    }
+                                }else {
+                                    Toast.makeText(getApplicationContext(),"Incorrect password or username", Toast.LENGTH_SHORT).show();
+                                }
+                            }
+                        });
+                    }
+                }else {
+
+
+
+
+                }
+            }
+        });
+    }
 
 
     public void goToNextActivity(int c) {
