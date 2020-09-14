@@ -155,6 +155,7 @@ public class AddBicycleActivity extends AppCompatActivity {
                                             String nameCat = category.getString("name");
                                             actv.setText(nameCat);
                                             imageButton.setVisibility(View.INVISIBLE);
+                                            changePic.setVisibility(View.VISIBLE);
                                             et2.setText(object.getString("name"));
                                             int br = object.getInt("price");
                                             et.setText(String.valueOf(br));
@@ -280,6 +281,17 @@ public class AddBicycleActivity extends AppCompatActivity {
                                                     parseObject.put("price", price);
                                                     parseObject.put("name", modelName);
                                                     parseObject.put("category_id", category_id);
+                                                    Bitmap bitmap = null;
+                                                    try {
+                                                        bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), uri);
+                                                    } catch (IOException ex) {
+                                                        ex.printStackTrace();
+                                                    }
+                                                    ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                                                    bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
+                                                    final byte[] byteArray = stream.toByteArray();
+                                                    final ParseFile file = new ParseFile("image", byteArray);
+                                                    parseObject.put("image", file);
                                                     parseObject.saveInBackground(new SaveCallback() {
                                                         @Override
                                                         public void done(ParseException e) {

@@ -23,6 +23,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import com.example.mpip.freeride.domain.Bike;
+import com.example.mpip.freeride.domain.RentedBike;
 import com.example.mpip.freeride.service.LocationService;
 import com.example.mpip.freeride.service.SendLocationToActivity;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -33,13 +34,10 @@ import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
 import java.io.FileNotFoundException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.*;
 
 public class RentedBikesActivity extends AppCompatActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
-    private ArrayList<Bike> onlyBikes = new ArrayList<>();
+    private ArrayList<RentedBike> onlyBikes = new ArrayList<>();
     private GridView gridView;
     private String clientId;
     private double myLat;
@@ -53,7 +51,7 @@ public class RentedBikesActivity extends AppCompatActivity implements SharedPref
     private ArrayList<String> rents_ids = new ArrayList<>();
     private LocationService locationService;
     private boolean mBound = false;
-    RentedBikeAdapter bikeAdapter;
+    RentedBikeAdapter bikeAdapter = null;
 
     private final ServiceConnection mServiceConnection = new ServiceConnection() {
         @Override
@@ -77,14 +75,13 @@ public class RentedBikesActivity extends AppCompatActivity implements SharedPref
         progressBar.setVisibility(View.VISIBLE);
         relativeLayout.setVisibility(View.VISIBLE);
         constraintLayout.setVisibility(View.INVISIBLE);
-
         count = 0;
         TimerTask timerTask = new TimerTask() {
             @Override
             public void run() {
                 count++;
                 progressBar.setProgress(count);
-                if(count == 15){
+                if(count == 100){
                     timer.cancel();
                     if(bikeAdapter != null){
                         runOnUiThread(new Runnable() {
@@ -93,18 +90,6 @@ public class RentedBikesActivity extends AppCompatActivity implements SharedPref
                                 handle();
                             }
                         });
-                    } else {
-                        new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
-                            @Override
-                            public void run() {
-                                //Do something here
-                                constraintLayout.setVisibility(View.VISIBLE);
-                                //if(onlyBikes.size()==0)
-                                //  available.setVisibility(View.VISIBLE);
-                                progressBar.setVisibility(View.INVISIBLE);
-                                relativeLayout.setVisibility(View.INVISIBLE);
-                            }
-                        }, 2000);
                     }
                 }
             }
@@ -121,6 +106,7 @@ public class RentedBikesActivity extends AppCompatActivity implements SharedPref
         progressBar = (ProgressBar) findViewById(R.id.progressbar1);
         Intent i = getIntent();
         constraintLayout = (ConstraintLayout) findViewById(R.id.constraintRented);
+        constraintLayout.setVisibility(View.INVISIBLE);
         clientId = i.getStringExtra("client_id");
         noBikes = (TextView) findViewById(R.id.noBikes);
         SpannableString spannableString = new SpannableString(noBikes.getText());
@@ -158,16 +144,18 @@ public class RentedBikesActivity extends AppCompatActivity implements SharedPref
             public void done(List<ParseObject> objects, ParseException e) {
                 if (e == null) {
                     if (objects.size() > 0) {
-                        for (ParseObject o : objects) {
-                            rents_ids.add(o.getObjectId());
+                        for (final ParseObject obj: objects) {
+                            rents_ids.add(obj.getObjectId());
                             final ParseQuery<ParseObject> query1 = new ParseQuery<ParseObject>("Bike");
-                            query1.whereEqualTo("objectId", o.getString("bike_id"));
+                            query1.whereEqualTo("objectId", obj.getString("bike_id"));
                             query1.findInBackground(new FindCallback<ParseObject>() {
                                 @Override
                                 public void done(List<ParseObject> list, ParseException e) {
                                     if (e == null){
                                         if(list.size() > 0){
                                             ParseObject o = list.get(0);
+                                            String dateFrom = getStringDateFromDate((Date) obj.get("date_from"));
+                                            String dateTo = getStringDateFromDate((Date) obj.get("date_to"));
                                             String bikeId = o.getObjectId();
                                             String name = o.getString("name");
                                             int price = o.getInt("price");
@@ -182,20 +170,20 @@ public class RentedBikesActivity extends AppCompatActivity implements SharedPref
                                                 assert img != null;
                                                 Bitmap bitmap = BitmapFactory.decodeByteArray(img.getData(), 0, img.getData().length);
                                                 Bike bike = new Bike(bikeId, name, price, bitmap, rented, location, renter_id, category_id);
-                                                onlyBikes.add(bike);
-                                                handle();
+                                                onlyBikes.add(new RentedBike(bike, " From: " +dateFrom, " To: " + dateTo));
                                             } catch (ParseException ex) {
                                                 ex.printStackTrace();
                                             }
-                                        } else {
-                                            noBikes.setVisibility(View.VISIBLE);
                                         }
                                     }
                                 }
                             });
                         }
                     }
-
+                    else {
+                        if(onlyBikes.size() == 0)
+                            noBikes.setVisibility(View.VISIBLE);
+                    }
                 } else {
                     e.printStackTrace();
                 }
@@ -203,31 +191,24 @@ public class RentedBikesActivity extends AppCompatActivity implements SharedPref
         });
     }
 
-    void handle(){
-        Bike [] arr = new Bike[onlyBikes.size()];
+    void handle() {
+        RentedBike[] arr = new RentedBike[onlyBikes.size()];
         int j = 0;
-        for(Bike bd : onlyBikes){
+        for (RentedBike bd : onlyBikes) {
             arr[j] = bd;
             j++;
         }
         bikeAdapter = new RentedBikeAdapter(RentedBikesActivity.this, arr, rents_ids.toArray(new String[0]), clientId, myLat, myLong);
         gridView.setAdapter(bikeAdapter);
-        new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                //Do something here
-                constraintLayout.setVisibility(View.VISIBLE);
-                //if(onlyBikes.size()==0)
-                //  available.setVisibility(View.VISIBLE);
-                progressBar.setVisibility(View.INVISIBLE);
-                relativeLayout.setVisibility(View.INVISIBLE);
-            }
-        }, 2000);
+        progressBar.setVisibility(View.INVISIBLE);
+        relativeLayout.setVisibility(View.INVISIBLE);
+        constraintLayout.setVisibility(View.VISIBLE);
     }
 
     @Override
     protected void onStart() {
         super.onStart();
+        handle();
         PreferenceManager.getDefaultSharedPreferences(this)
                 .registerOnSharedPreferenceChangeListener(this);
         EventBus.getDefault().register(this);
@@ -255,6 +236,22 @@ public class RentedBikesActivity extends AppCompatActivity implements SharedPref
         if(event != null) {
             myLat = event.getLocation().getLatitude();
             myLong = event.getLocation().getLongitude();
+
         }
+    }
+
+    private String getStringDateFromDate(Date dateFrom) {
+        String [] subs = dateFrom.toString().split(" ");
+        String dayName = subs[0];
+        String month = subs[1];
+        String dayOfMonth = subs[2];
+        String time = subs[3].substring(0, 5);
+        int hour = Integer.parseInt(time.substring(0, 2));
+        int minutes = Integer.parseInt(time.substring(3, 5));
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append(dayName);
+        stringBuilder.append(", ").append(month).append(" ").append(dayOfMonth).append(" at ");
+        stringBuilder.append(String.format("%02d", hour)).append(":").append(String.format("%02d", minutes));
+        return stringBuilder.toString();
     }
 }

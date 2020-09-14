@@ -72,10 +72,8 @@
 
         <ImageView
                 android:id="@+id/icon"
-                android:layout_width="344dp"
+                android:layout_width="354dp"
                 android:layout_height="161dp"
-                android:scaleType="fitXY"
-                android:paddingEnd="40dp"
                 android:layout_gravity="center_horizontal"
                 android:layout_marginBottom="611dp"
                 android:layout_marginTop="70dp"/>

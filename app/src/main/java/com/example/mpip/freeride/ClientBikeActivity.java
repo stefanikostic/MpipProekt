@@ -86,6 +86,7 @@ public class ClientBikeActivity extends AppCompatActivity {
         final int mMonth = calendar.get(MONTH);
         final int mYear = calendar.get(Calendar.YEAR);
         BottomNavigationView bottomNavigationView = (BottomNavigationView) findViewById(R.id.navigation_view3);
+        bottomNavigationView.getMenu().setGroupCheckable(0, false, true);
         bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
@@ -266,7 +267,7 @@ public class ClientBikeActivity extends AppCompatActivity {
                         @Override
                         public void onTimeSet(TimePicker timePicker, int hourOfDay, final int minute) {
                             Calendar currentTime = Calendar.getInstance();
-                            if(hourOfDay <= currentTime.get(Calendar.HOUR_OF_DAY)){
+                            if(startDay == currentTime.get(Calendar.DAY_OF_MONTH) && hourOfDay <= currentTime.get(Calendar.HOUR_OF_DAY)){
                                 Toast.makeText(getApplicationContext(), "You can choose only an hour following from current time!", Toast.LENGTH_SHORT).show();
                             } else {
                                 startHour = hourOfDay;
@@ -359,12 +360,19 @@ public class ClientBikeActivity extends AppCompatActivity {
         object.put("client_id", clientId);
         object.put("bike_id", id);
         object.put("price", total);
-        object.put("date_from", startAlarm.getTime());
 
-        if(pickDateTo.getVisibility()!=View.INVISIBLE)
+        if(pickDateTo.getVisibility()!=View.INVISIBLE) {
+            object.put("date_from", date1.getTime());
             object.put("date_to", date2.getTime());
-        else
-            object.put("date_to", endAlarm.getTime());
+        }
+        else {
+            Calendar begin_date = startAlarm;
+            begin_date.set(Calendar.HOUR_OF_DAY, startAlarm.get(Calendar.HOUR_OF_DAY)+1);
+            object.put("date_from", begin_date.getTime());
+            Calendar end_date = endAlarm;
+            end_date.set(Calendar.HOUR_OF_DAY, endAlarm.get(Calendar.HOUR_OF_DAY)+1);
+            object.put("date_to", end_date.getTime());
+        }
         object.put("hours", hours);
         object.saveInBackground(new SaveCallback() {
             @Override
@@ -455,7 +463,7 @@ public class ClientBikeActivity extends AppCompatActivity {
                     endAlarm.set(Calendar.MILLISECOND,0);
                     beforeEndAlarm = endAlarm;
                     beforeEndAlarm.set(Calendar.HOUR_OF_DAY, endHour - 1);
-                    if(startHour >= endHour || endHour <= Calendar.getInstance().get(Calendar.HOUR_OF_DAY)) {
+                    if(startHour >= endHour || (endHour <= Calendar.getInstance().get(Calendar.HOUR_OF_DAY) && startDay==Calendar.getInstance().get(Calendar.DAY_OF_MONTH))) {
                         Toast.makeText(getApplicationContext(), "Invalid values of start time and end time!", Toast.LENGTH_SHORT).show();
                     } else {
                         pickTimeTo.setText(String.format("%02d", hourOfDay)+ ":" + String.format("%02d", minute));

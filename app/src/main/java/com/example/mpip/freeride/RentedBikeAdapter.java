@@ -14,6 +14,7 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 import com.example.mpip.freeride.domain.Bike;
+import com.example.mpip.freeride.domain.RentedBike;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.parse.*;
 
@@ -22,14 +23,14 @@ import java.util.Date;
 
 public class RentedBikeAdapter extends BaseAdapter {
     private Context mContext;
-    private final Bike[] bikes;
+    private final RentedBike[] bikes;
     private final String[] rent_ids;
     String clientId;
     LayoutInflater inflter;
     double myLat, myLong;
     private Calendar calendar;
 
-    public RentedBikeAdapter(Context mContext, Bike[] bikes, String[] rent_ids, String clientId, double myLat, double myLong){
+    public RentedBikeAdapter(Context mContext, RentedBike[] bikes, String[] rent_ids, String clientId, double myLat, double myLong){
         this.mContext = mContext;
         this.bikes = bikes;
         this.clientId = clientId;
@@ -58,49 +59,32 @@ public class RentedBikeAdapter extends BaseAdapter {
     public View getView(final int position, View convertView, final ViewGroup parent) {
         LayoutInflater layoutInflater = (LayoutInflater)mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         final View listing = layoutInflater.inflate(R.layout.rented_gridview_item, parent, false);
-        Bitmap bitmap = bikes[position].getImage();
+        Bitmap bitmap = bikes[position].getBike().getImage();
         final ImageView icon = (ImageView) listing.findViewById(R.id.icon); // get the reference of ImageView
         icon.setImageBitmap(bitmap); // set logo images
         TextView textView = (TextView) listing.findViewById(R.id.textView);
-        textView.setText(bikes[position].getName());
+        textView.setText(bikes[position].getBike().getName());
         final TextView rentDescription = (TextView) listing.findViewById(R.id.rentDescription);
         final TextView rentDescription2 = (TextView) listing.findViewById(R.id.rentDescription2);
         FloatingActionButton fab = (FloatingActionButton) listing.findViewById(R.id.cancelBike);
         ParseQuery<ParseObject> query1 = new ParseQuery<ParseObject>("Rents");
-        query1.whereEqualTo("objectId", rent_ids[position]);
-        query1.getFirstInBackground(new GetCallback<ParseObject>() {
-            @Override
-            public void done(ParseObject obj, ParseException e) {
-               // need to make columns for time from and time to in parse
-                Date dateFrom = (Date) obj.get("date_from");
-                assert dateFrom != null;
-                String dateFromString = getStringDateFromDate(dateFrom);
-                Date dateTo = (Date) obj.get("date_to");
-                assert dateTo != null;
-                String dateToString = getStringDateFromDate(dateTo);
-                String rentDesc = "  From: " + dateFromString;
-
-                ImageSpan imageSpan = new ImageSpan(((Activity)mContext).getApplicationContext(), R.drawable.ic_today);
-
-                int start = 0;
-                int end = 1;
-                int flag = 0;
-                rentDescription.setText(rentDesc);
-                SpannableString spannableString = new SpannableString(rentDescription.getText());
-                spannableString.setSpan(imageSpan, start, end, flag);
-                rentDescription.setText(spannableString);
-                rentDesc = " To: " + dateToString;
-                rentDescription2.setText(rentDesc);
-                spannableString = new SpannableString(rentDescription2.getText());
-                spannableString.setSpan(imageSpan, start, end, flag);
-                rentDescription2.setText(spannableString);
-            }
-        });
+        rentDescription.setText(bikes[position].getTimeFrom());
+        SpannableString spannableString = new SpannableString(rentDescription.getText());
+        ImageSpan imageSpan = new ImageSpan(((Activity)mContext).getApplicationContext(), R.drawable.ic_today);
+        int start = 0;
+        int end = 1;
+        int flag = 0;
+        spannableString.setSpan(imageSpan, start, end, flag);
+        rentDescription.setText(spannableString);
+        rentDescription2.setText(bikes[position].getTimeTo());
+        spannableString = new SpannableString(rentDescription2.getText());
+        spannableString.setSpan(imageSpan, start, end, flag);
+        rentDescription2.setText(spannableString);
         listing.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 final ParseQuery<ParseObject> query = new ParseQuery<ParseObject>("Bike");
-                query.whereEqualTo("objectId", bikes[position].getId());
+                query.whereEqualTo("objectId", bikes[position].getBike().getId());
                 query.getFirstInBackground(new GetCallback<ParseObject>() {
                     @Override
                     public void done(final ParseObject parseObject, ParseException e) {
@@ -115,7 +99,7 @@ public class RentedBikeAdapter extends BaseAdapter {
             @Override
             public void onClick(View v) {
                 final ParseQuery<ParseObject> query = new ParseQuery<ParseObject>("Bike");
-                query.whereEqualTo("objectId", bikes[position].getId());
+                query.whereEqualTo("objectId", bikes[position].getBike().getId());
                 query.getFirstInBackground(new GetCallback<ParseObject>() {
                     @Override
                     public void done(ParseObject parseObject, ParseException e) {
@@ -124,7 +108,7 @@ public class RentedBikeAdapter extends BaseAdapter {
                             @Override
                             public void done(ParseException e) {
                                 ParseQuery<ParseObject> query1 = new ParseQuery<ParseObject>("Rents");
-                                query1.whereEqualTo("bike_id", bikes[position].getId());
+                                query1.whereEqualTo("bike_id", bikes[position].getBike().getId());
                                 query1.getFirstInBackground(new GetCallback<ParseObject>() {
                                     @Override
                                     public void done(ParseObject obj, ParseException e) {

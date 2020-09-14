@@ -18,9 +18,11 @@
 
         </ProgressBar>
         <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
-                  android:text="Loading ..."
+                  android:text="Loading your\n rented bikes..."
                   android:textColor="@color/colorPrimaryDark"
                   android:gravity="bottom|center"
+                  android:textAllCaps="true"
+                  android:textAlignment="center"
                   android:layout_alignLeft="@id/progressbar1"
                   android:layout_alignTop="@id/progressbar1"
                   android:layout_alignRight="@id/progressbar1"
@@ -49,20 +51,21 @@
 
 
         <TextView
-                android:text="These bicycles are waiting for you..."
+                android:text="THESE BICYCLES ARE WAITING FOR YOU..."
                 android:layout_width="418dp"
                 android:layout_height="49dp" android:id="@+id/availableBikes"
                 app:layout_constraintStart_toStartOf="parent"
                 android:layout_marginStart="32dp"
-                android:textSize="20sp"
+                android:textSize="16sp"
                 app:layout_constraintEnd_toEndOf="parent"
-                android:paddingStart="40dp"
+                android:paddingStart="45dp"
                 android:gravity="bottom"
-                android:textStyle="italic"
+                android:layout_marginEnd="16dp"
                 android:background="@drawable/textlines"
+                android:paddingBottom="8dp"
                 android:textColor="@color/common_google_signin_btn_text_dark_focused"
                 app:layout_constraintHorizontal_bias="0.643"
-                android:layout_marginEnd="8dp" android:lineSpacingExtra="8sp" android:typeface="sans"
+                android:lineSpacingExtra="8sp" android:typeface="sans"
                 android:textAppearance="@style/TextAppearance.AppCompat.Body1"
                 app:layout_constraintTop_toTopOf="parent"
                 android:layout_marginTop="8dp" app:layout_constraintBottom_toTopOf="@+id/gridview_bikes2"
@@ -71,13 +74,14 @@
         <GridView
                 android:id="@+id/gridview_bikes2"
                 android:visibility="visible"
-                android:layout_height="545dp"
-                android:layout_width="482dp"
-                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent" android:layout_marginEnd="0dp"
+                android:layout_height="607dp"
+                android:layout_width="match_parent"
+                android:gravity="center"
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintHorizontal_bias="0.341" app:layout_constraintTop_toBottomOf="@+id/availableBikes"
-        />
+                android:layout_marginBottom="8dp" app:layout_constraintVertical_bias="0.0"/>
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
