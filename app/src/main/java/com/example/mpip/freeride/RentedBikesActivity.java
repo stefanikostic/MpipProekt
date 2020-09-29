@@ -90,6 +90,16 @@ public class RentedBikesActivity extends AppCompatActivity implements SharedPref
                                 handle();
                             }
                         });
+                    } else {
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                constraintLayout.setVisibility(View.VISIBLE);
+                                progressBar.setVisibility(View.INVISIBLE);
+                                relativeLayout.setVisibility(View.INVISIBLE);
+                            }
+                        });
+
                     }
                 }
             }
